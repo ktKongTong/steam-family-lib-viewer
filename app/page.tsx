@@ -218,15 +218,15 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center max-w-[1024px] ml-auto mr-auto">
       <Header/>
-      <div className={"flex flex-col w-full min-w-96 px-20"}>
+      <div className={"flex flex-col w-full min-w-full md:min-w-96 px-4 md:px-20"}>
         <div className={"text-lg font-semibold py-2"}>AccessToken</div>
-        <div className={'flex flex-col sm:flex-row'}>
+        <div className={'flex flex-col md:flex-row'}>
           <div
             className={"max-w-96 space-y-2"}
           >
             <Textarea
               placeholder="Type your access_token here."
-              className={'min-h-72 min-w-96'}
+              className={'min-h-80 min-w-full md:min-w-96'}
               value={tokenInput}
               onChange={(e) => {
                 setToken(e.target.value)

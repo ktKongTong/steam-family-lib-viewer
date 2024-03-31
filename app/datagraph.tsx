@@ -10,6 +10,8 @@ import html2canvas from "html2canvas";
 import {Button} from "@/components/ui/button";
 import LockBodyScroll from "@/app/lockBodyScroll";
 
+import { useMediaQuery } from "@uidotdev/usehooks";
+import {Loader, Loader2} from "lucide-react";
 
 const useComputed = (
   libs: any[],
@@ -140,23 +142,30 @@ export default function DataGraph(
     setOverlayOpen(false)
     setImgURL('')
   },[])
-  const resetImgUrl = useCallback(()=> {
-    setImgURL('')
-  },[])
+
+  const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)");
   return (
     <>
       {
-        imgURL && <div className={'absolute inset-0 bg-zinc-700/70 z-10'} onClick={resetImgUrl}>
+        overlayOpen && <div className={'absolute inset-0 bg-zinc-700/70 z-10'} onClick={closeOverlay}>
           <LockBodyScroll/>
-          <div className={'top-24 relative'}>
-            <img src={imgURL} className={'max-w-96 ml-auto mr-auto mt-24'}/>
-          </div>
+          {
+             !imgURL && <Loader2 className={'h-16 w-16 animate-spin mx-auto top-1/2 mt-36 text-white'}/>
+          }
+          {
+            imgURL && <div className={'top-4 sm:top-12 md:top-24 relative'}>
+              <div className={'relative max-w-96 ml-auto mr-auto top-4 sm:top-12 md:top-24'}>
+                <div className={'absolute -top-5 text-zinc-300 text-sm'}>手机长按保存</div>
+                <img src={imgURL} className={'w-full h-full'}/>
+              </div>
+            </div>
+          }
         </div>
       }
-      <div className={'flex flex-col items-center space-y-2 px-20'}>
+      <div className={'flex flex-col items-center space-y-2 px-2 md:px-20'}>
         <Button onClick={share} className={'ml-auto mr-2'} variant={'ghost'}>share</Button>
-        <div className={"flex flex-col items-center space-y-2 p-4"} id={'data-graph'}>
-        <div className={"flex justify-evenly items-center w-full"}>
+        <div className={"flex flex-col items-center space-y-2 p-1 md:p-4"} id={'data-graph'}>
+        <div className={"flex justify-evenly items-center w-full flex-wrap"}>
           {players.map(player => (
             <div
               key={player.steamid}
@@ -174,26 +183,26 @@ export default function DataGraph(
           ))
           }
         </div>
-        <div className={'flex space-x-2'}>
+        <div className={'flex space-x-2 md:flex-row flex-col'}>
           <ReactECharts
             option={option}
-            style={{height: 400, width: 400}}
+            style={{height: 400, width:  isSmallDevice ? window.innerWidth - 40 : 400}}
           />
           <Piegraph
             countById={cntData.map(item=>({value:item.cnt,name:item.name}))}
-            style={{height: 400, width: 400}}
+            style={{height: 400, width: isSmallDevice ? window.innerWidth - 40 : 400}}
           />
         </div>
-        <WordCloud words={dicts} height={800} width={800} className={'flex items-center'}/>
+        <WordCloud words={dicts} height={800} width={isSmallDevice ? window.innerWidth - 40:800} className={'flex items-center'}/>
         </div>
-        <div className={'grid grid-cols-6 gap-2 '}>
-          <div className={'col-span-6 text-xs text-zinc-600'}>
+        <div className={'grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1 md:gap-1 lg:gap-2 '}>
+          <div className={'col-span-3 md:col-span-5 lg:col-span-6 text-xs text-zinc-600'}>
            共 {appsForUse.length} 部作品
           </div>
           {
             appsForUse.map(app=> {
               return (
-                <div key={app.appid} className={'relative w-36 aspect-[6/9] rounded-lg text-xs text-zinc-600/60'}>
+                <div key={app.appid} className={'relative w-24 sm:w-36 md:w-36 aspect-[6/9] rounded-lg text-xs text-zinc-600/60'}>
                   <ImageWithFallback
                     fallbackSrc = {`https://cdn.akamai.steamstatic.com/steam/apps/${app.appid}/portrait.png`}
                     src={`https://cdn.akamai.steamstatic.com/steam/apps/${app.appid}/library_600x900.jpg`}

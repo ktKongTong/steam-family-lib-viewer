@@ -8,7 +8,10 @@ import {shaDigestAvatarBase64ToStrAvatarHash} from "@/lib/steam_utils";
 import DataGraph from "@/app/datagraph";
 import Header from "@/app/header";
 import {cn} from "@/lib/utils";
-
+import {Label} from "@/components/ui/label";
+import relativeTime from 'dayjs/plugin/relativeTime'
+import dayjs from "dayjs";
+dayjs.extend(relativeTime)
 
 function validToken(token:string) {
   return ""
@@ -244,8 +247,16 @@ export default function Home() {
             <div className={""}>
               {
                 jwtInfo && jwtInfo.sub &&
-                  <div>
-                      <span>steamId: {jwtInfo.sub}</span>
+                  <div className={'flex items-center space-x-2'}>
+                      <Label>steam ID</Label>
+                      <span> {jwtInfo.sub}</span>
+                  </div>
+              }
+              {
+                jwtInfo && jwtInfo.exp &&
+                  <div className={'flex items-center space-x-2'}>
+                      <Label>token 过期时间</Label>
+                      <span> {dayjs.unix(jwtInfo.exp).format('MM月DD日 HH:mm:ss')}</span>
                   </div>
               }
             </div>

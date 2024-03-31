@@ -12,6 +12,7 @@ import LockBodyScroll from "@/app/lockBodyScroll";
 
 import { useMediaQuery } from "@uidotdev/usehooks";
 import {Loader, Loader2} from "lucide-react";
+import {Overlay} from "@/app/overlay";
 
 const useComputed = (
   libs: any[],
@@ -146,24 +147,31 @@ export default function DataGraph(
   const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)");
   return (
     <>
-      {
-        overlayOpen && <div className={'absolute inset-0 bg-zinc-700/70 z-10'} onClick={closeOverlay}>
+      {overlayOpen && <div>
           <LockBodyScroll/>
-          {
-             !imgURL && <Loader2 className={'h-16 w-16 animate-spin mx-auto top-1/2 mt-36 text-white'}/>
-          }
-          {
-            imgURL && <div className={'top-4 sm:top-12 md:top-24 relative'}>
-              <div className={'relative max-w-96 ml-auto mr-auto top-4 sm:top-12 md:top-24'}>
-                <div className={'absolute -top-5 text-zinc-300 text-sm'}>手机长按保存</div>
-                <img src={imgURL} className={'w-full h-full'}/>
-              </div>
+          <Overlay onClick={() => setOverlayOpen(false)}/>
+            <div className={'w-full h-full pointer-events-none top-0 left-0 right-0 px-1 py-16 sm:px-10 sm:pt-24 fixed overflow-y-scroll z-50 block'}>
+                <div className={'pointer-events-auto  my-0 mx-auto relative'}>
+
+                  {
+                    !imgURL && <Loader2 className={'h-16 w-16 animate-spin mx-auto top-1/2 mt-36 text-white'}/>
+                  }
+
+                  {
+                    imgURL &&(
+                      <>
+                        <div className={'text-center text-zinc-300 text-sm mx-auto'}>手机长按保存</div>
+                        <img src={imgURL} className={'w-fit max-w-96 mb-4 mx-auto'}/>
+                      </>
+                    )
+                  }
+                </div>
             </div>
-          }
-        </div>
+      </div>
       }
+
       <div className={'flex flex-col items-center space-y-2 px-2 md:px-20'}>
-        <Button onClick={share} className={'ml-auto mr-2'} variant={'ghost'}>share</Button>
+      <Button onClick={share} className={'ml-auto mr-2'} variant={'ghost'}>share</Button>
         <div className={"flex flex-col items-center space-y-2 p-1 md:p-4"} id={'data-graph'}>
         <div className={"flex justify-evenly items-center w-full flex-wrap"}>
           {players.map(player => (

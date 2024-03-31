@@ -181,13 +181,13 @@ export default function Home() {
     const itemsSteps = libIds.map((item,index)=> new Step())
     setSteps([...steps,...itemsSteps])
     const res = await Promise.all(libIds.map(async (idChunk,index) => {
-      itemsSteps[index].trigger(`正在获取分块【${index * 30 + 1}-${index * 30 + 1 + idChunk.length}】的库存信息`)
+      itemsSteps[index].trigger(`正在获取分块【${index * 30 + 1}-${index * 30 + idChunk.length}】的库存信息`)
       setSteps([...steps,...itemsSteps])
       const res = await fetchFamilyLibItems(idChunk)
       if (!res || res.data.storeItems.length == 0) {
-        itemsSteps[index].failed(`分块【${index * 30 + 1}-${index * 30 + 1 + idChunk.length}】的库存信息获取失败`)
+        itemsSteps[index].failed(`分块【${index * 30 + 1}-${index * 30 + idChunk.length}】的库存详情信息获取失败`)
       }else {
-        itemsSteps[index].success(`成功获取分块【${index * 30 + 1}-${index * 30 + 1 + idChunk.length}】的库存信息`)
+        itemsSteps[index].success(`成功获取分块【${index * 30 + 1}-${index * 30 + idChunk.length}】的库存详情信息`)
       }
       setSteps([...steps,...itemsSteps])
       return res
@@ -205,8 +205,8 @@ export default function Home() {
     setAllLibs(allLib)
     setLibDictionary(libDictionary)
     const finalStep = new Step()
-    finalStep.success("已获取所有库存信息")
-    setSteps([...steps, finalStep])
+    finalStep.success("已获取库存详情信息")
+    setSteps([...steps, ...itemsSteps, finalStep])
     setDataLoaded(true)
   }
   const onSubmitWrapper = ()=> {

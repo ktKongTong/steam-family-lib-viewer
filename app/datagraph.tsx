@@ -153,7 +153,7 @@ export default function DataGraph(
           </div>
         </div>
       }
-      <div className={'flex flex-col items-center space-y-2'}>
+      <div className={'flex flex-col items-center space-y-2 px-20'}>
         <Button onClick={share} className={'ml-auto mr-2'} variant={'ghost'}>share</Button>
         <div className={"flex flex-col items-center space-y-2 p-4"} id={'data-graph'}>
         <div className={"flex justify-evenly items-center w-full"}>

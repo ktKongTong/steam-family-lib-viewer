@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+# steam-family-lib-render
+
+这是一个获取 steam 家庭共享库存的小玩具。
+可以统计一些数据，看看库存成分。
+效果如图
+
+![img.png](doc/img.png)
 
 ## Getting Started
 
-First, run the development server:
+1. 需要一个已加入新版测试家庭的 steam 账号。
+2. 在 web 端登陆 steam。
+3. 按下 F12，或右键检查打开调试面板
+![img_1.png](doc/start_1.png)
+找到类型如图所示带有 access_token的网络请求，复制。
+   ![img_1.png](doc/start_2.png)
+4. 打开本站点，填入access_token
+![img_2.png](doc/start_3.png)
+5. 点击提交，不出意外，数据已经开始获取啦。
+   ![img_2.png](doc/start_4.png)
+6. 查看结果
+ ![img_2.png](doc/start_5.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Todo
+- [ ] more filter
+- [ ] more data panel
+- [ ] ui improve
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## sponsor
+如果觉得这个玩具还不错，可以考虑赞助一杯快乐水。
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+![wechat_pay_qrcode.png](doc/wechat_pay_qrcode.png)
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

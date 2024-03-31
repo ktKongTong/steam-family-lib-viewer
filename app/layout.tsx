@@ -19,9 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-    <Head>
+    <head>
       <script defer src="https://us.umami.is/script.js" data-website-id="d049a9db-d66c-4e55-86ea-2971d1173830"></script>
-    </Head>
+    </head>
     <body className={inter.className}>{children}</body>
     </html>
   );

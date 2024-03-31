@@ -1,113 +1,281 @@
-import Image from "next/image";
+'use client'
+import _ from 'lodash'
+import React, { useMemo, useState} from 'react';
+import {jwtDecode} from "jwt-decode";
+import {Textarea} from "@/components/ui/textarea";
+import {Button} from "@/components/ui/button";
+import {shaDigestAvatarBase64ToStrAvatarHash} from "@/lib/steam_utils";
+import DataGraph from "@/app/datagraph";
+import Header from "@/app/header";
+import {cn} from "@/lib/utils";
+
+
+function validToken(token:string) {
+  return ""
+}
+
+interface Step {
+  status: string,
+  message: string
+}
+
+async function fetchFamilyInfo(token:string):Promise<null|any>{
+  const data = await fetch(`/api/steam/family?access_token=${token}`)
+    .then(res=>res.json())
+    .catch(e=> {
+      console.log(e)
+      return null
+    })
+  return data
+}
+async function fetchFamilyMembers(token:string,ids:string[]){
+  const data = await fetch(`/api/steam/player/${ids.join(',')}?access_token=${token}`)
+    .then(res=>res.json())
+    .catch(e=> {
+      console.log(e)
+      return null
+    })
+  return data
+}
+
+async function fetchFamilySharedLibs(token:string,id:string){
+  const data = await fetch(`/api/steam/family/shared/${id}?access_token=${token}`)
+    .then(res=>res.json())
+    .catch(e=> {
+      console.log(e)
+      return null
+    })
+  return data
+}
+
+async function fetchFamilyLibItems(ids:string[]){
+  const data = await fetch(`/api/steam/items/${ids.join(',')}`)
+    .then(res=>res.json())
+    .catch(e=> {
+      console.log(e)
+      return null
+    })
+  return data
+}
+
+// type StepStatus = 'ok' | 'processing' | 'error'
+enum StepStatus {
+  NotStart,
+  OK,
+  Processing,
+  Error,
+}
+class Step {
+  stepStatus: StepStatus = StepStatus.NotStart
+  message:string = ""
+  constructor(message?: string) {
+    if(message) {
+      this.message = message
+    }
+  }
+  updateStatus(status:StepStatus, message?:string) {
+    this.stepStatus = status
+    if(message) {
+      this.message = message
+    }
+  }
+  trigger (message:string){
+      this.stepStatus = StepStatus.Processing
+      this.message = message
+  }
+  failed(message: string) {
+    this.stepStatus = StepStatus.Error
+    this.message = message
+  }
+  success(message: string) {
+    this.stepStatus = StepStatus.OK
+    this.message = message
+  }
+  isTriggered() {
+    return this.stepStatus !== StepStatus.NotStart
+  }
+}
+
+const statusToEmoji = (status:StepStatus)=> {
+  if(status === StepStatus.OK) {
+    return `✅`
+  }
+  if(status === StepStatus.Processing) {
+    return `🔧`
+  }
+  if(status === StepStatus.Error) {
+    return `❌`
+  }
+}
 
 export default function Home() {
+  const [tokenInput,setToken] = useState('')
+  const jwtInfo = useMemo(()=> {
+    try {
+     const jwtInfo = jwtDecode(tokenInput)
+      return jwtInfo
+    }catch (e) {return null}
+  },[tokenInput])
+  const [steps,setSteps] = useState<Step[]>([])
+  const [inputActive, setInputActive] = useState(true)
+
+  const [allMember,setAllMember] = useState<any[]>([])
+  const [libDictionary, setLibDictionary] = useState<any>()
+  const [allLibs, setAllLibs] = useState<any[]>([])
+  const [dataLoaded,setDataLoaded] = useState(false)
+  const onSubmit = async ()=> {
+    setDataLoaded(false)
+    const familyStep = new Step()
+    const memberStep = new Step()
+    const libsStep = new Step()
+    const steps = [familyStep,memberStep,libsStep]
+    setSteps(steps)
+    familyStep.trigger('正在获取家庭信息，请稍后')
+    const familyInfo = await fetchFamilyInfo(tokenInput)
+    if (!familyInfo) {
+      familyStep.failed("获取家庭信息失败")
+      setSteps([...steps])
+      return
+    }
+    const familyName = familyInfo.data.familyGroup.name
+    const memberIds =familyInfo.data.familyGroup.members.map((member:any)=>member.steamid.toString())
+    const memberFamilyInfos = _.keyBy(familyInfo.data.familyGroup?.members, 'steamid')
+    familyStep.success(`成功获取家庭信息，你好，${familyName} 的成员，更多数据正在赶来的路上`)
+    libsStep.trigger('正在获取共享库存信息')
+    memberStep.trigger('正在获取家庭成员信息')
+    setSteps([...steps])
+    const [libOverviewInfos,memberInfos] = await Promise.all([
+      fetchFamilySharedLibs(tokenInput, familyInfo.data.familyGroupid),
+      fetchFamilyMembers(tokenInput, memberIds)
+    ])
+
+    if (!libOverviewInfos) {
+      libsStep.failed('获取共享库存信息失败')
+    }else {
+      libsStep.success('成功获取共享库存信息')
+    }
+    if (!memberInfos) {
+      memberStep.failed('获取家庭成员信息失败')
+    }else {
+      memberStep.success('成功获取家庭成员信息')
+    }
+    if(!libOverviewInfos || !memberInfos ) {
+      return
+    }
+    setSteps([...steps])
+    const members = memberInfos.data.accounts.map((account:any)=> {
+      const id = account.publicData.steamid
+      const avatar_hash = shaDigestAvatarBase64ToStrAvatarHash(account.publicData.shaDigestAvatar.toString())
+      return {
+        ...account.publicData,
+        avatar_hash,
+        ...memberFamilyInfos[id]
+      }
+    })
+    setAllMember(members)
+
+    const libs = libOverviewInfos.data.apps
+      .filter( (app:any) => app.excludeReason == undefined || app.excludeReason == 0)
+
+    const libIds:string[][] = _.chunk(libs.map((it:any)=>it.appid.toString()), 30)
+    const itemsSteps = libIds.map((item,index)=> new Step())
+    setSteps([...steps,...itemsSteps])
+    const res = await Promise.all(libIds.map(async (idChunk,index) => {
+      itemsSteps[index].trigger(`正在获取分块【${index * 30 + 1}-${index * 30 + 1 + idChunk.length}】的库存信息`)
+      setSteps([...steps,...itemsSteps])
+      const res = await fetchFamilyLibItems(idChunk)
+      if (!res || res.data.storeItems.length == 0) {
+        itemsSteps[index].failed(`分块【${index * 30 + 1}-${index * 30 + 1 + idChunk.length}】的库存信息获取失败`)
+      }else {
+        itemsSteps[index].success(`成功获取分块【${index * 30 + 1}-${index * 30 + 1 + idChunk.length}】的库存信息`)
+      }
+      setSteps([...steps,...itemsSteps])
+      return res
+    }))
+    const items = res
+      .filter((it,index) => {
+        return !(!it || it.data.storeItems.length == 0);
+      })
+    .map(resp=>resp.data.storeItems).flatMap(it=>it)
+    const libDictionary = _.keyBy(items, 'id')
+    const allLib = libs.map((lib:any)=> ({
+      ...lib,
+        detail: libDictionary[lib.appid]
+    }))
+    setAllLibs(allLib)
+    setLibDictionary(libDictionary)
+    const finalStep = new Step()
+    finalStep.success("已获取所有库存信息")
+    setSteps([...steps, finalStep])
+    setDataLoaded(true)
+  }
+  const onSubmitWrapper = ()=> {
+    setInputActive(false)
+    onSubmit()
+    setInputActive(true)
+  }
+  // const
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="flex min-h-screen flex-col items-center max-w-[1024px] ml-auto mr-auto">
+      <Header/>
+      <div className={"flex flex-col w-full min-w-96 px-20"}>
+        <div className={"text-lg font-semibold py-2"}>AccessToken</div>
+        <div className={'flex flex-col sm:flex-row'}>
+          <div
+            className={"max-w-96 space-y-2"}
           >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+            <Textarea
+              placeholder="Type your access_token here."
+              className={'min-h-72 min-w-96'}
+              value={tokenInput}
+              onChange={(e) => {
+                setToken(e.target.value)
+              }}
+              disabled={!inputActive}
             />
-          </a>
+            {
+              tokenInput.length > 0 && !jwtInfo &&
+                <div className={"text-xs text-red-500 font-light py-0.5"}>
+                    <span>无法提取steamId，似乎不是一个正确的 token</span>
+                </div>
+            }
+          </div>
+          <div className={"pl-4"}>
+            <div className={""}>
+              {
+                jwtInfo && jwtInfo.sub &&
+                  <div>
+                      <span>steamId: {jwtInfo.sub}</span>
+                  </div>
+              }
+            </div>
+            <div>
+              {
+                steps
+                  .filter(step=>step.isTriggered())
+                  .map((step, index) =>
+                  <div key={index} className={"space-x-2 text-xs font-light"}>
+                    <span
+                    className={cn(
+
+                      // step.stepStatus === StepStatus.Processing && 'animate-spin'
+                    )}
+                    >{statusToEmoji(step.stepStatus)}</span>
+                    <span>{step.message}</span>
+                  </div>
+                )
+              }
+            </div>
+          </div>
         </div>
+        <Button variant={'ghost'} className={"ml-auto mr-2 w-fit my-4"}
+                disabled={!inputActive}
+                onClick={onSubmitWrapper}
+        >提交</Button>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      {
+        dataLoaded && <DataGraph libs={allLibs} players={allMember}/>
+      }
     </main>
   );
 }

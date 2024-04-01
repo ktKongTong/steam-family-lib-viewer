@@ -147,16 +147,15 @@ export default function DataGraph(
   const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)");
   return (
     <>
-      {overlayOpen && <div>
+      {overlayOpen &&
+        <div>
           <LockBodyScroll/>
-          <Overlay onClick={() => setOverlayOpen(false)}/>
+          <Overlay onClick={closeOverlay}/>
             <div className={'w-full h-full pointer-events-none top-0 left-0 right-0 px-1 py-16 sm:px-10 sm:pt-24 fixed overflow-y-scroll z-50 block'}>
                 <div className={'pointer-events-auto  my-0 mx-auto relative'}>
-
                   {
                     !imgURL && <Loader2 className={'h-16 w-16 animate-spin mx-auto top-1/2 mt-36 text-white'}/>
                   }
-
                   {
                     imgURL &&(
                       <>
@@ -167,26 +166,24 @@ export default function DataGraph(
                   }
                 </div>
             </div>
-      </div>
+        </div>
       }
 
       <div className={'flex flex-col items-center space-y-2 px-2 md:px-20'}>
-      <Button onClick={share} className={'ml-auto mr-2'} variant={'ghost'}>share</Button>
+        <Button onClick={share} className={'ml-auto mr-2'} variant={'ghost'}>share</Button>
         <div className={"flex flex-col items-center space-y-2 p-1 md:p-4"} id={'data-graph'}>
         <div className={"flex justify-evenly items-center w-full flex-wrap"}>
           {players.map(player => (
             <div
               key={player.steamid}
               className={`flex items-center mx-4 hover:bg-zinc-300/30 cursor-pointer rounded-lg px-4 py-2 ${checkActive(player) ? '' : 'grayscale'}`}
-              onClick={() => {
-                setFilterUser(player)
-              }}
+              onClick={() => {setFilterUser(player)}}
             >
-              <img src={`https://avatars.akamai.steamstatic.com/${player.avatar_hash}_full.jpg`} loading={'lazy'}
-                   className={`w-8 h-8 rounded-full ${checkActive(player) ? '' : 'grayscale'}`} />
-              <div className={'text-xs text-zinc-700/70 pl-2'}>
-                <span>{player.personaName}</span>
-              </div>
+              <img
+                src={`https://avatars.akamai.steamstatic.com/${player.avatar_hash}_full.jpg`}
+                loading={'lazy'}
+                className={`w-8 h-8 rounded-full ${checkActive(player) ? '' : 'grayscale'}`} />
+              <div className={'text-xs text-zinc-700/70 pl-2'}><span>{player.personaName}</span></div>
             </div>
           ))
           }
@@ -226,7 +223,6 @@ export default function DataGraph(
             })
           }
         </div>
-
       </div>
     </>
   )

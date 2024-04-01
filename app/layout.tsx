@@ -3,7 +3,6 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 import {Metadata} from "next";
-import Head from "next/head";
 
 
 

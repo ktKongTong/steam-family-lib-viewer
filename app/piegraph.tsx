@@ -28,7 +28,6 @@ style: {height: number, width: number}
       {
         type: 'pie',
         radius: [20, 140],
-        // center: ['25%', '50%'],
         roseType: 'radius',
         itemStyle: {
           borderRadius: 5
@@ -36,11 +35,6 @@ style: {height: number, width: number}
         label: {
           show: false
         },
-        // emphasis: {
-        //   label: {
-        //     show: true
-        //   }
-        // },
         data: countById
       }]
   };

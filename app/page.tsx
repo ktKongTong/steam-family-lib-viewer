@@ -11,16 +11,14 @@ import {cn} from "@/lib/utils";
 import {Label} from "@/components/ui/label";
 import relativeTime from 'dayjs/plugin/relativeTime'
 import dayjs from "dayjs";
+import {RetryableStep, statusToEmoji, Step} from "@/app/step";
+import GetToken from "@/app/GetToken";
 dayjs.extend(relativeTime)
 
 function validToken(token:string) {
   return ""
 }
 
-interface Step {
-  status: string,
-  message: string
-}
 
 async function fetchFamilyInfo(token:string):Promise<null|any>{
   const data = await fetch(`/api/steam/family?access_token=${token}`)
@@ -61,55 +59,6 @@ async function fetchFamilyLibItems(ids:string[]){
   return data
 }
 
-// type StepStatus = 'ok' | 'processing' | 'error'
-enum StepStatus {
-  NotStart,
-  OK,
-  Processing,
-  Error,
-}
-class Step {
-  stepStatus: StepStatus = StepStatus.NotStart
-  message:string = ""
-  constructor(message?: string) {
-    if(message) {
-      this.message = message
-    }
-  }
-  updateStatus(status:StepStatus, message?:string) {
-    this.stepStatus = status
-    if(message) {
-      this.message = message
-    }
-  }
-  trigger (message:string){
-      this.stepStatus = StepStatus.Processing
-      this.message = message
-  }
-  failed(message: string) {
-    this.stepStatus = StepStatus.Error
-    this.message = message
-  }
-  success(message: string) {
-    this.stepStatus = StepStatus.OK
-    this.message = message
-  }
-  isTriggered() {
-    return this.stepStatus !== StepStatus.NotStart
-  }
-}
-
-const statusToEmoji = (status:StepStatus)=> {
-  if(status === StepStatus.OK) {
-    return `✅`
-  }
-  if(status === StepStatus.Processing) {
-    return `🔧`
-  }
-  if(status === StepStatus.Error) {
-    return `❌`
-  }
-}
 
 export default function Home() {
   const [tokenInput,setToken] = useState('')
@@ -127,19 +76,19 @@ export default function Home() {
   const [allLibs, setAllLibs] = useState<any[]>([])
   const [dataLoaded,setDataLoaded] = useState(false)
   const onSubmit = async ()=> {
+
+
     setDataLoaded(false)
-    const familyStep = new Step()
+    const getFamilyInfo = async ()=>{
+      return await fetchFamilyInfo(tokenInput)
+    }
+    const familyStep = new RetryableStep(getFamilyInfo, "获取家庭信息")
     const memberStep = new Step()
     const libsStep = new Step()
     const steps = [familyStep,memberStep,libsStep]
     setSteps(steps)
-    familyStep.trigger('正在获取家庭信息，请稍后')
-    const familyInfo = await fetchFamilyInfo(tokenInput)
-    if (!familyInfo) {
-      familyStep.failed("获取家庭信息失败")
-      setSteps([...steps])
-      return
-    }
+    const familyInfo = await familyStep.trigger()
+    if (!familyInfo) {return}
     const familyName = familyInfo.data.familyGroup.name
     const memberIds =familyInfo.data.familyGroup.members.map((member:any)=>member.steamid.toString())
     const memberFamilyInfos = _.keyBy(familyInfo.data.familyGroup?.members, 'steamid')
@@ -181,16 +130,20 @@ export default function Home() {
       .filter( (app:any) => app.excludeReason == undefined || app.excludeReason == 0)
 
     const libIds:string[][] = _.chunk(libs.map((it:any)=>it.appid.toString()), 30)
-    const itemsSteps = libIds.map((item,index)=> new Step())
+    const itemsSteps = libIds.map((idChunk,index)=> new RetryableStep(async ()=>{
+      return await fetchFamilyLibItems(idChunk)
+    },`分块【${index * 30 + 1}-${index * 30 + idChunk.length}】的库存详情信息`))
+
     setSteps([...steps,...itemsSteps])
     const res = await Promise.all(libIds.map(async (idChunk,index) => {
-      itemsSteps[index].trigger(`正在获取分块【${index * 30 + 1}-${index * 30 + idChunk.length}】的库存信息`)
+      const curStep = itemsSteps[index]
+      const stepRes = curStep.trigger()
       setSteps([...steps,...itemsSteps])
-      const res = await fetchFamilyLibItems(idChunk)
+      const res = await stepRes
       if (!res || res.data.storeItems.length == 0) {
-        itemsSteps[index].failed(`分块【${index * 30 + 1}-${index * 30 + idChunk.length}】的库存详情信息获取失败`)
+        curStep.failed()
       }else {
-        itemsSteps[index].success(`成功获取分块【${index * 30 + 1}-${index * 30 + idChunk.length}】的库存详情信息`)
+        curStep.success()
       }
       setSteps([...steps,...itemsSteps])
       return res
@@ -222,7 +175,10 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center max-w-[1024px] ml-auto mr-auto">
       <Header/>
       <div className={"flex flex-col w-full min-w-full md:min-w-96 px-4 md:px-20"}>
-        <div className={"text-lg font-semibold py-2"}>AccessToken</div>
+        <div className={'flex items-center space-x-2'}>
+          <div className={"text-lg font-semibold py-2"}>AccessToken</div>
+          <GetToken/>
+        </div>
         <div className={'flex flex-col md:flex-row'}>
           <div
             className={"max-w-96 space-y-2"}
@@ -231,9 +187,7 @@ export default function Home() {
               placeholder="Type your access_token here."
               className={'min-h-80 min-w-full md:min-w-96'}
               value={tokenInput}
-              onChange={(e) => {
-                setToken(e.target.value)
-              }}
+              onChange={(e) => {setToken(e.target.value)}}
               disabled={!inputActive}
             />
             {
@@ -267,10 +221,7 @@ export default function Home() {
                   .map((step, index) =>
                   <div key={index} className={"space-x-2 text-xs font-light"}>
                     <span
-                    className={cn(
-
-                      // step.stepStatus === StepStatus.Processing && 'animate-spin'
-                    )}
+                    className={cn()}
                     >{statusToEmoji(step.stepStatus)}</span>
                     <span>{step.message}</span>
                   </div>

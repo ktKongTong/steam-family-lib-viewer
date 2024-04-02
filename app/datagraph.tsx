@@ -13,11 +13,15 @@ import LockBodyScroll from "@/app/lockBodyScroll";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import {Loader, Loader2} from "lucide-react";
 import {Overlay} from "@/app/overlay";
+import dayjs from "dayjs";
+import Game from "@/app/game";
+import GamesGrid from "@/app/games-grid";
+import {Player} from "@/app/page";
 
 const useComputed = (
   libs: any[],
   filteredPlayer: any[],
-  players: any[]
+  players: Player[]
 )=> {
   const names = useMemo(()=>players.map(account=>({
     id: account.steamid,
@@ -29,7 +33,9 @@ const useComputed = (
       {
         return filteredPlayer.filter(player=>item.ownerSteamids.includes(player.steamid)).length > 0
       }
-    ),[filteredPlayer,libs])
+    ).sort((a,b)=>b.rtTimeAcquired - a.rtTimeAcquired)
+
+    ,[filteredPlayer,libs])
 
   const games = useMemo(()=>appsForUse
     .flatMap((item) => {
@@ -76,7 +82,7 @@ export default function DataGraph(
   players
 }:{
   libs: any[],
-  players: any[]
+  players: Player[]
 }
 ) {
   const [filteredPlayer, setFilteredPlayer] = useState<any[]>(players)
@@ -147,6 +153,8 @@ export default function DataGraph(
   const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)");
   return (
     <>
+
+
       {overlayOpen &&
         <div>
           <LockBodyScroll/>
@@ -170,22 +178,38 @@ export default function DataGraph(
       }
 
       <div className={'flex flex-col items-center space-y-2 px-2 md:px-20'}>
+
+        <div className={'grid data grid-cols-4 gap-2'}>
+          <div
+            className={'data flex flex-col items-center border-zinc-700 rounded-lg shadow-md p-2 bg-zinc-100/30 backdrop-blur min-w-32'}>
+            <span className={'mr-auto text-lg font-bold'}>作品数</span>
+            <span className={'text-xl font-extrabold ml-auto'}>{appsForUse.length}</span>
+          </div>
+          <div
+            className={'data flex flex-col items-center border-zinc-700 rounded-lg shadow-md p-2 bg-zinc-100/30 backdrop-blur min-w-32'}>
+            <span className={' mr-auto text-lg font-bold'}>7 天新增</span>
+            <span className={'text-xl font-extrabold ml-auto'}>+{3}</span>
+          </div>
+        </div>
+
+
         <Button onClick={share} className={'ml-auto mr-2'} variant={'ghost'}>share</Button>
         <div className={"flex flex-col items-center space-y-2 p-1 md:p-4"} id={'data-graph'}>
-        <div className={"flex justify-evenly items-center w-full flex-wrap"}>
-          {players.map(player => (
-            <div
-              key={player.steamid}
-              className={`flex items-center mx-4 hover:bg-zinc-300/30 cursor-pointer rounded-lg px-4 py-2 ${checkActive(player) ? '' : 'grayscale'}`}
-              onClick={() => {setFilterUser(player)}}
-            >
-              <img
-                src={`https://avatars.akamai.steamstatic.com/${player.avatar_hash}_full.jpg`}
-                loading={'lazy'}
-                className={`w-8 h-8 rounded-full ${checkActive(player) ? '' : 'grayscale'}`} />
-              <div className={'text-xs text-zinc-700/70 pl-2'}><span>{player.personaName}</span></div>
-            </div>
-          ))
+          <div className={"grid grid-cols-3 justify-evenly items-center w-full gap-1"}>
+            {
+              players.map(player => (
+              <div
+                key={player.steamid}
+                className={`flex items-center mx-4 hover:bg-zinc-300/30 cursor-pointer rounded-lg px-4 py-2 ${checkActive(player) ? '' : 'grayscale'}`}
+                onClick={() => {setFilterUser(player)}}
+              >
+                <img
+                  src={`https://avatars.akamai.steamstatic.com/${player.avatar_hash}_full.jpg`}
+                  loading={'lazy'}
+                  className={`w-8 h-8 rounded-full ${checkActive(player) ? '' : 'grayscale'}`} />
+                <div className={'text-xs text-zinc-700/70 pl-2'}><span>{player.personaName}</span></div>
+              </div>
+            ))
           }
         </div>
         <div className={'flex space-x-2 md:flex-row flex-col'}>
@@ -200,29 +224,7 @@ export default function DataGraph(
         </div>
         <WordCloud words={dicts} height={800} width={isSmallDevice ? window.innerWidth - 40:800} className={'flex items-center'}/>
         </div>
-        <div className={'grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1 md:gap-1 lg:gap-2 '}>
-          <div className={'col-span-3 md:col-span-5 lg:col-span-6 text-xs text-zinc-600'}>
-           共 {appsForUse.length} 部作品
-          </div>
-          {
-            appsForUse.map(app=> {
-              return (
-                <div key={app.appid} className={'relative w-24 sm:w-36 md:w-36 aspect-[6/9] rounded-lg text-xs text-zinc-600/60'}>
-                  <ImageWithFallback
-                    fallbackSrc = {`https://cdn.akamai.steamstatic.com/steam/apps/${app.appid}/portrait.png`}
-                    src={`https://cdn.akamai.steamstatic.com/steam/apps/${app.appid}/library_600x900.jpg`}
-                    className={'w-full h-full rounded-lg'}
-                    loading={'lazy'}
-                  />
-                  <div>
-                    {app.name}
-                  </div>
-                </div>
-              )
-
-            })
-          }
-        </div>
+        <GamesGrid apps={appsForUse} players={players}/>
       </div>
     </>
   )

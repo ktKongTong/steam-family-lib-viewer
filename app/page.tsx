@@ -13,6 +13,15 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import dayjs from "dayjs";
 import {RetryableStep, statusToEmoji, Step} from "@/app/step";
 import GetToken from "@/app/GetToken";
+import {
+  CFamilyGroups_GetFamilyGroup_Response,
+  CFamilyGroups_GetFamilyGroupForUser_Response, CFamilyGroups_GetSharedLibraryApps_Response_SharedApp, FamilyGroupMember
+} from "@/proto/gen/web-ui/service_familygroups_pb";
+import {
+  CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails,
+  CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails_AccountPublicData
+} from "@/proto/gen/web-ui/service_player_pb";
+import {StoreItem} from "@/proto/gen/web-ui/common_pb";
 dayjs.extend(relativeTime)
 
 function validToken(token:string) {
@@ -60,6 +69,12 @@ async function fetchFamilyLibItems(ids:string[]){
 }
 
 
+export type Player = FamilyGroupMember & CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails_AccountPublicData & {
+  avatar_hash: string
+}
+export type App = CFamilyGroups_GetSharedLibraryApps_Response_SharedApp & {  detail: StoreItem } & {
+  owners: Player[]
+}
 export default function Home() {
   const [tokenInput,setToken] = useState('')
   const jwtInfo = useMemo(()=> {
@@ -71,7 +86,7 @@ export default function Home() {
   const [steps,setSteps] = useState<Step[]>([])
   const [inputActive, setInputActive] = useState(true)
 
-  const [allMember,setAllMember] = useState<any[]>([])
+  const [allMember,setAllMember] = useState<Player[]>([])
   const [libDictionary, setLibDictionary] = useState<any>()
   const [allLibs, setAllLibs] = useState<any[]>([])
   const [dataLoaded,setDataLoaded] = useState(false)
@@ -115,9 +130,9 @@ export default function Home() {
       return
     }
     setSteps([...steps])
-    const members = memberInfos.data.accounts.map((account:any)=> {
-      const id = account.publicData.steamid
-      const avatar_hash = shaDigestAvatarBase64ToStrAvatarHash(account.publicData.shaDigestAvatar.toString())
+    const members:Player[] = memberInfos.data.accounts.map((account:any)=> {
+      const id = account?.publicData?.steamid!
+      const avatar_hash = shaDigestAvatarBase64ToStrAvatarHash(account?.publicData?.shaDigestAvatar?.toString())
       return {
         ...account.publicData,
         avatar_hash,
@@ -125,6 +140,7 @@ export default function Home() {
       }
     })
     setAllMember(members)
+    const memberDict = _.keyBy(members, 'steamid')
 
     const libs = libOverviewInfos.data.apps
       .filter( (app:any) => app.excludeReason == undefined || app.excludeReason == 0)
@@ -156,7 +172,8 @@ export default function Home() {
     const libDictionary = _.keyBy(items, 'id')
     const allLib = libs.map((lib:any)=> ({
       ...lib,
-        detail: libDictionary[lib.appid]
+        detail: libDictionary[lib.appid],
+        owners:lib.ownerSteamids.map((id:any) => memberDict[id])
     }))
     setAllLibs(allLib)
     setLibDictionary(libDictionary)

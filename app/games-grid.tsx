@@ -110,7 +110,7 @@ export default function GamesGrid({
           <div className={'flex gap-1 items-center flex-wrap '}>
             {
               tagFilter.map(tag =>
-                <span
+                <span key={tag}
                   className={'px-1 py-0.5 bg-zinc-200/70 shadow rounded-md flex space-x-1 items-center'}
                   onClick={()=>{
                     setTagFilter([...tagFilter.filter(it=>it != tag)])

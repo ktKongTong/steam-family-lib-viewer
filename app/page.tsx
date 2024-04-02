@@ -174,8 +174,9 @@ export default function Home() {
       ...lib,
         detail: libDictionary[lib.appid],
         owners:lib.ownerSteamids.map((id:any) => {
-          console.log("id",id)
-          console.log("member",memberDict[id])
+          // console.log("id",id)
+          // console.log("member",memberDict[id])
+          return memberDict[id]
         })
     }))
     setAllLibs(allLib)

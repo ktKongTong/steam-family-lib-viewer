@@ -33,7 +33,7 @@ function validToken(token:JwtPayload|null)  {
       reason: "无法提取出有效的 token 信息"
     }
   }
-  const res = dayjs.unix(token.exp).isBefore(dayjs())
+  const res = dayjs.unix(token.exp).isAfter(dayjs())
   return {
     res: res,
     reason: res ? 'success':`token 已于${dayjs.unix(token.exp).format('YY-MM-DD HH:mm:ss')}失效`

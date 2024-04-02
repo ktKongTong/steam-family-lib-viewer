@@ -1,7 +1,7 @@
 'use client'
 import _ from 'lodash'
-import React, { useMemo, useState} from 'react';
-import {jwtDecode} from "jwt-decode";
+import React, {useMemo, useState} from 'react';
+import {jwtDecode, JwtPayload} from "jwt-decode";
 import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
 import {shaDigestAvatarBase64ToStrAvatarHash} from "@/lib/steam_utils";
@@ -14,18 +14,30 @@ import dayjs from "dayjs";
 import {RetryableStep, statusToEmoji, Step} from "@/app/step";
 import GetToken from "@/app/GetToken";
 import {
-  CFamilyGroups_GetFamilyGroup_Response,
-  CFamilyGroups_GetFamilyGroupForUser_Response, CFamilyGroups_GetSharedLibraryApps_Response_SharedApp, FamilyGroupMember
+  CFamilyGroups_GetSharedLibraryApps_Response_SharedApp,
+  FamilyGroupMember
 } from "@/proto/gen/web-ui/service_familygroups_pb";
 import {
-  CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails,
   CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails_AccountPublicData
 } from "@/proto/gen/web-ui/service_player_pb";
 import {StoreItem} from "@/proto/gen/web-ui/common_pb";
+import {useToast} from "@/components/ui/use-toast";
+
 dayjs.extend(relativeTime)
 
-function validToken(token:string) {
-  return ""
+function validToken(token:JwtPayload|null)  {
+  if(!token || !token.exp) {
+
+    return {
+      res: false,
+      reason: "无法提取出有效的 token 信息"
+    }
+  }
+  const res = dayjs.unix(token.exp).isBefore(dayjs())
+  return {
+    res: res,
+    reason: res ? 'success':`token 已于${dayjs.unix(token.exp).format('YY-MM-DD HH:mm:ss')}失效`
+  }
 }
 
 
@@ -79,8 +91,7 @@ export default function Home() {
   const [tokenInput,setToken] = useState('')
   const jwtInfo = useMemo(()=> {
     try {
-     const jwtInfo = jwtDecode(tokenInput)
-      return jwtInfo
+      return jwtDecode(tokenInput)
     }catch (e) {return null}
   },[tokenInput])
   const [steps,setSteps] = useState<Step[]>([])
@@ -103,7 +114,12 @@ export default function Home() {
     const steps = [familyStep,memberStep,libsStep]
     setSteps(steps)
     const familyInfo = await familyStep.trigger()
-    if (!familyInfo) {return}
+    if (!familyInfo) {
+      toast({
+        title:"获取家庭信息失败",
+        description: familyStep.message
+      })
+    }
     const familyName = familyInfo.data.familyGroup.name
     const memberIds =familyInfo.data.familyGroup.members.map((member:any)=>member.steamid.toString())
     const memberFamilyInfos = _.keyBy(familyInfo.data.familyGroup?.members, 'steamid')
@@ -186,10 +202,20 @@ export default function Home() {
     setSteps([...steps, ...itemsSteps, finalStep])
     setDataLoaded(true)
   }
+  const {toast} = useToast()
   const onSubmitWrapper = ()=> {
-    setInputActive(false)
-    onSubmit()
-    setInputActive(true)
+    const {res,reason} = validToken(jwtInfo)
+    if(res) {
+      setInputActive(false)
+      onSubmit()
+      setInputActive(true)
+    }else {
+      toast({
+        title: "AccessToken 无效",
+        description: reason,
+      })
+    }
+  //
   }
   // const
   return (

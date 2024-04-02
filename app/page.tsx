@@ -72,9 +72,9 @@ async function fetchFamilyLibItems(ids:string[]){
 export type Player = FamilyGroupMember & CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails_AccountPublicData & {
   avatar_hash: string
 }
-export type App = CFamilyGroups_GetSharedLibraryApps_Response_SharedApp & {  detail: StoreItem } & {
-  owners: Player[]
-}
+export type App = CFamilyGroups_GetSharedLibraryApps_Response_SharedApp
+  & {  detail: StoreItem }
+  & { owners: Player[] }
 export default function Home() {
   const [tokenInput,setToken] = useState('')
   const jwtInfo = useMemo(()=> {
@@ -173,7 +173,10 @@ export default function Home() {
     const allLib = libs.map((lib:any)=> ({
       ...lib,
         detail: libDictionary[lib.appid],
-        owners:lib.ownerSteamids.map((id:any) => memberDict[id])
+        owners:lib.ownerSteamids.map((id:any) => {
+          console.log("id",id)
+          console.log("member",memberDict[id])
+        })
     }))
     setAllLibs(allLib)
     setLibDictionary(libDictionary)

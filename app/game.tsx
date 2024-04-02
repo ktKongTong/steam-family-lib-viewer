@@ -1,8 +1,6 @@
 import {ImageWithFallback} from "@/app/fallbackImg";
 import dayjs from "dayjs";
 import React, {useCallback, useEffect, useState} from "react";
-import {StoreItem} from "@/proto/gen/web-ui/common_pb";
-import {CFamilyGroups_GetSharedLibraryApps_Response_SharedApp} from "@/proto/gen/web-ui/service_familygroups_pb";
 import {App, Player} from "@/app/page";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {cn} from "@/lib/utils";
@@ -195,10 +193,10 @@ export default function Game({
           <div className={'mt-auto ml-auto flex flex-col group '}>
             {
               game.owners.map((it, index) =>
-                <Avatar key={it.steamid}
+                <Avatar key={index}
                         className={cn('h-6 w-6 border-[2px] border-zinc-700', '-mt-[10px] group-hover:mb-[10px]  transition-all ease-in-out')}>
-                  <AvatarImage src={getAvatar(it.avatar_hash)} alt={`@${it.personaName}`}/>
-                  <AvatarFallback>{it.personaName}</AvatarFallback>
+                  <AvatarImage src={getAvatar(it?.avatar_hash??"")} alt={`@${it?.personaName}`}/>
+                  <AvatarFallback>{it?.personaName}</AvatarFallback>
                 </Avatar>
               )
             }

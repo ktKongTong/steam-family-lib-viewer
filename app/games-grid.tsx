@@ -116,13 +116,14 @@ export default function GamesGrid({
                     setTagFilter([...tagFilter.filter(it=>it != tag)])
                   }}
                 >
-                  <span>{convertTag(tag)}</span><span><X className={'h-3 w-3'}/></span>
+                  <span>{convertTag(tag)}</span>
+                  <span><X className={'h-3 w-3'}/></span>
                 </span>
               )
             }
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
-                <button className={'px-1 py-0.5 bg-zinc-300 rounded-md bg-zinc-200/70 shadow'}><Plus className={'w-4 h-4'}/></button>
+                <button className={'px-1 py-0.5 bg-zinc-200/70 rounded-md shadow'}><Plus className={'w-4 h-4'}/></button>
               </PopoverTrigger>
               <PopoverContent className="w-[200px] p-0">
                 <Command>

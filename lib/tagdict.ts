@@ -1,4 +1,4 @@
-const Tags = [
+export const Tags = [
   {
     "id": "492",
     "name": "独立"

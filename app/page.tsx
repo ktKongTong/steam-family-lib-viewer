@@ -253,7 +253,8 @@ export default function Home() {
         >提交</Button>
       </div>
       {
-        dataLoaded && <DataGraph libs={allLibs} players={allMember}/>
+        dataLoaded &&
+          <DataGraph libs={allLibs} players={allMember}/>
       }
     </main>
   );

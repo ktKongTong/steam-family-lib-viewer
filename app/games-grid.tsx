@@ -10,11 +10,14 @@ import {
   PaginationNext,
   PaginationPrevious
 } from "@/components/ui/pagination";
-import {MoveDown, MoveUp} from "lucide-react";
+import {Check, MoveDown, MoveUp, Plus, X} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {Input} from "@/components/ui/input";
 import _ from "lodash";
 import {useMediaQuery} from "@uidotdev/usehooks";
+import {convertTag, Tags} from "@/lib/tagdict";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
 
 interface GamesGridProps {
   apps: App[],
@@ -54,10 +57,21 @@ export default function GamesGrid({
   const [order,setOrder] = useState(Order.DESC)
   const [ruleKey,setRuleKey] = useState(Rule.Date)
   const [keyword, setKeyword] = useState<string>("")
+  const [tagFilter,setTagFilter] = useState<number[]>([])
   const filteredApps = useMemo(()=> {
-    return apps.filter(x=>keyword?x.name?.toUpperCase()?.includes(keyword?.toUpperCase()) : true)
+    return apps
+      .filter(x=>keyword?x.name?.toUpperCase()?.includes(keyword?.toUpperCase()) : true)
+      .filter(x=> {
+        if(tagFilter.length == 0) return true
+        for (let filter of tagFilter) {
+          if(!x.detail.tagids.includes(filter)) {
+            return false
+          }
+        }
+        return  true
+      })
       .sort(sortFunc(order, ruleKey))
-  },[apps, keyword, order, ruleKey])
+  },[apps, keyword, order, ruleKey, tagFilter])
 
 
   const sm = useMediaQuery("only screen and (max-width : 768px)")
@@ -74,6 +88,7 @@ export default function GamesGrid({
     },[currentPage, filteredApps, pageSize])
 
 
+
   useEffect(()=> {
     setCurrentPage(1)
   },[keyword])
@@ -85,12 +100,67 @@ export default function GamesGrid({
       setOrder(Order.DESC)
     }
   }
+  const [open,setOpen] = useState(false)
 
   return (
     <>
       <div className={'grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1 md:gap-1 lg:gap-2 '}>
-        <div className={'col-span-full text-xs text-zinc-600 cursor-default flex justify-between flex-col sm:flex-row'}>
-          <div className={'flex items-center'}>共 {filteredApps.length} 部作品</div>
+        <div className={'col-span-full text-xs text-zinc-600 cursor-default flex justify-between flex-col sm:flex-row gap-1'}>
+          <div className={'flex items-center px-2'}>共 {filteredApps.length} 部作品</div>
+          <div className={'flex gap-1 items-center flex-wrap '}>
+            {
+              tagFilter.map(tag =>
+                <span
+                  className={'px-1 py-0.5 bg-zinc-200/70 shadow rounded-md flex space-x-1 items-center'}
+                  onClick={()=>{
+                    setTagFilter([...tagFilter.filter(it=>it != tag)])
+                  }}
+                >
+                  <span>{convertTag(tag)}</span><span><X className={'h-3 w-3'}/></span>
+                </span>
+              )
+            }
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <button className={'px-1 py-0.5 bg-zinc-300 rounded-md bg-zinc-200/70 shadow'}><Plus className={'w-4 h-4'}/></button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[200px] p-0">
+                <Command>
+                  <CommandInput placeholder="搜索标签..." />
+                  <CommandEmpty>没有这样的标签哦</CommandEmpty>
+                  <CommandGroup>
+                    <CommandList>
+                      {
+                        Tags
+                      .map((tag) => (
+                      <CommandItem
+                        key={tag.id}
+                        value={tag.id}
+                        onSelect={(currentValue) => {
+                          if(tagFilter.includes(parseInt(tag.id))) {
+                            setTagFilter([...tagFilter.filter(tag=>tag != parseInt(currentValue))])
+                          }else {
+                            setTagFilter([...tagFilter,parseInt(currentValue)])
+                          }
+                          setOpen(false)
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            tagFilter.includes(parseInt(tag.id)) ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {tag.name}
+                      </CommandItem>
+                    ))}
+
+                    </CommandList>
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
           <div className={'flex space-x-2 items-center ml-auto'}>
             <div className={'flex space-x-1 items-center w-16'} onClick={()=>switchSortRule(Rule.Date)}>
               <span>日期</span>
@@ -138,7 +208,6 @@ const Paging = ({
 
   const sm = useMediaQuery("only screen and (max-width : 768px)")
   const md = useMediaQuery("only screen and (max-width : 1024px)")
-  console.log('sm',sm)
   // hasNextPage
   const hasNextPage = useMemo(()=>totalPage > curPage,[curPage,totalPage])
   const hasPreviousPage = useMemo(()=>curPage > 1,[curPage])
@@ -177,9 +246,7 @@ const Paging = ({
             !showPreviousEllipsis && hasPreviousPage && !sm &&
             _.range(2,curPage).map(
               page=>
-              {                console.log('start', curPage)
-                console.log('page', page)
-                console.log('end', totalPage-1)
+              {
                 return (
 
                   <PaginationItem key={page}>
@@ -213,9 +280,7 @@ const Paging = ({
             !showNextPageEllipsis && hasNextPage && !sm &&
             _.range(curPage + 1,totalPage).map(
               page=>
-              {                console.log('start', curPage)
-                console.log('page', page)
-                           console.log('end', totalPage-1)
+              {
                 return (
 
                   <PaginationItem key={page}>

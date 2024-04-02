@@ -104,7 +104,7 @@ export default function GamesGrid({
 
   return (
     <>
-      <div className={'grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1 md:gap-1 lg:gap-2 '}>
+      <div className={'grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-2 md:gap-2 lg:gap-2 '}>
         <div className={'col-span-full text-xs text-zinc-600 cursor-default flex justify-between flex-col sm:flex-row gap-1'}>
           <div className={'flex items-center px-2'}>共 {filteredApps.length} 部作品</div>
           <div className={'flex gap-1 items-center flex-wrap '}>

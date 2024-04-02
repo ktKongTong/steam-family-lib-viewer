@@ -150,6 +150,7 @@ export default function DataGraph(
     setImgURL('')
   },[])
 
+  const recentlyCnt= libs.filter(lib=> dayjs.unix(lib.rtTimeAcquired).isAfter(dayjs().add(-1,'month'))).length
   const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)");
   return (
     <>
@@ -179,18 +180,18 @@ export default function DataGraph(
 
       <div className={'flex flex-col items-center space-y-2 px-2 md:px-20'}>
 
-        <div className={'grid data grid-cols-4 gap-2'}>
-          <div
-            className={'data flex flex-col items-center border-zinc-700 rounded-lg shadow-md p-2 bg-zinc-100/30 backdrop-blur min-w-32'}>
-            <span className={'mr-auto text-lg font-bold'}>作品数</span>
-            <span className={'text-xl font-extrabold ml-auto'}>{appsForUse.length}</span>
-          </div>
-          <div
-            className={'data flex flex-col items-center border-zinc-700 rounded-lg shadow-md p-2 bg-zinc-100/30 backdrop-blur min-w-32'}>
-            <span className={' mr-auto text-lg font-bold'}>7 天新增</span>
-            <span className={'text-xl font-extrabold ml-auto'}>+{3}</span>
-          </div>
-        </div>
+        {/*<div className={'grid data grid-cols-4 gap-2'}>*/}
+        {/*  <div*/}
+        {/*    className={'data flex flex-col items-center border-zinc-700 rounded-lg shadow-md p-2 bg-zinc-100/30 backdrop-blur min-w-32'}>*/}
+        {/*    <span className={'mr-auto text-lg font-bold'}>作品数</span>*/}
+        {/*    <span className={'text-xl font-extrabold ml-auto'}>{appsForUse.length}</span>*/}
+        {/*  </div>*/}
+        {/*  <div*/}
+        {/*    className={'data flex flex-col items-center border-zinc-700 rounded-lg shadow-md p-2 bg-zinc-100/30 backdrop-blur min-w-32'}>*/}
+        {/*    <span className={' mr-auto text-lg font-bold'}>最近新增</span>*/}
+        {/*    <span className={'text-xl font-extrabold ml-auto'}>+{recentlyCnt}</span>*/}
+        {/*  </div>*/}
+        {/*</div>*/}
 
 
         <Button onClick={share} className={'ml-auto mr-2'} variant={'ghost'}>share</Button>

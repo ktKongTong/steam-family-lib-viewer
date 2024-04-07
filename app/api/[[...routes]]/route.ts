@@ -13,6 +13,14 @@ import {
   CPlayer_GetPlayerLinkDetails_Response
 } from "@/proto/gen/web-ui/service_player_pb";
 import { jwtDecode } from "jwt-decode";
+import {
+  CAuthentication_BeginAuthSessionViaQR_Request,
+  CAuthentication_BeginAuthSessionViaQR_Response,
+  CAuthentication_PollAuthSessionStatus_Request,
+  CAuthentication_PollAuthSessionStatus_Response
+} from "@/proto/gen/web-ui/service_authentication_pb";
+import {util} from "protobufjs";
+import _ from "lodash";
 
 export const runtime = 'edge';
 
@@ -26,24 +34,118 @@ app.post('/api/hello', async(c) => {
   return c.json(JSON.parse(data.toJsonString()))
 })
 interface Decoder {
-  decode:(arr:Uint8Array)=>any
+  fromBinary:(arr:Uint8Array)=>any
 }
 interface Encoder {
   toBinary: (opt?:any)=>Uint8Array
 }
-
-const decodeResponseProtobuf = async(res:Response,decoder:Decoder)=>{
-  let tmp =await res.arrayBuffer()
-  const arr = new Uint8Array(tmp);
-  const data =  decoder.decode(arr)
-  return data
+interface Buf {
+  fromJson:(obj:any) => Encoder
 }
 
 const encodeRequestProtobuf = async(encoder:Encoder)=>{
   const res = encoder.toBinary()
   return encodeProtobuf(res)
 }
+const decodeResponseProtobuf = async(resp:Response,decoder:Decoder)=>{
+  let tmp =await resp.arrayBuffer()
+  const arr = new Uint8Array(tmp);
+  const data =  decoder.fromBinary(arr)
+  return data
+}
+const f = async(clazz: Buf,value:any)=> {
+  try {
+    const req = clazz.fromJson(value)
+    let bufParam = await encodeRequestProtobuf(req)
+    return bufParam
+  }catch(err){
+    console.log(err)
+  }
 
+  // bufParam = bufParam.replaceAll('+','%2B').replaceAll('=','%3D')
+
+}
+
+app.get('/api/steam/wishlist/:ids', async (c)=> {
+  const idParam = c.req.param('ids')
+  const wishesByPlayer = await Promise.all(idParam.split(',').map(async (id)=>{
+    const url = `https://store.steampowered.com/wishlist/profiles/${id}/wishlistdata/?p=0&v=`
+    const res = await fetch(url).then(res=>res.json())
+    const appIds = Object.keys(res)
+    return appIds.map(appId=>({
+      wisher: id,
+      item:res[appId],
+      appId:appId
+    })).filter(app=>app.appId !== "success")
+  }))
+  const wishes = wishesByPlayer.flatMap(wish=>wish)
+
+  const groupedWishes = _.groupBy(wishes,'appId')
+  const appIds = Object.keys(groupedWishes)
+  const finalWishes = appIds.map(appId => {
+    const items = groupedWishes[appId]
+    return {
+      wishers: items.map(item=>item.wisher),
+      appId: appId,
+      itemInfo: items[0].item
+    }
+  })
+  return c.json({
+    data: finalWishes,
+  })
+
+})
+
+app.get('/api/steam/auth/qr', async (c)=>{
+  const bufParam = await f(CAuthentication_BeginAuthSessionViaQR_Request, {
+    deviceDetails: {
+      deviceFriendlyName: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0",
+      platformType: 1
+    },
+    websiteId: 'Store'
+  })
+  const form = new FormData()
+
+  form.set("input_protobuf_encoded", bufParam!)
+  const url = "https://api.steampowered.com/IAuthenticationService/BeginAuthSessionViaQR/v1"
+  const resp = await fetch(url,{method: 'POST', body: form, headers: {
+      'Origin':'https://store.steampowered.com',
+      'Referer':'https://store.steampowered.com/',
+      'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0'
+    }})
+  let tmp =await resp.arrayBuffer()
+  const arr = new Uint8Array(tmp);
+  const data =  CAuthentication_BeginAuthSessionViaQR_Response.fromBinary(arr)
+  return c.json({data})
+})
+
+app.get('/api/steam/auth/poll', async (c)=>{
+  const client_id= c.req.query('client_id')
+  const request_id= c.req.query('request_id')
+  // base64 to
+  // const buf = new Uint8Array(16)
+  // base64.decode(request_id!, buf, 0)
+  // base64 编码
+  const buf = Buffer.from(request_id!, 'base64')
+  const arr1 = new Uint8Array(buf)
+  const a = new CAuthentication_PollAuthSessionStatus_Request({
+    clientId: BigInt(client_id!),
+    requestId: arr1
+  })
+  const bufParam = await encodeRequestProtobuf(a)
+  const form = new FormData()
+  form.set('input_protobuf_encoded',bufParam!)
+  const url = "https://api.steampowered.com/IAuthenticationService/PollAuthSessionStatus/v1"
+  const resp = await fetch(url,{method: 'POST', body: form, headers: {
+      'Origin':'https://store.steampowered.com',
+      'Referer':'https://store.steampowered.com/',
+      'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0'
+    }})
+  let tmp =await resp.arrayBuffer()
+  const arr = new Uint8Array(tmp);
+  const data =  CAuthentication_PollAuthSessionStatus_Response.fromBinary(arr)
+  return c.json({data})
+})
 // info self id must be first
 app.get('/api/steam/player/:ids',async (c)=>{
   const idParam = c.req.param('ids')

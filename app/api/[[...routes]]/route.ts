@@ -70,7 +70,12 @@ app.get('/api/steam/wishlist/:ids', async (c)=> {
   const idParam = c.req.param('ids')
   const wishesByPlayer = await Promise.all(idParam.split(',').map(async (id)=>{
     const url = `https://store.steampowered.com/wishlist/profiles/${id}/wishlistdata/?p=0&v=`
-    const res = await fetch(url).then(async (res)=> {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent':'SteamFamilyLibViewer/0.0.1 (https://steam-family-lib-viewer.ktlab.io)'
+      }
+    }).then(async (res)=> {
+      console.log(url)
      const text = await res.text()
       console.log(text)
       return JSON.parse(text)

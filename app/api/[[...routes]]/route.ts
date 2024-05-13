@@ -1,25 +1,27 @@
 import {
   CFamilyGroups_GetFamilyGroupForUser_Request,
   CFamilyGroups_GetFamilyGroupForUser_Response,
+  CFamilyGroups_GetPlaytimeSummary_Request,
+  CFamilyGroups_GetPreferredLenders_Request,
+  CFamilyGroups_GetPreferredLenders_Response,
   CFamilyGroups_GetSharedLibraryApps_Request,
   CFamilyGroups_GetSharedLibraryApps_Response
 } from '@/proto/gen/web-ui/service_familygroups_pb';
-import { Hono } from 'hono'
-import { handle } from 'hono/vercel'
+import {Hono} from 'hono'
+import {handle} from 'hono/vercel'
 import {encodeProtobuf} from '@/lib/steam_utils';
 import {CStoreBrowse_GetItems_Request, CStoreBrowse_GetItems_Response} from "@/proto/gen/web-ui/common_pb";
 import {
   CPlayer_GetPlayerLinkDetails_Request,
   CPlayer_GetPlayerLinkDetails_Response
 } from "@/proto/gen/web-ui/service_player_pb";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import {
   CAuthentication_BeginAuthSessionViaQR_Request,
   CAuthentication_BeginAuthSessionViaQR_Response,
   CAuthentication_PollAuthSessionStatus_Request,
   CAuthentication_PollAuthSessionStatus_Response
 } from "@/proto/gen/web-ui/service_authentication_pb";
-import {util} from "protobufjs";
 import _ from "lodash";
 
 export const runtime = 'edge';
@@ -75,10 +77,10 @@ app.get('/api/steam/wishlist/:ids', async (c)=> {
         'User-Agent':'SteamFamilyLibViewer/0.0.1 (https://steam-family-lib-viewer.ktlab.io)'
       }
     }).then(async (res)=> {
-      console.log(url)
-     const text = await res.text()
-      console.log(text)
-      return JSON.parse(text)
+     //  console.log(url)
+     // const text = await res.text()
+     //  console.log(text)
+      return res.json()
     })
     const appIds = Object.keys(res)
     return appIds.map(appId=>({
@@ -179,7 +181,7 @@ app.get('/api/steam/player/:ids',async (c)=>{
   let bufParam = await encodeRequestProtobuf(req)
   const baseURL =
     `https://api.steampowered.com/IPlayerService/GetPlayerLinkDetails/v1?access_token=${tokenParam}&spoof_steamid=&origin=https:%2F%2Fstore.steampowered.com&input_protobuf_encoded=`
-  bufParam = bufParam.replace('+','%2B').replaceAll('=','%3D')
+  bufParam = bufParam.replaceAll('+','%2B').replaceAll('=','%3D')
   let url = baseURL + bufParam
   const resp = await fetch(url)
   let tmp =await resp.arrayBuffer()
@@ -283,6 +285,7 @@ app.get('/api/steam/items/:ids',async (c)=>{
       include_platforms : true,
       include_screenshots: true,
       include_trailers: true,
+      include_included_items: true,
       "include_tag_count":20,
     }
   })
@@ -318,6 +321,43 @@ app.get('/api/steam/detail/:ids', async(c) => {
     )
   )
   return c.json({data: res})
+})
+
+
+app.get('/api/steam/family/preferred/:id', async (c) => {
+  const tokenParam = c.req.query('access_token')
+  const familyParam = c.req.param('id')
+  const req = CFamilyGroups_GetPreferredLenders_Request.fromJson({
+    "family_groupid":familyParam,
+  })
+  let bufParam = await encodeRequestProtobuf(req)
+  const baseURL =
+    `https://api.steampowered.com/IFamilyGroupsService/GetPreferredLenders/v1?access_token=${tokenParam}&spoof_steamid=&origin=https:%2F%2Fstore.steampowered.com&input_protobuf_encoded=`
+  bufParam = bufParam.replaceAll('+','%2B').replaceAll('=','%3D')
+  let url = baseURL + bufParam
+  const resp = await fetch(url)
+  let tmp =await resp.arrayBuffer()
+  const arr = new Uint8Array(tmp);
+  const data =  CFamilyGroups_GetPreferredLenders_Response.fromBinary(arr)
+  return c.json({
+    data:data
+  })
+})
+
+app.get('/api/steam/family/summary/:id', async (c) => {
+  const tokenParam = c.req.query('access_token')
+  const familyParam = c.req.param('id')
+  let url = `https://api.steampowered.com/IFamilyGroupsService/GetPlaytimeSummary/v1`
+  const form = new FormData()
+  form.append("access_token",tokenParam!)
+  form.append("family_groupid", familyParam)
+  const resp = await fetch(url, {
+    method: 'POST',
+    body: form
+  })
+  return c.json({
+    data: await resp.json()
+  })
 })
 export const GET = handle(app)
 export const POST = handle(app)

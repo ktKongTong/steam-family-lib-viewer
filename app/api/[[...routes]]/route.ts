@@ -1,7 +1,8 @@
 import {
+  CFamilyGroups_ClearCooldownSkip_Request, CFamilyGroups_ClearCooldownSkip_Response,
   CFamilyGroups_GetFamilyGroupForUser_Request,
   CFamilyGroups_GetFamilyGroupForUser_Response,
-  CFamilyGroups_GetPlaytimeSummary_Request,
+  CFamilyGroups_GetPlaytimeSummary_Request, CFamilyGroups_GetPlaytimeSummary_Response,
   CFamilyGroups_GetPreferredLenders_Request,
   CFamilyGroups_GetPreferredLenders_Response,
   CFamilyGroups_GetSharedLibraryApps_Request,
@@ -359,6 +360,61 @@ app.get('/api/steam/family/summary/:id', async (c) => {
     data: await resp.json()
   })
 })
+
+app.get('/api/steam/family/playtime/:id', async (c) => {
+  const tokenParam = c.req.query('access_token')
+  const familyParam = c.req.param('id')
+  const req = CFamilyGroups_GetPlaytimeSummary_Request.fromJson({
+    "family_groupid":familyParam,
+  })
+
+  const form = new FormData()
+  form.set('access_token', tokenParam as string)
+
+  let bufParam = await encodeRequestProtobuf(req)
+  form.set("input_protobuf_encoded", bufParam!)
+  const baseURL =
+    `https://api.steampowered.com/IFamilyGroupsService/GetPlaytimeSummary/v1?access_token=${tokenParam}&origin=https:%2F%2Fstore.steampowered.com&input_protobuf_encoded=`
+  bufParam = bufParam.replaceAll('+','%2B').replaceAll('=','%3D')
+  let url = baseURL + bufParam
+  const resp = await fetch(url, {
+    method : 'POST',
+    body: form
+  })
+  let tmp =await resp.arrayBuffer()
+  const arr = new Uint8Array(tmp);
+  const data =  CFamilyGroups_GetPlaytimeSummary_Response.fromBinary(arr)
+  return c.json({
+    data: data
+  })
+})
+app.get('/api/steam/family/clear/:id', async (c) => {
+  const tokenParam = c.req.query('access_token')
+  const familyParam = c.req.param('id')
+  const req = CFamilyGroups_ClearCooldownSkip_Request.fromJson({
+    "steamid":familyParam,
+  })
+  const form = new FormData()
+  form.set('access_token', tokenParam as string)
+  let bufParam = await encodeRequestProtobuf(req)
+  form.set("input_protobuf_encoded", bufParam!)
+  const baseURL =
+    `https://api.steampowered.com/IFamilyGroupsService/ClearCooldownSkip/v1?access_token=${tokenParam}&origin=https:%2F%2Fstore.steampowered.com&input_protobuf_encoded=`
+  bufParam = bufParam.replaceAll('+','%2B').replaceAll('=','%3D')
+  let url = baseURL + bufParam
+
+  const resp = await fetch(url, {
+    method : 'POST',
+    body: form
+  })
+  let tmp =await resp.arrayBuffer()
+  const arr = new Uint8Array(tmp);
+  const data =  CFamilyGroups_ClearCooldownSkip_Response.fromBinary(arr)
+  return c.json({
+    data: data
+  })
+})
+
 export const GET = handle(app)
 export const POST = handle(app)
 export const PUT = handle(app)

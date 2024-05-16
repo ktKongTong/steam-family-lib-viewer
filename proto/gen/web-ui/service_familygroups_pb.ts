@@ -81,6 +81,74 @@ export class CFamilyGroups_CancelFamilyGroupInvite_Response extends Message<CFam
 }
 
 /**
+ * @generated from message CFamilyGroups_ClearCooldownSkip_Request
+ */
+export class CFamilyGroups_ClearCooldownSkip_Request extends Message<CFamilyGroups_ClearCooldownSkip_Request> {
+  /**
+   * @generated from field: optional fixed64 steamid = 1;
+   */
+  steamid?: bigint;
+
+  constructor(data?: PartialMessage<CFamilyGroups_ClearCooldownSkip_Request>) {
+    super();
+    proto2.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto2 = proto2;
+  static readonly typeName = "CFamilyGroups_ClearCooldownSkip_Request";
+  static readonly fields: FieldList = proto2.util.newFieldList(() => [
+    { no: 1, name: "steamid", kind: "scalar", T: 6 /* ScalarType.FIXED64 */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_ClearCooldownSkip_Request {
+    return new CFamilyGroups_ClearCooldownSkip_Request().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CFamilyGroups_ClearCooldownSkip_Request {
+    return new CFamilyGroups_ClearCooldownSkip_Request().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CFamilyGroups_ClearCooldownSkip_Request {
+    return new CFamilyGroups_ClearCooldownSkip_Request().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CFamilyGroups_ClearCooldownSkip_Request | PlainMessage<CFamilyGroups_ClearCooldownSkip_Request> | undefined, b: CFamilyGroups_ClearCooldownSkip_Request | PlainMessage<CFamilyGroups_ClearCooldownSkip_Request> | undefined): boolean {
+    return proto2.util.equals(CFamilyGroups_ClearCooldownSkip_Request, a, b);
+  }
+}
+
+/**
+ * @generated from message CFamilyGroups_ClearCooldownSkip_Response
+ */
+export class CFamilyGroups_ClearCooldownSkip_Response extends Message<CFamilyGroups_ClearCooldownSkip_Response> {
+  constructor(data?: PartialMessage<CFamilyGroups_ClearCooldownSkip_Response>) {
+    super();
+    proto2.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto2 = proto2;
+  static readonly typeName = "CFamilyGroups_ClearCooldownSkip_Response";
+  static readonly fields: FieldList = proto2.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_ClearCooldownSkip_Response {
+    return new CFamilyGroups_ClearCooldownSkip_Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CFamilyGroups_ClearCooldownSkip_Response {
+    return new CFamilyGroups_ClearCooldownSkip_Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CFamilyGroups_ClearCooldownSkip_Response {
+    return new CFamilyGroups_ClearCooldownSkip_Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CFamilyGroups_ClearCooldownSkip_Response | PlainMessage<CFamilyGroups_ClearCooldownSkip_Response> | undefined, b: CFamilyGroups_ClearCooldownSkip_Response | PlainMessage<CFamilyGroups_ClearCooldownSkip_Response> | undefined): boolean {
+    return proto2.util.equals(CFamilyGroups_ClearCooldownSkip_Response, a, b);
+  }
+}
+
+/**
  * @generated from message CFamilyGroups_ConfirmInviteToFamilyGroup_Request
  */
 export class CFamilyGroups_ConfirmInviteToFamilyGroup_Request extends Message<CFamilyGroups_ConfirmInviteToFamilyGroup_Request> {
@@ -292,6 +360,11 @@ export class CFamilyGroups_CreateFamilyGroup_Response extends Message<CFamilyGro
    */
   familyGroupid?: bigint;
 
+  /**
+   * @generated from field: optional bool cooldown_skip_granted = 2;
+   */
+  cooldownSkipGranted?: boolean;
+
   constructor(data?: PartialMessage<CFamilyGroups_CreateFamilyGroup_Response>) {
     super();
     proto2.util.initPartial(data, this);
@@ -301,6 +374,7 @@ export class CFamilyGroups_CreateFamilyGroup_Response extends Message<CFamilyGro
   static readonly typeName = "CFamilyGroups_CreateFamilyGroup_Response";
   static readonly fields: FieldList = proto2.util.newFieldList(() => [
     { no: 1, name: "family_groupid", kind: "scalar", T: 4 /* ScalarType.UINT64 */, opt: true },
+    { no: 2, name: "cooldown_skip_granted", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_CreateFamilyGroup_Response {
@@ -389,88 +463,76 @@ export class CFamilyGroups_DeleteFamilyGroup_Response extends Message<CFamilyGro
 }
 
 /**
- * @generated from message CFamilyGroups_FamilyDispersionGraph
+ * @generated from message CFamilyGroups_ForceAcceptInvite_Request
  */
-export class CFamilyGroups_FamilyDispersionGraph extends Message<CFamilyGroups_FamilyDispersionGraph> {
+export class CFamilyGroups_ForceAcceptInvite_Request extends Message<CFamilyGroups_ForceAcceptInvite_Request> {
   /**
-   * @generated from field: repeated CFamilyGroups_FamilyDispersionGraph_Edge edges = 1;
+   * @generated from field: optional uint64 family_groupid = 1;
    */
-  edges: CFamilyGroups_FamilyDispersionGraph_Edge[] = [];
+  familyGroupid?: bigint;
 
-  constructor(data?: PartialMessage<CFamilyGroups_FamilyDispersionGraph>) {
+  /**
+   * @generated from field: optional fixed64 steamid = 2;
+   */
+  steamid?: bigint;
+
+  constructor(data?: PartialMessage<CFamilyGroups_ForceAcceptInvite_Request>) {
     super();
     proto2.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto2 = proto2;
-  static readonly typeName = "CFamilyGroups_FamilyDispersionGraph";
+  static readonly typeName = "CFamilyGroups_ForceAcceptInvite_Request";
   static readonly fields: FieldList = proto2.util.newFieldList(() => [
-    { no: 1, name: "edges", kind: "message", T: CFamilyGroups_FamilyDispersionGraph_Edge, repeated: true },
+    { no: 1, name: "family_groupid", kind: "scalar", T: 4 /* ScalarType.UINT64 */, opt: true },
+    { no: 2, name: "steamid", kind: "scalar", T: 6 /* ScalarType.FIXED64 */, opt: true },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_FamilyDispersionGraph {
-    return new CFamilyGroups_FamilyDispersionGraph().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_ForceAcceptInvite_Request {
+    return new CFamilyGroups_ForceAcceptInvite_Request().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CFamilyGroups_FamilyDispersionGraph {
-    return new CFamilyGroups_FamilyDispersionGraph().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CFamilyGroups_ForceAcceptInvite_Request {
+    return new CFamilyGroups_ForceAcceptInvite_Request().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CFamilyGroups_FamilyDispersionGraph {
-    return new CFamilyGroups_FamilyDispersionGraph().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CFamilyGroups_ForceAcceptInvite_Request {
+    return new CFamilyGroups_ForceAcceptInvite_Request().fromJsonString(jsonString, options);
   }
 
-  static equals(a: CFamilyGroups_FamilyDispersionGraph | PlainMessage<CFamilyGroups_FamilyDispersionGraph> | undefined, b: CFamilyGroups_FamilyDispersionGraph | PlainMessage<CFamilyGroups_FamilyDispersionGraph> | undefined): boolean {
-    return proto2.util.equals(CFamilyGroups_FamilyDispersionGraph, a, b);
+  static equals(a: CFamilyGroups_ForceAcceptInvite_Request | PlainMessage<CFamilyGroups_ForceAcceptInvite_Request> | undefined, b: CFamilyGroups_ForceAcceptInvite_Request | PlainMessage<CFamilyGroups_ForceAcceptInvite_Request> | undefined): boolean {
+    return proto2.util.equals(CFamilyGroups_ForceAcceptInvite_Request, a, b);
   }
 }
 
 /**
- * @generated from message CFamilyGroups_FamilyDispersionGraph_Edge
+ * @generated from message CFamilyGroups_ForceAcceptInvite_Response
  */
-export class CFamilyGroups_FamilyDispersionGraph_Edge extends Message<CFamilyGroups_FamilyDispersionGraph_Edge> {
-  /**
-   * @generated from field: optional uint32 accountid1 = 1;
-   */
-  accountid1?: number;
-
-  /**
-   * @generated from field: optional uint32 accountid2 = 2;
-   */
-  accountid2?: number;
-
-  /**
-   * @generated from field: optional double distance = 3;
-   */
-  distance?: number;
-
-  constructor(data?: PartialMessage<CFamilyGroups_FamilyDispersionGraph_Edge>) {
+export class CFamilyGroups_ForceAcceptInvite_Response extends Message<CFamilyGroups_ForceAcceptInvite_Response> {
+  constructor(data?: PartialMessage<CFamilyGroups_ForceAcceptInvite_Response>) {
     super();
     proto2.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto2 = proto2;
-  static readonly typeName = "CFamilyGroups_FamilyDispersionGraph_Edge";
+  static readonly typeName = "CFamilyGroups_ForceAcceptInvite_Response";
   static readonly fields: FieldList = proto2.util.newFieldList(() => [
-    { no: 1, name: "accountid1", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
-    { no: 2, name: "accountid2", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
-    { no: 3, name: "distance", kind: "scalar", T: 1 /* ScalarType.DOUBLE */, opt: true },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_FamilyDispersionGraph_Edge {
-    return new CFamilyGroups_FamilyDispersionGraph_Edge().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_ForceAcceptInvite_Response {
+    return new CFamilyGroups_ForceAcceptInvite_Response().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CFamilyGroups_FamilyDispersionGraph_Edge {
-    return new CFamilyGroups_FamilyDispersionGraph_Edge().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CFamilyGroups_ForceAcceptInvite_Response {
+    return new CFamilyGroups_ForceAcceptInvite_Response().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CFamilyGroups_FamilyDispersionGraph_Edge {
-    return new CFamilyGroups_FamilyDispersionGraph_Edge().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CFamilyGroups_ForceAcceptInvite_Response {
+    return new CFamilyGroups_ForceAcceptInvite_Response().fromJsonString(jsonString, options);
   }
 
-  static equals(a: CFamilyGroups_FamilyDispersionGraph_Edge | PlainMessage<CFamilyGroups_FamilyDispersionGraph_Edge> | undefined, b: CFamilyGroups_FamilyDispersionGraph_Edge | PlainMessage<CFamilyGroups_FamilyDispersionGraph_Edge> | undefined): boolean {
-    return proto2.util.equals(CFamilyGroups_FamilyDispersionGraph_Edge, a, b);
+  static equals(a: CFamilyGroups_ForceAcceptInvite_Response | PlainMessage<CFamilyGroups_ForceAcceptInvite_Response> | undefined, b: CFamilyGroups_ForceAcceptInvite_Response | PlainMessage<CFamilyGroups_ForceAcceptInvite_Response> | undefined): boolean {
+    return proto2.util.equals(CFamilyGroups_ForceAcceptInvite_Response, a, b);
   }
 }
 
@@ -606,86 +668,6 @@ export class CFamilyGroups_GetChangeLog_Response_Change extends Message<CFamilyG
 
   static equals(a: CFamilyGroups_GetChangeLog_Response_Change | PlainMessage<CFamilyGroups_GetChangeLog_Response_Change> | undefined, b: CFamilyGroups_GetChangeLog_Response_Change | PlainMessage<CFamilyGroups_GetChangeLog_Response_Change> | undefined): boolean {
     return proto2.util.equals(CFamilyGroups_GetChangeLog_Response_Change, a, b);
-  }
-}
-
-/**
- * @generated from message CFamilyGroups_GetDispersionForFamily_Request
- */
-export class CFamilyGroups_GetDispersionForFamily_Request extends Message<CFamilyGroups_GetDispersionForFamily_Request> {
-  /**
-   * @generated from field: optional uint64 family_groupid = 1;
-   */
-  familyGroupid?: bigint;
-
-  constructor(data?: PartialMessage<CFamilyGroups_GetDispersionForFamily_Request>) {
-    super();
-    proto2.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto2 = proto2;
-  static readonly typeName = "CFamilyGroups_GetDispersionForFamily_Request";
-  static readonly fields: FieldList = proto2.util.newFieldList(() => [
-    { no: 1, name: "family_groupid", kind: "scalar", T: 4 /* ScalarType.UINT64 */, opt: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_GetDispersionForFamily_Request {
-    return new CFamilyGroups_GetDispersionForFamily_Request().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CFamilyGroups_GetDispersionForFamily_Request {
-    return new CFamilyGroups_GetDispersionForFamily_Request().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CFamilyGroups_GetDispersionForFamily_Request {
-    return new CFamilyGroups_GetDispersionForFamily_Request().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: CFamilyGroups_GetDispersionForFamily_Request | PlainMessage<CFamilyGroups_GetDispersionForFamily_Request> | undefined, b: CFamilyGroups_GetDispersionForFamily_Request | PlainMessage<CFamilyGroups_GetDispersionForFamily_Request> | undefined): boolean {
-    return proto2.util.equals(CFamilyGroups_GetDispersionForFamily_Request, a, b);
-  }
-}
-
-/**
- * @generated from message CFamilyGroups_GetDispersionForFamily_Response
- */
-export class CFamilyGroups_GetDispersionForFamily_Response extends Message<CFamilyGroups_GetDispersionForFamily_Response> {
-  /**
-   * @generated from field: optional double total_dispersion = 1;
-   */
-  totalDispersion?: number;
-
-  /**
-   * @generated from field: optional CFamilyGroups_FamilyDispersionGraph graph = 2;
-   */
-  graph?: CFamilyGroups_FamilyDispersionGraph;
-
-  constructor(data?: PartialMessage<CFamilyGroups_GetDispersionForFamily_Response>) {
-    super();
-    proto2.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto2 = proto2;
-  static readonly typeName = "CFamilyGroups_GetDispersionForFamily_Response";
-  static readonly fields: FieldList = proto2.util.newFieldList(() => [
-    { no: 1, name: "total_dispersion", kind: "scalar", T: 1 /* ScalarType.DOUBLE */, opt: true },
-    { no: 2, name: "graph", kind: "message", T: CFamilyGroups_FamilyDispersionGraph, opt: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_GetDispersionForFamily_Response {
-    return new CFamilyGroups_GetDispersionForFamily_Response().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CFamilyGroups_GetDispersionForFamily_Response {
-    return new CFamilyGroups_GetDispersionForFamily_Response().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CFamilyGroups_GetDispersionForFamily_Response {
-    return new CFamilyGroups_GetDispersionForFamily_Response().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: CFamilyGroups_GetDispersionForFamily_Response | PlainMessage<CFamilyGroups_GetDispersionForFamily_Response> | undefined, b: CFamilyGroups_GetDispersionForFamily_Response | PlainMessage<CFamilyGroups_GetDispersionForFamily_Response> | undefined): boolean {
-    return proto2.util.equals(CFamilyGroups_GetDispersionForFamily_Response, a, b);
   }
 }
 
@@ -898,6 +880,11 @@ export class CFamilyGroups_GetFamilyGroupForUser_Response extends Message<CFamil
    */
   familyGroup?: CFamilyGroups_GetFamilyGroup_Response;
 
+  /**
+   * @generated from field: optional bool can_undelete_last_joined_family = 9;
+   */
+  canUndeleteLastJoinedFamily?: boolean;
+
   constructor(data?: PartialMessage<CFamilyGroups_GetFamilyGroupForUser_Response>) {
     super();
     proto2.util.initPartial(data, this);
@@ -914,6 +901,7 @@ export class CFamilyGroups_GetFamilyGroupForUser_Response extends Message<CFamil
     { no: 6, name: "role", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 7, name: "cooldown_seconds_remaining", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 8, name: "family_group", kind: "message", T: CFamilyGroups_GetFamilyGroup_Response, opt: true },
+    { no: 9, name: "can_undelete_last_joined_family", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_GetFamilyGroupForUser_Response {
@@ -930,6 +918,92 @@ export class CFamilyGroups_GetFamilyGroupForUser_Response extends Message<CFamil
 
   static equals(a: CFamilyGroups_GetFamilyGroupForUser_Response | PlainMessage<CFamilyGroups_GetFamilyGroupForUser_Response> | undefined, b: CFamilyGroups_GetFamilyGroupForUser_Response | PlainMessage<CFamilyGroups_GetFamilyGroupForUser_Response> | undefined): boolean {
     return proto2.util.equals(CFamilyGroups_GetFamilyGroupForUser_Response, a, b);
+  }
+}
+
+/**
+ * @generated from message CFamilyGroups_GetInviteCheckResults_Request
+ */
+export class CFamilyGroups_GetInviteCheckResults_Request extends Message<CFamilyGroups_GetInviteCheckResults_Request> {
+  /**
+   * @generated from field: optional uint64 family_groupid = 1;
+   */
+  familyGroupid?: bigint;
+
+  /**
+   * @generated from field: optional fixed64 steamid = 2;
+   */
+  steamid?: bigint;
+
+  constructor(data?: PartialMessage<CFamilyGroups_GetInviteCheckResults_Request>) {
+    super();
+    proto2.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto2 = proto2;
+  static readonly typeName = "CFamilyGroups_GetInviteCheckResults_Request";
+  static readonly fields: FieldList = proto2.util.newFieldList(() => [
+    { no: 1, name: "family_groupid", kind: "scalar", T: 4 /* ScalarType.UINT64 */, opt: true },
+    { no: 2, name: "steamid", kind: "scalar", T: 6 /* ScalarType.FIXED64 */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_GetInviteCheckResults_Request {
+    return new CFamilyGroups_GetInviteCheckResults_Request().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CFamilyGroups_GetInviteCheckResults_Request {
+    return new CFamilyGroups_GetInviteCheckResults_Request().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CFamilyGroups_GetInviteCheckResults_Request {
+    return new CFamilyGroups_GetInviteCheckResults_Request().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CFamilyGroups_GetInviteCheckResults_Request | PlainMessage<CFamilyGroups_GetInviteCheckResults_Request> | undefined, b: CFamilyGroups_GetInviteCheckResults_Request | PlainMessage<CFamilyGroups_GetInviteCheckResults_Request> | undefined): boolean {
+    return proto2.util.equals(CFamilyGroups_GetInviteCheckResults_Request, a, b);
+  }
+}
+
+/**
+ * @generated from message CFamilyGroups_GetInviteCheckResults_Response
+ */
+export class CFamilyGroups_GetInviteCheckResults_Response extends Message<CFamilyGroups_GetInviteCheckResults_Response> {
+  /**
+   * @generated from field: optional bool wallet_country_matches = 1;
+   */
+  walletCountryMatches?: boolean;
+
+  /**
+   * @generated from field: optional bool has_ip_match = 2;
+   */
+  hasIpMatch?: boolean;
+
+  constructor(data?: PartialMessage<CFamilyGroups_GetInviteCheckResults_Response>) {
+    super();
+    proto2.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto2 = proto2;
+  static readonly typeName = "CFamilyGroups_GetInviteCheckResults_Response";
+  static readonly fields: FieldList = proto2.util.newFieldList(() => [
+    { no: 1, name: "wallet_country_matches", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
+    { no: 2, name: "has_ip_match", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_GetInviteCheckResults_Response {
+    return new CFamilyGroups_GetInviteCheckResults_Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CFamilyGroups_GetInviteCheckResults_Response {
+    return new CFamilyGroups_GetInviteCheckResults_Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CFamilyGroups_GetInviteCheckResults_Response {
+    return new CFamilyGroups_GetInviteCheckResults_Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CFamilyGroups_GetInviteCheckResults_Response | PlainMessage<CFamilyGroups_GetInviteCheckResults_Response> | undefined, b: CFamilyGroups_GetInviteCheckResults_Response | PlainMessage<CFamilyGroups_GetInviteCheckResults_Response> | undefined): boolean {
+    return proto2.util.equals(CFamilyGroups_GetInviteCheckResults_Response, a, b);
   }
 }
 
@@ -979,6 +1053,11 @@ export class CFamilyGroups_GetPlaytimeSummary_Response extends Message<CFamilyGr
    */
   entries: CFamilyGroups_PlaytimeEntry[] = [];
 
+  /**
+   * @generated from field: repeated CFamilyGroups_PlaytimeEntry entries_by_owner = 2;
+   */
+  entriesByOwner: CFamilyGroups_PlaytimeEntry[] = [];
+
   constructor(data?: PartialMessage<CFamilyGroups_GetPlaytimeSummary_Response>) {
     super();
     proto2.util.initPartial(data, this);
@@ -988,6 +1067,7 @@ export class CFamilyGroups_GetPlaytimeSummary_Response extends Message<CFamilyGr
   static readonly typeName = "CFamilyGroups_GetPlaytimeSummary_Response";
   static readonly fields: FieldList = proto2.util.newFieldList(() => [
     { no: 1, name: "entries", kind: "message", T: CFamilyGroups_PlaytimeEntry, repeated: true },
+    { no: 2, name: "entries_by_owner", kind: "message", T: CFamilyGroups_PlaytimeEntry, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_GetPlaytimeSummary_Response {
@@ -1647,6 +1727,16 @@ export class CFamilyGroups_JoinFamilyGroup_Response extends Message<CFamilyGroup
    */
   twoFactorMethod?: number;
 
+  /**
+   * @generated from field: optional bool cooldown_skip_granted = 3;
+   */
+  cooldownSkipGranted?: boolean;
+
+  /**
+   * @generated from field: optional bool invite_already_accepted = 4;
+   */
+  inviteAlreadyAccepted?: boolean;
+
   constructor(data?: PartialMessage<CFamilyGroups_JoinFamilyGroup_Response>) {
     super();
     proto2.util.initPartial(data, this);
@@ -1656,6 +1746,8 @@ export class CFamilyGroups_JoinFamilyGroup_Response extends Message<CFamilyGroup
   static readonly typeName = "CFamilyGroups_JoinFamilyGroup_Response";
   static readonly fields: FieldList = proto2.util.newFieldList(() => [
     { no: 2, name: "two_factor_method", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+    { no: 3, name: "cooldown_skip_granted", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
+    { no: 4, name: "invite_already_accepted", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_JoinFamilyGroup_Response {
@@ -2287,6 +2379,74 @@ export class CFamilyGroups_SetPreferredLender_Response extends Message<CFamilyGr
 
   static equals(a: CFamilyGroups_SetPreferredLender_Response | PlainMessage<CFamilyGroups_SetPreferredLender_Response> | undefined, b: CFamilyGroups_SetPreferredLender_Response | PlainMessage<CFamilyGroups_SetPreferredLender_Response> | undefined): boolean {
     return proto2.util.equals(CFamilyGroups_SetPreferredLender_Response, a, b);
+  }
+}
+
+/**
+ * @generated from message CFamilyGroups_UndeleteFamilyGroup_Request
+ */
+export class CFamilyGroups_UndeleteFamilyGroup_Request extends Message<CFamilyGroups_UndeleteFamilyGroup_Request> {
+  /**
+   * @generated from field: optional uint64 family_groupid = 1;
+   */
+  familyGroupid?: bigint;
+
+  constructor(data?: PartialMessage<CFamilyGroups_UndeleteFamilyGroup_Request>) {
+    super();
+    proto2.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto2 = proto2;
+  static readonly typeName = "CFamilyGroups_UndeleteFamilyGroup_Request";
+  static readonly fields: FieldList = proto2.util.newFieldList(() => [
+    { no: 1, name: "family_groupid", kind: "scalar", T: 4 /* ScalarType.UINT64 */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_UndeleteFamilyGroup_Request {
+    return new CFamilyGroups_UndeleteFamilyGroup_Request().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CFamilyGroups_UndeleteFamilyGroup_Request {
+    return new CFamilyGroups_UndeleteFamilyGroup_Request().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CFamilyGroups_UndeleteFamilyGroup_Request {
+    return new CFamilyGroups_UndeleteFamilyGroup_Request().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CFamilyGroups_UndeleteFamilyGroup_Request | PlainMessage<CFamilyGroups_UndeleteFamilyGroup_Request> | undefined, b: CFamilyGroups_UndeleteFamilyGroup_Request | PlainMessage<CFamilyGroups_UndeleteFamilyGroup_Request> | undefined): boolean {
+    return proto2.util.equals(CFamilyGroups_UndeleteFamilyGroup_Request, a, b);
+  }
+}
+
+/**
+ * @generated from message CFamilyGroups_UndeleteFamilyGroup_Response
+ */
+export class CFamilyGroups_UndeleteFamilyGroup_Response extends Message<CFamilyGroups_UndeleteFamilyGroup_Response> {
+  constructor(data?: PartialMessage<CFamilyGroups_UndeleteFamilyGroup_Response>) {
+    super();
+    proto2.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto2 = proto2;
+  static readonly typeName = "CFamilyGroups_UndeleteFamilyGroup_Response";
+  static readonly fields: FieldList = proto2.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CFamilyGroups_UndeleteFamilyGroup_Response {
+    return new CFamilyGroups_UndeleteFamilyGroup_Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CFamilyGroups_UndeleteFamilyGroup_Response {
+    return new CFamilyGroups_UndeleteFamilyGroup_Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CFamilyGroups_UndeleteFamilyGroup_Response {
+    return new CFamilyGroups_UndeleteFamilyGroup_Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CFamilyGroups_UndeleteFamilyGroup_Response | PlainMessage<CFamilyGroups_UndeleteFamilyGroup_Response> | undefined, b: CFamilyGroups_UndeleteFamilyGroup_Response | PlainMessage<CFamilyGroups_UndeleteFamilyGroup_Response> | undefined): boolean {
+    return proto2.util.equals(CFamilyGroups_UndeleteFamilyGroup_Response, a, b);
   }
 }
 

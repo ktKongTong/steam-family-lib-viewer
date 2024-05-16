@@ -22,6 +22,7 @@ import {
 } from "@/proto/gen/web-ui/service_player_pb";
 import {StoreItem} from "@/proto/gen/web-ui/common_pb";
 import {useToast} from "@/components/ui/use-toast";
+import {SteamAppPlaytime, SteamPlaytimeItem, SteamPlaytimeResponse} from "@/interface/steamPlaytime";
 
 dayjs.extend(relativeTime)
 
@@ -49,6 +50,37 @@ async function fetchFamilyInfo(token:string):Promise<null|any>{
       return null
     })
   return data
+}
+async function fetchFamilyPlayTime(token:string,id:string) {
+  const data = (await fetch(`/api/steam/family/playtime/${id}?access_token=${token}`)
+    .then(res=>res.json())
+    .catch(e=> {
+      console.log(e)
+      return null
+    })) as SteamPlaytimeResponse
+  console.log(data.data)
+  const appids:number[] = data.data.entries.flatMap((it:any)=>it.appid)
+  const appidsByOwner = data.data.entriesByOwner.flatMap(it => it.appid)
+  const allIds = _.uniq(appids.concat(appidsByOwner))
+  const appPlaytimeDict = _.groupBy(data.data.entries,'appid')
+  const appPlaytimeByOwnerDict = _.groupBy(data.data.entriesByOwner, 'appid')
+
+  return allIds.map(id=> {
+    let res: (SteamPlaytimeItem & {isOwner:boolean}) [] = []
+    let owners = appPlaytimeByOwnerDict[id]
+    let players = appPlaytimeDict[id]
+    if(owners) {
+      res = res.concat(owners.map(owner => ({...owner, isOwner: true})))
+    }
+    if(players) {
+      res = res.concat(players.map(player => ({...player, isOwner: false})))
+    }
+    return {
+      appid: id,
+      players: res,
+    }
+  })
+
 }
 async function fetchFamilyMembers(token:string,ids:string[]){
   const data = await fetch(`/api/steam/player/${ids.join(',')}?access_token=${token}`)
@@ -79,7 +111,15 @@ async function fetchFamilyLibItems(ids:string[]){
     })
   return data
 }
-
+async function getRandomBackground(){
+  const data = await fetch(`https://moe.anosu.top/img/?type=json`)
+    .then(res=>res.json())
+    .catch(e=> {
+      console.log(e)
+      return null
+    })
+  return data.pics[0] as string
+}
 
 export type Player = FamilyGroupMember & CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails_AccountPublicData & {
   avatar_hash: string
@@ -87,6 +127,7 @@ export type Player = FamilyGroupMember & CPlayer_GetPlayerLinkDetails_Response_P
 export type App = CFamilyGroups_GetSharedLibraryApps_Response_SharedApp
   & {  detail: StoreItem }
   & { owners: Player[] }
+  & { playtime?: any }
 export default function Home() {
   const [tokenInput,setToken] = useState('')
   const jwtInfo = useMemo(()=> {
@@ -97,18 +138,17 @@ export default function Home() {
   const [steps,setSteps] = useState<Step[]>([])
   const [inputActive, setInputActive] = useState(true)
 
+  const [familyInfo,setFamilyInfo] = useState<any>(null)
   const [allMember,setAllMember] = useState<Player[]>([])
   const [libDictionary, setLibDictionary] = useState<any>()
   const [allLibs, setAllLibs] = useState<any[]>([])
+  const [libsPlaytime,setLibsPlaytime] = useState<SteamAppPlaytime[]>([])
   const [dataLoaded,setDataLoaded] = useState(false)
+  const [background, setBackground] = useState("https://pic.rmb.bdstatic.com/bjh/85b8180794c573eba31c2e498bb40714.jpeg")
   const onSubmit = async ()=> {
-
-
     setDataLoaded(false)
-    const getFamilyInfo = async ()=>{
-      return await fetchFamilyInfo(tokenInput)
-    }
-    const familyStep = new RetryableStep(getFamilyInfo, "获取家庭信息")
+    getRandomBackground().then(res=> {if(res) {setBackground(res)}})
+    const familyStep = new RetryableStep(() => fetchFamilyInfo(tokenInput), "获取家庭信息")
     const memberStep = new Step()
     const libsStep = new Step()
     const steps = [familyStep,memberStep,libsStep]
@@ -120,6 +160,7 @@ export default function Home() {
         description: familyStep.message
       })
     }
+    setFamilyInfo(familyInfo)
     const familyName = familyInfo.data.familyGroup.name
     const memberIds =familyInfo.data.familyGroup.members.map((member:any)=>member.steamid.toString())
     const memberFamilyInfos = _.keyBy(familyInfo.data.familyGroup?.members, 'steamid')
@@ -127,11 +168,15 @@ export default function Home() {
     libsStep.trigger('正在获取共享库存信息')
     memberStep.trigger('正在获取家庭成员信息')
     setSteps([...steps])
-    const [libOverviewInfos,memberInfos] = await Promise.all([
+    const [libsPlaytimeSummary,libOverviewInfos,memberInfos] = await Promise.all([
+      fetchFamilyPlayTime(tokenInput, familyInfo.data.familyGroupid),
       fetchFamilySharedLibs(tokenInput, familyInfo.data.familyGroupid),
       fetchFamilyMembers(tokenInput, memberIds)
-    ])
 
+    ])
+    console.log("loadedtime")
+    console.log(libsPlaytimeSummary)
+    setLibsPlaytime(libsPlaytimeSummary)
     if (!libOverviewInfos) {
       libsStep.failed('获取共享库存信息失败')
     }else {
@@ -284,7 +329,7 @@ export default function Home() {
       </div>
       {
         dataLoaded &&
-          <DataGraph libs={allLibs} players={allMember}/>
+          <DataGraph libs={allLibs} players={allMember} libsPlaytime={libsPlaytime} family={familyInfo} bg={background}/>
       }
     </main>
   );

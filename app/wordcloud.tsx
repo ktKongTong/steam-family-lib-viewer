@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Text } from '@visx/text';
 import { scaleLog } from '@visx/scale';
 import Wordcloud from '@visx/wordcloud/lib/Wordcloud';
+import {selectableColor} from "@/app/playtimeGraph";
 
 
-const colors = ['#143059', '#2F6B9A', '#82a6c2'];
+const colors = selectableColor;
 
 function wordFreq(text: string): WordData[] {
   const words: string[] = text.replace(/\./g, '').split(/\s/);
@@ -58,6 +59,7 @@ export default function WordCloud({ width, height, showControls,words,className}
         fontSize={fontSizeSetter}
         font={'Impact'}
         padding={2}
+
         spiral={spiralType}
         rotate={withRotation ? getRotationDegree : 0}
         random={fixedValueGenerator}

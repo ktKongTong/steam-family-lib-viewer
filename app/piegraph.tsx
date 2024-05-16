@@ -1,42 +1,92 @@
 import ReactECharts from "echarts-for-react";
 import React from "react";
+import {axisStyle, defaultTextStyle, selectableColor} from "@/app/playtimeGraph";
 
 export function Piegraph({
+  countData,
   countById,
   style
 }:{
+  countData: any,
   countById:any
 style: {height: number, width: number}
 
 }){
-
+  const cntData = countData.map((it:any)=> {
+    return [it.name, it.cnt]
+  })
   const option = {
+    darkMode: true,
+    color: selectableColor,
     title: {
       text: '库存数量',
-      left: 'center'
+      left: 'center',
+      textStyle: {
+        color: '#ffffff'
+      }
     },
-    tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b} : {c} ({d}%)'
-    },
+
     legend: {
       left: 'center',
-      top: 'bottom',
-      data: countById.map((it:any)=>it.name)
+      top:'bottom',
+      textStyle: defaultTextStyle,
+    },
+    grid: { left: '55%' },
+    xAxis: {
+      gridIndex: 0,
+      ...axisStyle,
+
+    },
+    yAxis: {
+      type: 'category',
+      ...axisStyle
+    },
+    dataset: {
+      source: [
+        ['name', 'count'],
+        ...cntData
+      ]
     },
     series: [
+    ...cntData.map((it:any)=> ({
+        type: 'bar',
+        seriesLayoutBy: 'row',
+        itemStyle: {
+          borderRadius: [0,50,50,0]
+        },
+        height: '4px',
+        label: {
+          textStyle: {
+            color:'#ffffff'
+          },
+          show: true,
+          position: 'right'
+        },
+      })),
       {
         type: 'pie',
-        radius: [20, 140],
+        id: 'pie',
+        radius: '40%',
+        center: ['30%', '50%'],
         roseType: 'radius',
         itemStyle: {
-          borderRadius: 5
+          borderRadius: 10
+        },
+        emphasis: {
+          focus: 'self'
         },
         label: {
-          show: false
+          formatter: '{b}:({d}%)',
+          textStyle: {
+            color:'#ffffff'
+          }
         },
-        data: countById
-      }]
+        encode: {
+          itemName: 'name',
+          value: 'count',
+        }
+      }
+    ]
   };
 
 

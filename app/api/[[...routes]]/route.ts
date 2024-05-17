@@ -9,7 +9,7 @@ import {steamAuth} from "@/app/api/[[...routes]]/auth";
 export const runtime = 'edge';
 
 
-export class App<E extends HEnv, S extends Schema = {}, BasePath extends string = '/api'> extends Hono<E,S,BasePath> {
+class App<E extends HEnv, S extends Schema = {}, BasePath extends string = '/api'> extends Hono<E,S,BasePath> {
   apply(func: <T extends HEnv>(app: Hono<E,S,BasePath>) => void) {
     func(this)
     return this

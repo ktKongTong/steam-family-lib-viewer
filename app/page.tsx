@@ -14,15 +14,21 @@ import dayjs from "dayjs";
 import {RetryableStep, statusToEmoji, Step} from "@/app/step";
 import GetToken from "@/app/GetToken";
 import {
+  CFamilyGroups_GetFamilyGroupForUser_Response,
+  CFamilyGroups_GetPlaytimeSummary_Response,
+  CFamilyGroups_GetSharedLibraryApps_Response,
   CFamilyGroups_GetSharedLibraryApps_Response_SharedApp,
+  CFamilyGroups_PlaytimeEntry,
   FamilyGroupMember
 } from "@/proto/gen/web-ui/service_familygroups_pb";
 import {
   CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails_AccountPublicData
 } from "@/proto/gen/web-ui/service_player_pb";
-import {StoreItem} from "@/proto/gen/web-ui/common_pb";
+import {CStoreBrowse_GetItems_Response, StoreItem} from "@/proto/gen/web-ui/common_pb";
 import {useToast} from "@/components/ui/use-toast";
 import {SteamAppPlaytime, SteamPlaytimeItem, SteamPlaytimeResponse} from "@/interface/steamPlaytime";
+import {ProxiedAPIResponse} from "@/app/api/[[...routes]]/(api)/interface";
+import {Message} from "@bufbuild/protobuf";
 
 dayjs.extend(relativeTime)
 
@@ -42,7 +48,7 @@ function validToken(token:JwtPayload|null)  {
 }
 
 
-async function fetchFamilyInfo(token:string):Promise<null|any>{
+async function fetchFamilyInfo(token:string):Promise<null| ProxiedAPIResponse<CFamilyGroups_GetFamilyGroupForUser_Response>>{
   const data = await fetch(`/api/steam/family?access_token=${token}`)
     .then(res=>res.json())
     .catch(e=> {
@@ -57,30 +63,29 @@ async function fetchFamilyPlayTime(token:string,id:string) {
     .catch(e=> {
       console.log(e)
       return null
-    })) as SteamPlaytimeResponse
+    })) as ProxiedAPIResponse<CFamilyGroups_GetPlaytimeSummary_Response>
   console.log(data.data)
-  const appids:number[] = data.data.entries.flatMap((it:any)=>it.appid)
-  const appidsByOwner = data.data.entriesByOwner.flatMap(it => it.appid)
+  const appids:number[] = data.data!.entries.flatMap((it:any)=>it.appid)
+  const appidsByOwner = data.data!.entriesByOwner.flatMap(it => it.appid!)
   const allIds = _.uniq(appids.concat(appidsByOwner))
-  const appPlaytimeDict = _.groupBy(data.data.entries,'appid')
-  const appPlaytimeByOwnerDict = _.groupBy(data.data.entriesByOwner, 'appid')
-
+  const appPlaytimeDict = _.groupBy(data.data!.entries,'appid')
+  const appPlaytimeByOwnerDict = _.groupBy(data.data!.entriesByOwner, 'appid')
   return allIds.map(id=> {
-    let res: (SteamPlaytimeItem & {isOwner:boolean}) [] = []
+    let res:any[] = []
     let owners = appPlaytimeByOwnerDict[id]
     let players = appPlaytimeDict[id]
     if(owners) {
-      res = res.concat(owners.map(owner => ({...owner, isOwner: true})))
+      res = res.concat(owners.map(owner => ({...owner, isOwner: true}))
+      )
     }
     if(players) {
       res = res.concat(players.map(player => ({...player, isOwner: false})))
     }
     return {
       appid: id,
-      players: res,
+      players: res as (CFamilyGroups_PlaytimeEntry & {isOwner:boolean})[],
     }
   })
-
 }
 async function fetchFamilyMembers(token:string,ids:string[]){
   const data = await fetch(`/api/steam/player/${ids.join(',')}?access_token=${token}`)
@@ -94,7 +99,7 @@ async function fetchFamilyMembers(token:string,ids:string[]){
 
 async function fetchFamilySharedLibs(token:string,id:string){
   const data = await fetch(`/api/steam/family/shared/${id}?access_token=${token}`)
-    .then(res=>res.json())
+    .then(res=>res.json() as Promise<ProxiedAPIResponse<CFamilyGroups_GetSharedLibraryApps_Response>>)
     .catch(e=> {
       console.log(e)
       return null
@@ -104,7 +109,7 @@ async function fetchFamilySharedLibs(token:string,id:string){
 
 async function fetchFamilyLibItems(ids:string[]){
   const data = await fetch(`/api/steam/items/${ids.join(',')}`)
-    .then(res=>res.json())
+    .then(res=>res.json() as Promise<ProxiedAPIResponse<CStoreBrowse_GetItems_Response>>)
     .catch(e=> {
       console.log(e)
       return null
@@ -161,18 +166,19 @@ export default function Home() {
       })
     }
     setFamilyInfo(familyInfo)
-    const familyName = familyInfo.data.familyGroup.name
-    const memberIds =familyInfo.data.familyGroup.members.map((member:any)=>member.steamid.toString())
-    const memberFamilyInfos = _.keyBy(familyInfo.data.familyGroup?.members, 'steamid')
+    let familyGroupId = familyInfo!.data!.familyGroupid!
+    let familyData = familyInfo?.data?.familyGroup!
+    const familyName = familyData.name!!
+    const memberIds =familyData.members!.map((member)=>member.steamid!.toString())
+    const memberFamilyInfos = _.keyBy(familyData.members, 'steamid')
     familyStep.success(`成功获取家庭信息，你好，${familyName} 的成员，更多数据正在赶来的路上`)
     libsStep.trigger('正在获取共享库存信息')
     memberStep.trigger('正在获取家庭成员信息')
     setSteps([...steps])
     const [libsPlaytimeSummary,libOverviewInfos,memberInfos] = await Promise.all([
-      fetchFamilyPlayTime(tokenInput, familyInfo.data.familyGroupid),
-      fetchFamilySharedLibs(tokenInput, familyInfo.data.familyGroupid),
+      fetchFamilyPlayTime(tokenInput, familyGroupId.toString()),
+      fetchFamilySharedLibs(tokenInput, familyGroupId.toString()),
       fetchFamilyMembers(tokenInput, memberIds)
-
     ])
     console.log("loadedtime")
     console.log(libsPlaytimeSummary)
@@ -203,7 +209,7 @@ export default function Home() {
     setAllMember(members)
     const memberDict = _.keyBy(members, 'steamid')
 
-    const libs = libOverviewInfos.data.apps
+    const libs = libOverviewInfos.data!.apps
       .filter( (app:any) => app.excludeReason == undefined || app.excludeReason == 0)
 
     const libIds:string[][] = _.chunk(libs.map((it:any)=>it.appid.toString()), 30)
@@ -217,7 +223,7 @@ export default function Home() {
       const stepRes = curStep.trigger()
       setSteps([...steps,...itemsSteps])
       const res = await stepRes
-      if (!res || res.data.storeItems.length == 0) {
+      if (!res || res!.data!.storeItems.length == 0) {
         curStep.failed()
       }else {
         curStep.success()
@@ -227,17 +233,17 @@ export default function Home() {
     }))
     const items = res
       .filter((it,index) => {
-        return !(!it || it.data.storeItems.length == 0);
+        return !(!it || it.data!.storeItems.length == 0);
       })
-    .map(resp=>resp.data.storeItems).flatMap(it=>it)
+    .map(resp=>resp!.data!.storeItems).flatMap(it=>it)
     const libDictionary = _.keyBy(items, 'id')
-    const allLib = libs.map((lib:any)=> ({
+    const allLib = libs.map((lib)=> ({
       ...lib,
-        detail: libDictionary[lib.appid],
-        owners:lib.ownerSteamids.map((id:any) => {
+        detail: libDictionary[lib.appid!],
+        owners:lib.ownerSteamids.map((id) => {
           // console.log("id",id)
           // console.log("member",memberDict[id])
-          return memberDict[id]
+          return memberDict[id.toString()]
         })
     }))
     setAllLibs(allLib)
@@ -290,34 +296,34 @@ export default function Home() {
             }
           </div>
           <div className={"pl-4"}>
-            <div className={""}>
-              {
-                jwtInfo && jwtInfo.sub &&
-                  <div className={'flex items-center space-x-2'}>
-                      <Label>steam ID</Label>
-                      <span> {jwtInfo.sub}</span>
-                  </div>
-              }
-              {
-                jwtInfo && jwtInfo.exp &&
-                  <div className={'flex items-center space-x-2'}>
-                      <Label>token 过期时间</Label>
-                      <span> {dayjs.unix(jwtInfo.exp).format('MM月DD日 HH:mm:ss')}</span>
-                  </div>
-              }
-            </div>
-            <div>
+            <div className={"max-h-80 overflow-y-auto scrollbar-none"}>
+              <div className={""}>
+                {
+                  jwtInfo && jwtInfo.sub &&
+                    <div className={'flex items-center space-x-2'}>
+                        <Label>steam ID</Label>
+                        <span> {jwtInfo.sub}</span>
+                    </div>
+                }
+                {
+                  jwtInfo && jwtInfo.exp &&
+                    <div className={'flex items-center space-x-2'}>
+                        <Label>token 过期时间</Label>
+                        <span> {dayjs.unix(jwtInfo.exp).format('MM月DD日 HH:mm:ss')}</span>
+                    </div>
+                }
+              </div>
               {
                 steps
-                  .filter(step=>step.isTriggered())
+                  .filter(step => step.isTriggered())
                   .map((step, index) =>
-                  <div key={index} className={"space-x-2 text-xs font-light"}>
+                    <div key={index} className={"space-x-2 text-xs font-light"}>
                     <span
-                    className={cn()}
+                      className={cn()}
                     >{statusToEmoji(step.stepStatus)}</span>
-                    <span>{step.message}</span>
-                  </div>
-                )
+                      <span>{step.message}</span>
+                    </div>
+                  )
               }
             </div>
           </div>
@@ -329,7 +335,8 @@ export default function Home() {
       </div>
       {
         dataLoaded &&
-          <DataGraph libs={allLibs} players={allMember} libsPlaytime={libsPlaytime} family={familyInfo} bg={background}/>
+          <DataGraph libs={allLibs} players={allMember} libsPlaytime={libsPlaytime} family={familyInfo}
+                     bg={background}/>
       }
     </main>
   );

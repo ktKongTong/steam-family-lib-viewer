@@ -1,249 +1,180 @@
-'use client'
 import {
-  CFamilyGroups_GetFamilyGroupForUser_Response,
-  CFamilyGroups_GetSharedLibraryApps_Response
+  CFamilyGroups_GetFamilyGroupForUser_Response, CFamilyGroups_GetPlaytimeSummary_Response,
+  CFamilyGroups_GetSharedLibraryApps_Response, CFamilyGroups_PlaytimeEntry
 } from "@/proto/gen/web-ui/service_familygroups_pb";
-import {jwtDecode} from "jwt-decode";
-import {CPlayer_GetPlayerLinkDetails_Response} from "@/proto/gen/web-ui/service_player_pb";
 import _ from "lodash";
-import {StoreItem} from "@/proto/gen/web-ui/common_pb";
-import {convertTag} from "@/lib/tagdict";
-import ReactECharts from "echarts-for-react";
-import React, {useCallback, useEffect, useState} from "react";
-import {useQuery} from "@tanstack/react-query";
-import WordCloud from "@/app/wordcloud";
+import {CStoreBrowse_GetItems_Response} from "@/proto/gen/web-ui/common_pb";
+
+import React from "react";
 import {shaDigestAvatarBase64ToStrAvatarHash} from "@/lib/steam_utils";
+import {ProxiedAPIResponse} from "@/app/api/[[...routes]]/(api)/interface";
+import {Player} from "@/app/page";
+import DataGraph from "@/app/datagraph";
+import Graph from "@/app/render/graph";
 
-interface APIResponse<T> {
-  data: T | null
-}
-async function getFamily(access_token:string):Promise<CFamilyGroups_GetFamilyGroupForUser_Response | null> {
-  const res:APIResponse<CFamilyGroups_GetFamilyGroupForUser_Response> = await fetch(`/api/steam/family?access_token=${access_token}`)
+let host = "http://localhost:3000"
+async function fetchFamilyInfo(token:string):Promise<null| ProxiedAPIResponse<CFamilyGroups_GetFamilyGroupForUser_Response>>{
+  const data = await fetch(`${host}/api/steam/family?access_token=${token}`)
     .then(res=>res.json())
-  return res.data
+    .catch(e=> {
+      console.log(e)
+      return null
+    })
+  return data
 }
-
-
-async function getFamilySharedLib(access_token:string,familyId:string):Promise<CFamilyGroups_GetSharedLibraryApps_Response | null> {
-  const res:APIResponse<CFamilyGroups_GetSharedLibraryApps_Response> = await fetch(`/api/steam/family/shared/${familyId}?access_token=${access_token}`)
+async function fetchFamilyPlayTime(token:string,id:string) {
+  let url = `${host}/api/steam/family/playtime/${id}?access_token=${token}`
+  const data = (await fetch(url)
     .then(res=>res.json())
-  return res.data
-}
-
-async function getFamilyMembers(access_token:string,ids:string[]):Promise<CPlayer_GetPlayerLinkDetails_Response | null> {
-  const res:APIResponse<CPlayer_GetPlayerLinkDetails_Response> = await fetch(`/api/steam/player/${ids.join(',')}?access_token=${access_token}`)
-    .then(res=>res.json())
-  return res.data
-}
-
-async function PrepareData(access_token:string) {
-  // access_token
-  const tokenInfo = jwtDecode(access_token??"")
-  const user = tokenInfo.sub
-  if(!user) {return null}
-  const family = await getFamily(access_token)
-  if(!family) {return null}
-  const familyMemberIds = family.familyGroup?.members.map(member=>member.steamid!.toString())
-  const familyId = family.familyGroupid
-  if(!familyMemberIds || !familyId) {
-    return
-  }
-  const [players,apps] = await Promise.all([
-    getFamilyMembers(access_token,familyMemberIds),
-    getFamilySharedLib(access_token,familyId?.toString())
-  ])
-  if(!players || !apps) {
-    return
-  }
-  const games = apps.apps
-    .filter(it=>it.excludeReason == undefined || it.excludeReason == 0)
-    .flatMap((item) => {
-    return item.ownerSteamids.map((it) => ({
-      ...item,
-      ownerSteamid: it,
-    }))
-  });
-
-
-
-  const gameById = _.countBy(games, game=>game.ownerSteamid.toString())
-  const shownApps = apps.apps
-    .filter(it=>it.excludeReason == undefined || it.excludeReason == 0)
-  // will cause error
-  const ids = _.chunk(shownApps
-    .map(it=>it.appid), 30)
-
-  const idReq = ids.map(it=>it.join(','))
-  const appInfos= await Promise.all(idReq.map(ids=>fetch(`/api/steam/items/${ids}`).then(res=>res.json()).then(json=>{
-    return json.storeItems
-  })))
-  const items = appInfos.flatMap(appInfos=>appInfos)
-  // items to dictionary
-  const itemDict = new Map()
-
-  items.forEach(item=> {
-    itemDict.set(item.appid, item)
+    .catch(e=> {
+      console.log(e)
+      return null
+    })) as ProxiedAPIResponse<CFamilyGroups_GetPlaytimeSummary_Response>
+  console.log(data.data)
+  const appids:number[] = data.data!.entries.flatMap((it:any)=>it.appid)
+  const appidsByOwner = data.data!.entriesByOwner.flatMap(it => it.appid!)
+  const allIds = _.uniq(appids.concat(appidsByOwner))
+  const appPlaytimeDict = _.groupBy(data.data!.entries,'appid')
+  const appPlaytimeByOwnerDict = _.groupBy(data.data!.entriesByOwner, 'appid')
+  return allIds.map(id=> {
+    let res:any[] = []
+    let owners = appPlaytimeByOwnerDict[id]
+    let players = appPlaytimeDict[id]
+    if(owners) {
+      res = res.concat(owners.map(owner => ({...owner, isOwner: true}))
+      )
+    }
+    if(players) {
+      res = res.concat(players.map(player => ({...player, isOwner: false})))
+    }
+    return {
+      appid: id,
+      players: res as (CFamilyGroups_PlaytimeEntry & {isOwner:boolean})[],
+    }
   })
+}
+async function fetchFamilyMembers(token:string,ids:string[]){
+  const data = await fetch(`${host}/api/steam/player/${ids.join(',')}?access_token=${token}`)
+    .then(res=>res.json())
+    .catch(e=> {
+      console.log(e)
+      return null
+    })
+  return data
+}
 
+async function fetchFamilySharedLibs(token:string,id:string){
+  const data = await fetch(`${host}/api/steam/family/shared/${id}?access_token=${token}`)
+    .then(res=>res.json() as Promise<ProxiedAPIResponse<CFamilyGroups_GetSharedLibraryApps_Response>>)
+    .catch(e=> {
+      console.log(e)
+      return null
+    })
+  return data
+}
+
+async function fetchFamilyLibItems(ids:string[]){
+  const data = await fetch(`${host}/api/steam/items/${ids.join(',')}`)
+    .then(res=>res.json() as Promise<ProxiedAPIResponse<CStoreBrowse_GetItems_Response>>)
+    .catch(e=> {
+      console.log(e)
+      return null
+    })
+  return data
+}
+async function getRandomBackground(){
+  const data = await fetch(`https://moe.jitsu.top/img/?type=json`)
+    .then(res=>res.json())
+    .catch(e=> {
+      console.log(e)
+      return null
+    })
+  return data.pics[0] as string
+}
+
+
+async function prepareData(accessToken:string) {
+  const bg = getRandomBackground()
+  const familyInfo = await fetchFamilyInfo(accessToken)
+  let familyData = familyInfo?.data?.familyGroup!
+  const memberIds = familyData.members!.map((member)=>member.steamid!.toString())
+  const memberFamilyInfos = _.keyBy(familyData.members, 'steamid')
+
+  let familyGroupId = familyInfo?.data?.familyGroupid
+
+  const [libsPlaytimeSummary,libOverviewInfos,memberInfos] = await Promise.all([
+    fetchFamilyPlayTime(accessToken, familyGroupId!.toString()),
+    fetchFamilySharedLibs(accessToken, familyGroupId!.toString()),
+    fetchFamilyMembers(accessToken, memberIds)
+  ])
+
+  const members:Player[] = memberInfos.data.accounts.map((account:any)=> {
+    const id = account?.publicData?.steamid!
+    const avatar_hash = shaDigestAvatarBase64ToStrAvatarHash(account?.publicData?.shaDigestAvatar?.toString())
+    return {
+      ...account.publicData,
+      avatar_hash,
+      ...memberFamilyInfos[id]
+    }
+  })
+  const memberDict = _.keyBy(members, 'steamid')
+  const libs = libOverviewInfos!.data!.apps
+    .filter( (app) => app.excludeReason == undefined || app.excludeReason == 0)
+
+
+  const libIds:string[][] = _.chunk(libs.map((it:any)=>it.appid.toString()), 30)
+  const res = await Promise.all(libIds.map(async (idChunk,index) => {
+    const res = await fetchFamilyLibItems(idChunk)
+    return res
+  }))
+  const items = res
+    .filter((it,index) => {
+      return !(!it || it.data!.storeItems.length == 0);
+    })
+    .map(resp=>resp!.data!.storeItems).flatMap(it=>it)
+  const libDictionary = _.keyBy(items, 'id')
+  const allLib = libs.map((lib)=> ({
+    ...lib,
+    detail: libDictionary[lib.appid!],
+    owners:lib.ownerSteamids.map((id) => {
+      return memberDict[id.toString()]
+    })
+  }))
+  const background = await bg
   return {
-    gameById,
-    items,
-    itemDict,
-    shownApps,
-    players:players.accounts
+    allLib,
+    libDictionary,
+    members,
+    libsPlaytimeSummary,
+    familyInfo,
+    background
   }
 }
 
-export default function Page({
+export default async function Page({
   searchParams
 }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const token = searchParams['access_token']
-  const [dataLoaded,setDataLoaded] = useState(false)
-  const [filteredPlayer, setFilteredPlayer] = useState<any[]>([])
-  const { isSuccess, data:queryData, error, } = useQuery({
-    queryKey: ["ids"],
-    queryFn: async()=>{
-      if(!token || token instanceof Array) {
-        throw Error('invalid token')
-      }
-      const data = (await PrepareData(token))!!
-      console.log("query over",data)
-      setFilteredPlayer(data?.players!)
-      return data!
-    },
-  });
 
-  useEffect(() => {
-    console.log("queryData", queryData)
-    console.log(isSuccess,error)
-  }, [queryData, error, isSuccess]);
-  if(!isSuccess || !queryData) {
-    return <div>data fetch error, {error?.message} </div>
-  }
   const {
-    players,
-    gameById,
-    items,
-    shownApps,
-    itemDict
-  } = queryData!
+    allLib,
+    libDictionary,
+    members,
+    libsPlaytimeSummary,
+    familyInfo,
+    background
+  } = await prepareData(token as string)
 
-  const appsForUse= shownApps.filter(item=>
-    {
-      return filteredPlayer.filter(player=>item.ownerSteamids.includes(player.publicData.steamid?.toString())).length > 0
-    }
-  ).map(app=> ({
-    ...app,
-    detail: itemDict.get(app.appid)
-  }))
-
-  const names =
-    players.map(account=>({
-      id: account.publicData?.steamid,
-      name: account.publicData?.personaName
-    }))
-
-  const cntData = filteredPlayer.map(gamer => ({
-    gamer,
-    cnt: gameById[gamer.publicData?.steamid?.toString()!],
-    name: names.find(it=>it.id?.toString() == gamer.publicData?.steamid?.toString()!)?.name
-  })).sort((a,b)=>a.cnt - b.cnt)
-
-
-  const tags = appsForUse
-    .map(app=> app.detail)
-    .map((item:StoreItem)=>item.tagids.slice(0,7)).flatMap((it:any)=>it)
-
-  const dict = _.countBy(tags, it=>it)
-  const dicts = Object.keys(dict).map(item=>({value:dict[item],text:convertTag(item)})).sort((a,b)=>b.value-a.value)
-
-  const option =  {
-    tooltip : {
-      trigger: 'axis'
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true
-    },
-    xAxis: {
-      type: 'value'
-    },
-    yAxis: {
-      type: 'category',
-      data: cntData.map(item=>item.name)
-    },
-    series : [
-
-      {
-        name: 'game amount',
-        type: 'bar',
-        label: {
-          show: true,
-          position: 'right'
-        },
-        data: cntData.map(item=>item.cnt)
-      },
-    ]
-  };
-
-  const getAvatar = (arr:Uint8Array|undefined)=> {
-    if(!arr) {
-      return ""
-    }
-    const hash = shaDigestAvatarBase64ToStrAvatarHash(arr.toString())
-    return `https://avatars.akamai.steamstatic.com/${hash}_full.jpg`
-  }
-
-  const setFilterUser = (user:any) => {
-    if(filteredPlayer.includes(user)) {
-      setFilteredPlayer(filteredPlayer.filter(it=>it!=user))
-    }else {
-      setFilteredPlayer([...filteredPlayer, user])
-    }
-  }
-
-  const checkActive = (user:any)=> {
-    return filteredPlayer.includes(user)
-  }
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      {
-        dataLoaded && (
-          <>
-            <div className={"flex justify-evenly items-center w-full"}>
-              {players.map(player => (
-                <div
-                  key={player.publicData?.steamid}
-                  className={`flex items-center mx-4 hover:bg-zinc-300/30 cursor-pointer rounded-lg px-4 py-2 ${checkActive(player) ? '' : 'mix-blend-color-dodge'}`}
-                  onClick={() => {
-                    setFilterUser(player)
-                  }}
-                >
-                  <img src={getAvatar(player.publicData!.shaDigestAvatar)} loading={'lazy'}
-                       className={'w-8 h-8 rounded-full'}/>
-                  <div className={'text-xs text-zinc-700/70 pl-2'}>
-                    <span>{player.publicData?.personaName}</span>
-                  </div>
-                </div>
-              ))
-              }
-            </div>
-            <div>
-              <ReactECharts
-                option={option}
-                style={{height: 400, width: 800}}
-              />
-            </div>
-            <div>
-              {
-                <WordCloud words={dicts} height={400} width={800} className={""}/>
-              }
-            </div>
-          </>
-        )}
-
-    </main>)
+      <Graph
+        libs={allLib}
+        players={members}
+        libsPlaytime={libsPlaytimeSummary}
+        family={familyInfo}
+        bg={background}
+      />
+    </main>
+  )
 
 }

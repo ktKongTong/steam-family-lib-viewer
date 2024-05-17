@@ -1,12 +1,10 @@
-import ReactECharts from "echarts-for-react";
+'use client'
 import WordCloud from "@/app/wordcloud";
 import React, {useCallback, useMemo, useRef, useState} from "react";
 import {StoreItem} from "@/proto/gen/web-ui/common_pb";
 import _ from "lodash";
 import {convertTag} from "@/lib/tagdict";
-import {ImageWithFallback} from "@/app/fallbackImg";
 import {Piegraph} from "@/app/piegraph";
-import html2canvas from "html2canvas";
 import {Button} from "@/components/ui/button";
 import LockBodyScroll from "@/app/lockBodyScroll";
 
@@ -14,11 +12,10 @@ import { useMediaQuery } from "@uidotdev/usehooks";
 import {Loader, Loader2} from "lucide-react";
 import {Overlay} from "@/app/overlay";
 import dayjs from "dayjs";
-import Game from "@/app/game";
 import GamesGrid from "@/app/games-grid";
 import {Player} from "@/app/page";
 import duration from 'dayjs/plugin/duration'
-import {ExtendedSteamPlaytimeItem, SteamAppPlaytime} from "@/interface/steamPlaytime";
+import {SteamAppPlaytime} from "@/interface/steamPlaytime";
 import {PlaytimeGraph} from "@/app/playtimeGraph";
 dayjs.extend(duration)
 
@@ -85,8 +82,8 @@ const useComputed = (
   const playersPlayData = _.groupBy(allPlayTimeData,'steamid')
   const playtimeData = _.keys(playersPlayData).map(key=> {
     const it = playersPlayData[key]
-    const asOwnerLendTime = it.filter(item=> item.isOwner).reduce((acc,cur) => acc + cur.secondsPlayed,0)
-    const asPlayerTime = it.filter(item=> !item.isOwner).reduce((acc,cur) => acc + cur.secondsPlayed,0)
+    const asOwnerLendTime = it.filter(item=> item.isOwner).reduce((acc,cur) => acc + cur.secondsPlayed!,0)
+    const asPlayerTime = it.filter(item=> !item.isOwner).reduce((acc,cur) => acc + cur.secondsPlayed!,0)
     return {
       asOwnerLendTime,
       asPlayerTime,

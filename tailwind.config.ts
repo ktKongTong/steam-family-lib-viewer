@@ -1,5 +1,6 @@
-import type { Config } from "tailwindcss"
+import plugin, { Config } from "tailwindcss"
 
+// @ts-ignore
 const config = {
   darkMode: ["class"],
   content: [

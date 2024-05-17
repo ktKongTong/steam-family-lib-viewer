@@ -1,3 +1,5 @@
+import {CFamilyGroups_PlaytimeEntry} from "@/proto/gen/web-ui/service_familygroups_pb";
+
 export interface SteamPlaytimeResponse {
   data: {
     entries: SteamPlaytimeItem[],
@@ -12,10 +14,9 @@ export interface SteamPlaytimeItem {
   secondsPlayed: number
 }
 
-export interface ExtendedSteamPlaytimeItem extends SteamPlaytimeItem {
+export interface ExtendedSteamPlaytimeItem extends CFamilyGroups_PlaytimeEntry {
   isOwner: boolean
 }
-
 export interface SteamAppPlaytime {
   appid: number,
   players: ExtendedSteamPlaytimeItem[]

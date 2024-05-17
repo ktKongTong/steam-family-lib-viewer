@@ -9,10 +9,9 @@ import React from "react";
 import {shaDigestAvatarBase64ToStrAvatarHash} from "@/lib/steam_utils";
 import {ProxiedAPIResponse} from "@/app/api/[[...routes]]/(api)/interface";
 import {Player} from "@/app/page";
-import DataGraph from "@/app/datagraph";
 import Graph from "@/app/render/graph";
 
-let host = "http://localhost:3000"
+let host = process.env.BASE_URL as string
 async function fetchFamilyInfo(token:string):Promise<null| ProxiedAPIResponse<CFamilyGroups_GetFamilyGroupForUser_Response>>{
   const data = await fetch(`${host}/api/steam/family?access_token=${token}`)
     .then(res=>res.json())
@@ -89,6 +88,9 @@ async function getRandomBackground(){
       console.log(e)
       return null
     })
+  if(data == null) {
+    return "https://moe.jitsu.top/img"
+  }
   return data.pics[0] as string
 }
 
@@ -96,6 +98,7 @@ async function getRandomBackground(){
 async function prepareData(accessToken:string) {
   const bg = getRandomBackground()
   const familyInfo = await fetchFamilyInfo(accessToken)
+  console.log(familyInfo)
   let familyData = familyInfo?.data?.familyGroup!
   const memberIds = familyData.members!.map((member)=>member.steamid!.toString())
   const memberFamilyInfos = _.keyBy(familyData.members, 'steamid')

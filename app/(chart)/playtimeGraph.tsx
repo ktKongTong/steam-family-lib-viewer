@@ -17,6 +17,9 @@ export const axisStyle = {
     }
   },
 }
+
+
+
 export const selectableColor =  [
   'rgb(196, 71, 95,0.7)', 'rgb(53, 162, 235,0.7)',
   'rgb(245, 193, 87,0.7)', 'rgb(227, 92, 94,0.7)',

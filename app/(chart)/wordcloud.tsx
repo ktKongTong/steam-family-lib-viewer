@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Text } from '@visx/text';
 import { scaleLog } from '@visx/scale';
 import Wordcloud from '@visx/wordcloud/lib/Wordcloud';
-import {selectableColor} from "@/app/playtimeGraph";
+import {selectableColor} from "@/app/(chart)/playtimeGraph";
 
 
 const colors = selectableColor;

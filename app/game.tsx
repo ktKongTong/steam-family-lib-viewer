@@ -1,3 +1,4 @@
+'use client'
 import {ImageWithFallback} from "@/app/fallbackImg";
 import dayjs from "dayjs";
 import React, {useCallback, useEffect, useState} from "react";
@@ -149,8 +150,6 @@ export default function Game({
 }: GameProps
 ) {
   const sm = useMediaQuery("only screen and (max-width : 768px)")
-
-  game.playtime
   return (
     <div key={game.appid}
          className={'relative w-24 sm:w-36 md:w-36 aspect-[6/9] rounded-lg text-xs text-zinc-600/60'}>

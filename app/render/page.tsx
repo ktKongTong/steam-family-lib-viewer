@@ -11,6 +11,8 @@ import {ProxiedAPIResponse} from "@/app/api/[[...routes]]/(api)/interface";
 import {Player} from "@/app/page";
 import Graph from "@/app/render/graph";
 
+export const revalidate = 3600
+
 let host = process.env.BASE_URL as string
 async function fetchFamilyInfo(token:string):Promise<null| ProxiedAPIResponse<CFamilyGroups_GetFamilyGroupForUser_Response>>{
   const data = await fetch(`${host}/api/steam/family?access_token=${token}`)
@@ -82,7 +84,9 @@ async function fetchFamilyLibItems(ids:string[]){
   return data
 }
 async function getRandomBackground(){
-  const data = await fetch(`https://moe.jitsu.top/img/?type=json`)
+  const data = await fetch(`https://moe.jitsu.top/img/?type=json`, {
+    cache:'no-cache'
+  })
     .then(res=>res.json())
     .catch(e=> {
       console.log(e)

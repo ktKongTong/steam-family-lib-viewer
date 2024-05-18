@@ -50,7 +50,7 @@ export default function Graph({
           players={players}
           style={{height: 400, width: 1000}}
         />
-        <EchartWordCloud words={dicts} height={800} width={800}
+        <WordCloud words={dicts} height={800} width={800}
                    className={'flex items-center'}/>
         <div className={'grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-2 md:gap-2 lg:gap-2 '}>
           {

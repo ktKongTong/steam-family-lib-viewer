@@ -31,7 +31,6 @@ async function fetchFamilyPlayTime(token:string,id:string) {
       console.log(e)
       return null
     })) as ProxiedAPIResponse<CFamilyGroups_GetPlaytimeSummary_Response>
-  console.log(data.data)
   const appids:number[] = data.data!.entries.flatMap((it:any)=>it.appid)
   const appidsByOwner = data.data!.entriesByOwner.flatMap(it => it.appid!)
   const allIds = _.uniq(appids.concat(appidsByOwner))

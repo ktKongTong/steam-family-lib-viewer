@@ -16,8 +16,6 @@ interface GameProps {
 }
 
 const getAvatar = (hash:string) => `https://avatars.akamai.steamstatic.com/${hash}_full.jpg`
-const getSteamAsset = (appid:string,name:string) => `https://cdn.akamai.steamstatic.com/steam/apps/${appid}/${name}?t=1702072288`
-
 const getGameAsset = (game:App, filename:string) => {
   const format = game.detail.assets?.assetUrlFormat
   const prefix = "https://cdn.akamai.steamstatic.com/"

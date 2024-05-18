@@ -10,7 +10,6 @@ import {useComputedData} from "@/hooks/use-computed-data";
 import PlayerItem from "@/app/player";
 import EchartWordCloud from "@/app/(chart)/echart-worldcloud";
 
-
 export default function Graph({
   libs,
   players,

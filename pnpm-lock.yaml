@@ -84,8 +84,8 @@ dependencies:
     specifier: ^2.1.0
     version: 2.1.0(echarts@5.5.0)
   hono:
-    specifier: ^4.1.5
-    version: 4.1.5
+    specifier: ^4.2.7
+    version: 4.2.7
   html-to-image:
     specifier: ^1.11.11
     version: 1.11.11
@@ -3455,8 +3455,8 @@ packages:
     dependencies:
       function-bind: 1.1.2
 
-  /hono@4.1.5:
-    resolution: {integrity: sha512-3ChJiIoeCxvkt6vnkxJagplrt1YZg3NyNob7ssVeK2PUqEINp4q1F94HzFnvY9QE8asVmbW5kkTDlyWylfg2vg==}
+  /hono@4.2.7:
+    resolution: {integrity: sha512-k1xHi86tJnRIVvqhFMBDGFKJ8r5O+bEsT4P59ZK59r0F300Xd910/r237inVfuT/VmE86RQQffX4OYNda6dLXw==}
     engines: {node: '>=16.0.0'}
     dev: false
 

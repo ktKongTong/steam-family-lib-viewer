@@ -1,10 +1,11 @@
-import {Context, Hono} from 'hono'
+import { Hono} from 'hono'
 import {handle} from 'hono/vercel'
 import {Env as HEnv, Schema} from 'hono'
 
 import {steamFamilyGroup} from "@/app/api/[[...routes]]/familygroup";
 import {steamCommon} from "@/app/api/[[...routes]]/common";
 import {steamAuth} from "@/app/api/[[...routes]]/auth";
+import {steamHelper} from "@/app/api/[[...routes]]/helper";
 
 export const runtime = 'edge';
 
@@ -20,6 +21,7 @@ class App<E extends HEnv, S extends Schema = {}, BasePath extends string = '/api
       .apply(steamFamilyGroup)
       .apply(steamCommon)
       .apply(steamAuth)
+      .apply(steamHelper)
   }
 }
 

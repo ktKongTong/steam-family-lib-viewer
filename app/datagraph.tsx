@@ -18,6 +18,7 @@ import { toPng } from 'html-to-image';
 import {useComputedData} from "@/hooks/use-computed-data";
 import {cooldownDurationTostring} from "@/lib/utils";
 import EchartWordCloud from "@/app/(chart)/echart-worldcloud";
+import {CFamilyGroups_GetFamilyGroupForUser_Response} from "@/proto/gen/web-ui/service_familygroups_pb";
 export default function DataGraph(
 {
   libs,
@@ -106,7 +107,7 @@ export default function DataGraph(
         <div className={"relative z-10 overflow-hidden rounded-lg"} id={'data-graph'} ref={ref}>
           <div
             className={'bg-blend-darken dark bg-black/[.6] z-10 rounded-lg flex flex-col items-center justify-center mx-auto space-y-2 p-1 md:p-4'}>
-            <div className={"text-xl text-white  mx-auto"}> {family.data.familyGroup.name}</div>
+            <div className={"text-xl text-white  mx-auto"}> {family!.familyGroup!.name}</div>
               <div className={"grid grid-cols-2 sm:grid-cols-3 justify-evenly items-center w-full gap-1"}>
               {
                 players.map(player => (

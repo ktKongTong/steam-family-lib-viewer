@@ -28,9 +28,11 @@ import {CStoreBrowse_GetItems_Response, StoreItem} from "@/proto/gen/web-ui/comm
 import {useToast} from "@/components/ui/use-toast";
 import {SteamAppPlaytime} from "@/interface/steamPlaytime";
 import {ProxiedAPIResponse} from "@/app/api/[[...routes]]/(api)/interface";
-import QR from "@/components/qr";
 import {useTokenStore} from "@/hooks/auth/store/useTokenStore";
-import {TokenAddDrawerDialog, TokenPanel} from "@/app/tokenPanel";
+import {TokenPanel} from "@/components/tokenPanel";
+import {SharedLibraryStep, useSteamFamilyLibInfo} from "@/hooks/data/useSteamFamilyLibInfo";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {useRandomBackground} from "@/hooks/data/useRandomBackground";
 
 dayjs.extend(relativeTime)
 
@@ -50,83 +52,7 @@ function validToken(token:JwtPayload|null)  {
 }
 
 
-async function fetchFamilyInfo(token:string):Promise<null| ProxiedAPIResponse<CFamilyGroups_GetFamilyGroupForUser_Response>>{
-  const data = await fetch(`/api/steam/family?access_token=${token}`)
-    .then(res=>res.json())
-    .catch(e=> {
-      console.log(e)
-      return null
-    })
-  return data
-}
-async function fetchFamilyPlayTime(token:string,id:string) {
-  const data = (await fetch(`/api/steam/family/playtime/${id}?access_token=${token}`)
-    .then(res=>res.json())
-    .catch(e=> {
-      console.log(e)
-      return null
-    })) as ProxiedAPIResponse<CFamilyGroups_GetPlaytimeSummary_Response>
-  console.log(data.data)
-  const appids:number[] = data.data!.entries.flatMap((it:any)=>it.appid)
-  const appidsByOwner = data.data!.entriesByOwner.flatMap(it => it.appid!)
-  const allIds = _.uniq(appids.concat(appidsByOwner))
-  const appPlaytimeDict = _.groupBy(data.data!.entries,'appid')
-  const appPlaytimeByOwnerDict = _.groupBy(data.data!.entriesByOwner, 'appid')
-  return allIds.map(id=> {
-    let res:any[] = []
-    let owners = appPlaytimeByOwnerDict[id]
-    let players = appPlaytimeDict[id]
-    if(owners) {
-      res = res.concat(owners.map(owner => ({...owner, isOwner: true}))
-      )
-    }
-    if(players) {
-      res = res.concat(players.map(player => ({...player, isOwner: false})))
-    }
-    return {
-      appid: id,
-      players: res as (CFamilyGroups_PlaytimeEntry & {isOwner:boolean})[],
-    }
-  })
-}
-async function fetchFamilyMembers(token:string,ids:string[]){
-  const data = await fetch(`/api/steam/player/${ids.join(',')}?access_token=${token}`)
-    .then(res=>res.json())
-    .catch(e=> {
-      console.log(e)
-      return null
-    })
-  return data
-}
 
-async function fetchFamilySharedLibs(token:string,id:string){
-  const data = await fetch(`/api/steam/family/shared/${id}?access_token=${token}`)
-    .then(res=>res.json() as Promise<ProxiedAPIResponse<CFamilyGroups_GetSharedLibraryApps_Response>>)
-    .catch(e=> {
-      console.log(e)
-      return null
-    })
-  return data
-}
-
-async function fetchFamilyLibItems(ids:string[]){
-  const data = await fetch(`/api/steam/items/${ids.join(',')}`)
-    .then(res=>res.json() as Promise<ProxiedAPIResponse<CStoreBrowse_GetItems_Response>>)
-    .catch(e=> {
-      console.log(e)
-      return null
-    })
-  return data
-}
-async function getRandomBackground(){
-  const data = await fetch(`https://moe.anosu.top/img/?type=json`)
-    .then(res=>res.json())
-    .catch(e=> {
-      console.log(e)
-      return null
-    })
-  return data.pics[0] as string
-}
 
 export type Player = FamilyGroupMember & CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails_AccountPublicData & {
   avatar_hash: string
@@ -135,224 +61,156 @@ export type App = CFamilyGroups_GetSharedLibraryApps_Response_SharedApp
   & {  detail: StoreItem }
   & { owners: Player[] }
   & { playtime?: any }
+
+
 export default function Home() {
-  const [tokenInput,setToken] = useState('')
-  const jwtInfo = useMemo(()=> {
-    try {
-      return jwtDecode(tokenInput)
-    }catch (e) {return null}
-  },[tokenInput])
-  // const token = useTokenStore(state => state.currentToken)
 
-  // useEffect(()=> {
-  //   if (token?.accessToken) {
-  //     console.log("set token")
-  //     setToken(token.accessToken)
-  //   }
-  // }, [token])
+  const { toast } = useToast()
+  const { background } = useRandomBackground()
+  const token = useTokenStore(state => state.currentToken)
+  const {
+    dataLoaded,
+    canDisplay,
+    fetch,
+    steps,
+    steamFamilyInfo,
+    sharedPlaytime,
+    allLibs,
+    allMembers
+  } = useSteamFamilyLibInfo(token?.accessToken??"",token?.steamId ?? "")
 
-  const [steps,setSteps] = useState<Step[]>([])
-  const [inputActive, setInputActive] = useState(true)
 
-  const [familyInfo,setFamilyInfo] = useState<any>(null)
-  const [allMember,setAllMember] = useState<Player[]>([])
-  const [libDictionary, setLibDictionary] = useState<any>()
-  const [allLibs, setAllLibs] = useState<any[]>([])
-  const [libsPlaytime,setLibsPlaytime] = useState<SteamAppPlaytime[]>([])
-  const [dataLoaded,setDataLoaded] = useState(false)
-  const [background, setBackground] = useState("https://pic.rmb.bdstatic.com/bjh/85b8180794c573eba31c2e498bb40714.jpeg")
-  const onSubmit = async ()=> {
-    setDataLoaded(false)
-    getRandomBackground().then(res=> {if(res) {setBackground(res)}})
-    const familyStep = new RetryableStep(() => fetchFamilyInfo(tokenInput), "获取家庭信息")
-    const memberStep = new Step()
-    const libsStep = new Step()
-    const steps = [familyStep,memberStep,libsStep]
-    setSteps(steps)
-    const familyInfo = await familyStep.trigger()
-    if (!familyInfo) {
-      toast({
-        title:"获取家庭信息失败",
-        description: familyStep.message
-      })
-    }
-    setFamilyInfo(familyInfo)
-    let familyGroupId = familyInfo!.data!.familyGroupid!
-    let familyData = familyInfo?.data?.familyGroup!
-    const familyName = familyData.name!!
-    const memberIds =familyData.members!.map((member)=>member.steamid!.toString())
-    const memberFamilyInfos = _.keyBy(familyData.members, 'steamid')
-    familyStep.success(`成功获取家庭信息，你好，${familyName} 的成员，更多数据正在赶来的路上`)
-    libsStep.trigger('正在获取共享库存信息')
-    memberStep.trigger('正在获取家庭成员信息')
-    setSteps([...steps])
-    const [libsPlaytimeSummary,libOverviewInfos,memberInfos] = await Promise.all([
-      fetchFamilyPlayTime(tokenInput, familyGroupId.toString()),
-      fetchFamilySharedLibs(tokenInput, familyGroupId.toString()),
-      fetchFamilyMembers(tokenInput, memberIds)
-    ])
-    console.log("loadedtime")
-    console.log(libsPlaytimeSummary)
-    setLibsPlaytime(libsPlaytimeSummary)
-    if (!libOverviewInfos) {
-      libsStep.failed('获取共享库存信息失败')
-    }else {
-      libsStep.success('成功获取共享库存信息')
-    }
-    if (!memberInfos) {
-      memberStep.failed('获取家庭成员信息失败')
-    }else {
-      memberStep.success('成功获取家庭成员信息')
-    }
-    if(!libOverviewInfos || !memberInfos ) {
-      return
-    }
-    setSteps([...steps])
-    const members:Player[] = memberInfos.data.accounts.map((account:any)=> {
-      const id = account?.publicData?.steamid!
-      const avatar_hash = shaDigestAvatarBase64ToStrAvatarHash(account?.publicData?.shaDigestAvatar?.toString())
-      return {
-        ...account.publicData,
-        avatar_hash,
-        ...memberFamilyInfos[id]
-      }
-    })
-    setAllMember(members)
-    const memberDict = _.keyBy(members, 'steamid')
 
-    const libs = libOverviewInfos.data!.apps
-      .filter( (app:any) => app.excludeReason == undefined || app.excludeReason == 0)
 
-    const libIds:string[][] = _.chunk(libs.map((it:any)=>it.appid.toString()), 30)
-    const itemsSteps = libIds.map((idChunk,index)=> new RetryableStep(async ()=>{
-      return await fetchFamilyLibItems(idChunk)
-    },`分块【${index * 30 + 1}-${index * 30 + idChunk.length}】的库存详情信息`))
-
-    setSteps([...steps,...itemsSteps])
-    const res = await Promise.all(libIds.map(async (idChunk,index) => {
-      const curStep = itemsSteps[index]
-      const stepRes = curStep.trigger()
-      setSteps([...steps,...itemsSteps])
-      const res = await stepRes
-      if (!res || res!.data!.storeItems.length == 0) {
-        curStep.failed()
-      }else {
-        curStep.success()
-      }
-      setSteps([...steps,...itemsSteps])
-      return res
-    }))
-    const items = res
-      .filter((it,index) => {
-        return !(!it || it.data!.storeItems.length == 0);
-      })
-    .map(resp=>resp!.data!.storeItems).flatMap(it=>it)
-    const libDictionary = _.keyBy(items, 'id')
-    const allLib = libs.map((lib)=> ({
-      ...lib,
-        detail: libDictionary[lib.appid!],
-        owners:lib.ownerSteamids.map((id) => {
-          // console.log("id",id)
-          // console.log("member",memberDict[id])
-          return memberDict[id.toString()]
-        })
-    }))
-    setAllLibs(allLib)
-    setLibDictionary(libDictionary)
-    const finalStep = new Step()
-    finalStep.success("已获取库存详情信息")
-    setSteps([...steps, ...itemsSteps, finalStep])
-    setDataLoaded(true)
-  }
-  const {toast} = useToast()
-  //
-  const onSubmitWrapper = (qr: boolean = false)=> {
-    const {res,reason} = validToken(jwtInfo)
-    if(res) {
-      setInputActive(false)
-      onSubmit()
-      setInputActive(true)
+  const [ok, setOK] = useState(!!token)
+  useEffect(() => setOK(!token), [token])
+  const onSubmit = ()=> {
+    if(token) {
+      setOK(false)
+      fetch().then(()=> {setOK(true)})
     }else {
       toast({
-        title: "AccessToken 无效",
-        description: reason,
+        title: "获取失败",
+        description: "请先选中一个Token"
       })
     }
-  //
   }
-  // const
+
   return (
     <main className="flex min-h-screen flex-col items-center max-w-[1024px] ml-auto mr-auto">
       <Header/>
       <div className={"flex flex-col w-full min-w-full md:min-w-96 px-4 md:px-20"}>
-        <div className={'flex items-center space-x-2'}>
-          <div className={"text-lg font-semibold py-2"}>AccessToken</div>
-          <GetToken/>
-        </div>
         <TokenPanel/>
-        <div className={'flex flex-col md:flex-row'}>
-          <div
-            className={"max-w-96 space-y-2"}
-          >
-            <Textarea
-              placeholder="Type your access_token here."
-              className={'min-h-80 min-w-full md:min-w-96'}
-              value={tokenInput}
-              onChange={(e) => {setToken(e.target.value)}}
-              disabled={!inputActive}
-            />
-
-            {/*<QR/>*/}
-            {
-              tokenInput.length > 0 && !jwtInfo &&
-                <div className={"text-xs text-red-500 font-light py-0.5"}>
-                    <span>无法提取steamId，似乎不是一个正确的 token</span>
-                </div>
-            }
+        {
+          token &&
+          <div>
+              uname: {token.username}
+              curToken: {token.accessToken.slice(0,30)}
           </div>
-          <div className={"pl-4"}>
-            <div className={"max-h-80 overflow-y-auto scrollbar-none"}>
-              <div className={""}>
-                {
-                  jwtInfo && jwtInfo.sub &&
-                    <div className={'flex items-center space-x-2'}>
-                        <Label>steam ID</Label>
-                        <span> {jwtInfo.sub}</span>
-                    </div>
-                }
-                {
-                  jwtInfo && jwtInfo.exp &&
-                    <div className={'flex items-center space-x-2'}>
-                        <Label>token 过期时间</Label>
-                        <span> {dayjs.unix(jwtInfo.exp).format('MM月DD日 HH:mm:ss')}</span>
-                    </div>
-                }
-              </div>
-              {
-                steps
-                  .filter(step => step.isTriggered())
-                  .map((step, index) =>
-                    <div key={index} className={"space-x-2 text-xs font-light"}>
-                    <span
-                      className={cn()}
-                    >{statusToEmoji(step.stepStatus)}</span>
-                      <span>{step.message}</span>
-                    </div>
-                  )
-              }
-            </div>
-          </div>
-        </div>
+        }
+        <Steps steps={steps}/>
         <Button variant={'ghost'} className={"ml-auto mr-2 w-fit my-4"}
-                disabled={!inputActive}
-                onClick={()=>{onSubmitWrapper(true)}}
-        >提交</Button>
+                disabled={!ok}
+                onClick={onSubmit}
+        >Let's Start</Button>
       </div>
       {
-        dataLoaded &&
-          <DataGraph libs={allLibs} players={allMember} libsPlaytime={libsPlaytime} family={familyInfo}
+        canDisplay &&
+          <DataGraph libs={allLibs} players={allMembers} libsPlaytime={sharedPlaytime!} family={steamFamilyInfo!}
                      bg={background}/>
       }
     </main>
   );
+}
+
+
+
+function Steps(
+  {
+    steps
+  }:{
+    steps: [Step,[Step,Step,SharedLibraryStep],Step]
+  }
+) {
+  // console.log("rerenderSteps", JSON.parse(JSON.stringify(steps)))
+
+  return (
+    <div className={'flex md:flex-row w-full justify-evenly items-center'}>
+          <StepItem step={steps[0]}/>
+      <div className={"flex flex-col gap-2"}>
+        <RightStepItem step={steps[1][0]}/>
+        <RightStepItem step={steps[1][1]}/>
+        {
+          steps[1][2].steps.length == 0 ? (
+            <RightStepItem step={steps[1][2]}/>
+          ):(
+            <Popover>
+              <PopoverTrigger><RightStepItem step={steps[1][2]}/></PopoverTrigger>
+              <PopoverContent><SubSteps steps={steps[1][2].steps}/></PopoverContent>
+            </Popover>
+          )
+        }
+      </div>
+
+      <StepItem step={steps[2]}/>
+    </div>
+  )
+}
+
+function SubSteps({
+  steps
+}:{
+  steps: Step[]
+}) {
+  // retry 重新设置store
+  return (
+    <div className={"p-2"}>
+      <ul>
+        {steps.map(step => (
+          <li key={step.title}>
+            <div
+              className={"text-xs font-light rounded-full bg-gray-300"}>
+              <span className={cn("")}>{statusToEmoji(step.stepStatus)}</span>
+              <div className={""}>
+                {step.title}
+              </div>
+            </div>
+
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+function RightStepItem(
+  {
+    step
+  }: {
+    step: Step
+  }
+) {
+  return (
+    <div className={"text-xs font-light relative w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center"}>
+      <span className={cn("")}>{statusToEmoji(step.stepStatus)}</span>
+      <div className={"absolute left-full break-keep pl-1"}>
+        {step.title}
+      </div>
+    </div>
+  )
+}
+function StepItem(
+  {
+    step
+  }: {
+    step: Step
+  }
+) {
+  return (
+    <div className={"text-xs font-light relative w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center"}>
+      <span className={cn("")}>{statusToEmoji(step.stepStatus)}</span>
+      <div className={"absolute top-full break-keep -translate-x-1/2 left-4"}>
+            {step.title}
+          </div>
+        </div>
+  )
 }

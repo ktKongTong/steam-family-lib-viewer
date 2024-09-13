@@ -51,8 +51,8 @@ export function About() {
               <div className={'flex flex-col'}>
                 <p>如果你觉得这个玩具有意思，可以考虑赞赏作者一杯快乐水哦🍺</p>
                 <div className={'flex justify-evenly mx-auto w-full'}>
-                  <img src={'/wechat_pay_qrcode.png'} className={'max-h-40 mx-auto'}/>
-                  <img src={'/alipay_qrcode.png'} className={'max-h-40 mx-auto'}/>
+                  {/*<img src={'/wechat_pay_qrcode.png'} className={'max-h-40 mx-auto'}/>*/}
+                  {/*<img src={'/alipay_qrcode.png'} className={'max-h-40 mx-auto'}/>*/}
                 </div>
 
               </div>

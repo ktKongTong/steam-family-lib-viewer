@@ -11,7 +11,7 @@ export function useQRAuth() {
   const {data: authBasicInfo, isSuccess, isRefetching} = useAuthViaQRQuery()
   const queryClient = useQueryClient()
   const [ok, setOk] = useState(false)
-  const {status, pollTime, data, isLoading, error, refresh, challengeURL, setChallengeURL, setClientId} = useQRAuthPolling(isSuccess && !isRefetching , authBasicInfo?.qrInfo)
+  const {status, pollTime, data, isLoading, error, refresh, challengeURL, setChallengeURL, clientId,setClientId} = useQRAuthPolling(isSuccess && !isRefetching , authBasicInfo?.qrInfo)
   useEffect(() => {
     if(authBasicInfo?.qrInfo?.clientId) {
       // console.log(`qr refresh update clientId, ${authBasicInfo.qrInfo.clientId}`)
@@ -33,6 +33,7 @@ export function useQRAuth() {
         nonce: data!.refreshToken!!,
         sessionId: authBasicInfo?.sessionInfo?.sessionId!!,
         ak_bmsc: authBasicInfo?.sessionInfo?.ak_bmsc!!,
+        clientId: clientId!,
       })
     }
   }, [status, setOk, mutate, data, authBasicInfo?.sessionInfo?.sessionId, authBasicInfo?.sessionInfo?.ak_bmsc]);

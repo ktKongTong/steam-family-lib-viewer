@@ -1,9 +1,8 @@
 'use client'
-import WordCloud from "@/app/(chart)/wordcloud";
 import React, {useCallback, useRef, useState} from "react";
 import {Piegraph} from "@/app/(chart)/piegraph";
 import {Button} from "@/components/ui/button";
-import LockBodyScroll from "@/app/lockBodyScroll";
+import LockBodyScroll from "@/components/lockBodyScroll";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import {Loader2} from "lucide-react";
 import {Overlay} from "@/app/overlay";

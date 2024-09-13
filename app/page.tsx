@@ -30,6 +30,7 @@ import {SteamAppPlaytime} from "@/interface/steamPlaytime";
 import {ProxiedAPIResponse} from "@/app/api/[[...routes]]/(api)/interface";
 import QR from "@/components/qr";
 import {useTokenStore} from "@/hooks/auth/store/useTokenStore";
+import {TokenAddDrawerDialog, TokenPanel} from "@/app/tokenPanel";
 
 dayjs.extend(relativeTime)
 
@@ -141,14 +142,14 @@ export default function Home() {
       return jwtDecode(tokenInput)
     }catch (e) {return null}
   },[tokenInput])
-  const token = useTokenStore(state => state.currentToken)
+  // const token = useTokenStore(state => state.currentToken)
 
-  useEffect(()=> {
-    if (token?.accessToken) {
-      console.log("set token")
-      setToken(token.accessToken)
-    }
-  }, [token])
+  // useEffect(()=> {
+  //   if (token?.accessToken) {
+  //     console.log("set token")
+  //     setToken(token.accessToken)
+  //   }
+  // }, [token])
 
   const [steps,setSteps] = useState<Step[]>([])
   const [inputActive, setInputActive] = useState(true)
@@ -266,7 +267,7 @@ export default function Home() {
   const {toast} = useToast()
   //
   const onSubmitWrapper = (qr: boolean = false)=> {
-    const {res,reason} = validToken(!qr ? jwtInfo : jwtDecode(token?.accessToken!!))
+    const {res,reason} = validToken(jwtInfo)
     if(res) {
       setInputActive(false)
       onSubmit()
@@ -288,19 +289,20 @@ export default function Home() {
           <div className={"text-lg font-semibold py-2"}>AccessToken</div>
           <GetToken/>
         </div>
+        <TokenPanel/>
         <div className={'flex flex-col md:flex-row'}>
           <div
             className={"max-w-96 space-y-2"}
           >
-            {/*<Textarea*/}
-            {/*  placeholder="Type your access_token here."*/}
-            {/*  className={'min-h-80 min-w-full md:min-w-96'}*/}
-            {/*  value={tokenInput}*/}
-            {/*  onChange={(e) => {setToken(e.target.value)}}*/}
-            {/*  disabled={!inputActive}*/}
-            {/*/>*/}
+            <Textarea
+              placeholder="Type your access_token here."
+              className={'min-h-80 min-w-full md:min-w-96'}
+              value={tokenInput}
+              onChange={(e) => {setToken(e.target.value)}}
+              disabled={!inputActive}
+            />
 
-            <QR/>
+            {/*<QR/>*/}
             {
               tokenInput.length > 0 && !jwtInfo &&
                 <div className={"text-xs text-red-500 font-light py-0.5"}>

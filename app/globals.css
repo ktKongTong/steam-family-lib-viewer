@@ -74,3 +74,34 @@
     @apply bg-background text-foreground;
   }
 }
+
+/*.spinner {*/
+/*  @apply relative w-8 h-8 border-4 border-solid border-transparent rounded-full;*/
+/*  !*border: white;*!*/
+/*  border-bottom-color: white; !* 底部为可见颜色 *!*/
+/*  border-left-color: white; !* 左部分为可见颜色 *!*/
+/*  border-radius: 50%;*/
+/*  animation: spin 1s linear infinite;*/
+/*}*/
+
+/* !*使用伪元素添加层次感*!*/
+/*.spinner::before {*/
+/*  content: '';*/
+/*  @apply absolute inset-0 border-4 border-solid border-transparent rounded-full;*/
+/*  !*border-bottom-color: #e74c3c; !* 底部为可见颜色 *!*!*/
+/*  !*border-left-color: #2ecc71; !* 左部分为可见颜色 *!*!*/
+/*  animation: spin 1.5s linear infinite reverse;*/
+/*}*/
+
+/*!* 定义旋转动画 *!*/
+/*@keyframes spin {*/
+/*  0% {*/
+/*    transform: rotate(0deg);*/
+/*  }*/
+/*  !*50% {*!*/
+/*  !*  transform: rotate(270deg);*!*/
+/*  !*}*!*/
+/*  100% {*/
+/*    transform: rotate(360deg);*/
+/*  }*/
+/*}*/

@@ -1,6 +1,6 @@
 'use client'
 import _ from 'lodash'
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {jwtDecode, JwtPayload} from "jwt-decode";
 import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
@@ -26,9 +26,10 @@ import {
 } from "@/proto/gen/web-ui/service_player_pb";
 import {CStoreBrowse_GetItems_Response, StoreItem} from "@/proto/gen/web-ui/common_pb";
 import {useToast} from "@/components/ui/use-toast";
-import {SteamAppPlaytime, SteamPlaytimeItem, SteamPlaytimeResponse} from "@/interface/steamPlaytime";
+import {SteamAppPlaytime} from "@/interface/steamPlaytime";
 import {ProxiedAPIResponse} from "@/app/api/[[...routes]]/(api)/interface";
-import {Message} from "@bufbuild/protobuf";
+import QR from "@/components/qr";
+import {useTokenStore} from "@/hooks/auth/store/useTokenStore";
 
 dayjs.extend(relativeTime)
 
@@ -140,6 +141,15 @@ export default function Home() {
       return jwtDecode(tokenInput)
     }catch (e) {return null}
   },[tokenInput])
+  const token = useTokenStore(state => state.currentToken)
+
+  useEffect(()=> {
+    if (token?.accessToken) {
+      console.log("set token")
+      setToken(token.accessToken)
+    }
+  }, [token])
+
   const [steps,setSteps] = useState<Step[]>([])
   const [inputActive, setInputActive] = useState(true)
 
@@ -254,8 +264,9 @@ export default function Home() {
     setDataLoaded(true)
   }
   const {toast} = useToast()
-  const onSubmitWrapper = ()=> {
-    const {res,reason} = validToken(jwtInfo)
+  //
+  const onSubmitWrapper = (qr: boolean = false)=> {
+    const {res,reason} = validToken(!qr ? jwtInfo : jwtDecode(token?.accessToken!!))
     if(res) {
       setInputActive(false)
       onSubmit()
@@ -281,13 +292,15 @@ export default function Home() {
           <div
             className={"max-w-96 space-y-2"}
           >
-            <Textarea
-              placeholder="Type your access_token here."
-              className={'min-h-80 min-w-full md:min-w-96'}
-              value={tokenInput}
-              onChange={(e) => {setToken(e.target.value)}}
-              disabled={!inputActive}
-            />
+            {/*<Textarea*/}
+            {/*  placeholder="Type your access_token here."*/}
+            {/*  className={'min-h-80 min-w-full md:min-w-96'}*/}
+            {/*  value={tokenInput}*/}
+            {/*  onChange={(e) => {setToken(e.target.value)}}*/}
+            {/*  disabled={!inputActive}*/}
+            {/*/>*/}
+
+            <QR/>
             {
               tokenInput.length > 0 && !jwtInfo &&
                 <div className={"text-xs text-red-500 font-light py-0.5"}>
@@ -330,7 +343,7 @@ export default function Home() {
         </div>
         <Button variant={'ghost'} className={"ml-auto mr-2 w-fit my-4"}
                 disabled={!inputActive}
-                onClick={onSubmitWrapper}
+                onClick={()=>{onSubmitWrapper(true)}}
         >提交</Button>
       </div>
       {

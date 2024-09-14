@@ -34,6 +34,7 @@ interface TokenStoreAction {
   // addToken: (token: SteamToken) => void,
   // setCurrentToken: (token: SteamToken) => void,
   addAndSetCurrentToken: (token: SteamToken) => void,
+  setCurrentToken: (token: SteamToken) => void,
 }
 
 //todo 1. store in localstorage

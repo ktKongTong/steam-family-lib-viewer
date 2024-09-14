@@ -1,7 +1,8 @@
-import {Player} from "@/app/page";
+
 import {cooldownDurationTostring} from "@/lib/utils";
 import dayjs from "dayjs";
 import React from "react";
+import {Player} from "@/interface/steamPlaytime";
 
 export default function PlayerItem({
   player

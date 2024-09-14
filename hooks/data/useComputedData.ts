@@ -1,5 +1,5 @@
-import {Player} from "@/app/page";
-import {SteamAppPlaytime} from "@/interface/steamPlaytime";
+
+import {Player, SteamAppPlaytime} from "@/interface/steamPlaytime";
 import {useMemo} from "react";
 import _ from "lodash";
 import {StoreItem} from "@/proto/gen/web-ui/common_pb";

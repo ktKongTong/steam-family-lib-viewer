@@ -1,6 +1,4 @@
-import Game from "@/app/game";
 import React, {useCallback, useEffect, useMemo, useState} from "react";
-import {App, Player} from "@/app/page";
 import {
   Pagination,
   PaginationContent,
@@ -18,6 +16,8 @@ import {useMediaQuery} from "@uidotdev/usehooks";
 import {convertTag, Tags} from "@/lib/tagdict";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
+import {App, Player} from "@/interface/steamPlaytime";
+import Game from "@/app/_family-graph/game";
 
 interface GamesGridProps {
   apps: App[],

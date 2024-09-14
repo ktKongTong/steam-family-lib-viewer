@@ -2,12 +2,12 @@ import {Textarea} from "@/components/ui/textarea";
 import React, {useMemo, useState} from "react";
 import {jwtDecode} from "jwt-decode";
 import {Button} from "@/components/ui/button";
-import GetToken from "@/app/GetToken";
 import {useGetUserInfoMutation} from "@/hooks/auth/query/useGetFinalTokenMutation";
 import {AuthType} from "@/hooks/auth/interface";
 import {useTokenStore} from "@/hooks/auth/store/useTokenStore";
 import useStore from "@/hooks/useStore";
 import {Loader, Loader2} from "lucide-react";
+import GetToken from "@/components/token-pannel/GetToken";
 
 export default function NewTokenForm (
 

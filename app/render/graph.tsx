@@ -3,12 +3,10 @@ import {Piegraph} from "@/app/(chart)/piegraph";
 import {PlaytimeGraph} from "@/app/(chart)/playtimeGraph";
 import WordCloud from "@/app/(chart)/wordcloud";
 import React from "react";
-import {Player} from "@/app/page";
-import {SteamAppPlaytime} from "@/interface/steamPlaytime";
-import Game from "@/app/game";
-import {useComputedData} from "@/hooks/use-computed-data";
+import {Player, SteamAppPlaytime} from "@/interface/steamPlaytime";
+import {useComputedData} from "@/hooks/useComputedData";
 import PlayerItem from "@/app/player";
-import EchartWordCloud from "@/app/(chart)/echart-worldcloud";
+import Game from "@/app/_family-graph/game";
 
 export default function Graph({
   libs,

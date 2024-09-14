@@ -1,49 +1,20 @@
 'use client'
-import {ImageWithFallback} from "@/app/fallbackImg";
+import {ImageWithFallback} from "@/components/fallbackImg";
 import dayjs from "dayjs";
 import React, {useCallback, useEffect, useState} from "react";
-import {App, Player} from "@/app/page";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {cn} from "@/lib/utils";
+import {cn, getAvatar, getGameAsset, getGameCapsule, getGameHeader, getGameTrailer} from "@/lib/utils";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {convertTag} from "@/lib/tagdict";
 import {useMediaQuery} from "@uidotdev/usehooks";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {App, Player} from "@/interface/steamPlaytime";
 
 interface GameProps {
   game: App,
   players:Player[]
 }
 
-const getAvatar = (hash:string) => `https://avatars.akamai.steamstatic.com/${hash}_full.jpg`
-const getGameAsset = (game:App, filename:string) => {
-  const format = game.detail.assets?.assetUrlFormat
-  const prefix = "https://cdn.akamai.steamstatic.com/"
-  const url = format?.replace("${FILENAME}", filename)
-  // console.log(prefix+url)
-  return prefix + url
-}
-const getGameTrailer = (game:App) => {
-  try {
-    const format = game.detail.trailers?.highlights?.[0]!.trailerUrlFormat!
-    const prefix = "https://cdn.akamai.steamstatic.com/"
-    //
-    // https://cdn.akamai.steamstatic.com/steam/apps/256689996/microtrailer.webm
-    const filename = game.detail.trailers?.highlights?.[0]!.microtrailer[0].filename!
-    const url = format.replace("${FILENAME}", filename)
-    return prefix + url
-  }catch (e) {
-    return null
-  }
-
-}
-const getGameHeader = (game:App) => {
-  return getGameAsset(game,game.detail.assets?.header!)
-}
-
-const getGameCapsule = (game:App) => {
-  return getGameAsset(game,game.detail.assets?.libraryCapsule??'')
-}
 interface Media {
   src: string
   type:'video'|'img'

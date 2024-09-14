@@ -1,127 +1,96 @@
-import {useMutation} from "@tanstack/react-query";
-import {useCallback, useMemo, useState} from "react";
-import {useSteamItems} from "@/hooks/data/useSteamItems";
-import {SharedPlayTimeItem, useFamilyPlaytime} from "@/hooks/data/useFamilyPlaytime";
-import {useFamilyInfo} from "@/hooks/data/useFamilyInfo";
-import {useFamilySharedLibs} from "@/hooks/data/useFamilySharedLibs";
-import {useSteamPlayerInfo} from "@/hooks/data/useSteamPlayerInfo";
-import {RetryableStep, Step} from "@/app/step";
+import React, {useCallback, useMemo, useState} from "react";
+import {useFamilyPlaytime} from "@/hooks/data/query/useFamilyPlaytime";
+import {useSteamItems} from "@/hooks/data/query/useSteamItems";
+import {useFamilyInfo} from "@/hooks/data/query/useFamilyInfo";
+import {useFamilySharedLibs} from "@/hooks/data/query/useFamilySharedLibs";
+import {useSteamPlayerInfo} from "@/hooks/data/query/useSteamPlayerInfo";
+import {SharedLibraryStep, Step, StepStatus, WrappedStep} from "./step";
 import {
-  CFamilyGroups_GetFamilyGroupForUser_Response, CFamilyGroups_GetSharedLibraryApps_Response_SharedApp,
+  CFamilyGroups_GetFamilyGroupForUser_Response,
+  CFamilyGroups_GetSharedLibraryApps_Response_SharedApp,
 } from "@/proto/gen/web-ui/service_familygroups_pb";
 import _ from "lodash";
 import {CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails} from "@/proto/gen/web-ui/service_player_pb";
-import {CStoreBrowse_GetItems_Response, StoreItem} from "@/proto/gen/web-ui/common_pb";
+import {StoreItem} from "@/proto/gen/web-ui/common_pb";
 import {shaDigestAvatarBase64ToStrAvatarHash} from "@/lib/steam_utils";
-import {Player} from "@/app/page";
-
-/*
-* prepare
-* fetch family
-* 1. playtime, 2. sharedLibs, 3. playerInfo
-*              2.2 steamItems// parallel maybe many request
-* compute
-* finished
-* */
-
-enum FetchStage {
-  Prepare,
-  FetchFamily,
-
-  ParallelFetchPlayTimeAndSharedLibsAndFetch,
-
-}
-// detailStep
-
-export class SharedLibraryStep extends Step {
-  steps: Step[] = []
-  setSubSteps(steps: Step[]) {
-    this.steps = steps
-  }
-}
-
-interface FamilyLibInfo {
-  familyLibInfo: any,
-  membersInfo: any,
-  playtimeInfo: any,
-  sharedLibsInfo: any,
-  sharedLibsDetails: any,
-}
+import {Player} from "@/interface/steamPlaytime";
 
 type LibDetailsWithRangeIndex = Record<string, StoreItem[]>
 
-const getSteps:()=>[Step,[Step,Step,SharedLibraryStep],Step] = ()=> [
-  new Step( "获取赛博家庭基本信息"),
-  [
+const getSteps:()=>[Step,WrappedStep,Step] = ()=> [
+  new Step( "获取基本信息"),
+  new WrappedStep([
     new Step( "获取家庭借用游玩时间"),
     new Step("获取家庭成员信息"),
-    new SharedLibraryStep( "获取家庭库存信息")
-  ],
+    new SharedLibraryStep( [],"获取家庭库存信息")
+  ],"获取详情信息"),
   new Step( "完成")
 ]
 
 export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
 
 
-  const steamFamilyInfoQuery = useFamilyInfo()
+  const {fetchFamilyInfo, reset: resetFamilyInfo, steamFamilyInfo, error: familyInfoError} = useFamilyInfo(accessToken)
 
-  const steamPlayersInfoQuery = useSteamPlayerInfo()
+  const { fetchFamilyPlaytime, reset: resetSharedPlaytime, sharedPlaytime, error:sharedPlaytimeError} = useFamilyPlaytime(accessToken)
 
-  const steamFamilyPlaytimeQuery = useFamilyPlaytime()
+  const { fetchSteamPlayers, reset: resetSteamPlayers, steamPlayers, error:steamPlayersError}  = useSteamPlayerInfo(accessToken)
+
 
   const steamFamilySharedLibsQuery = useFamilySharedLibs()
 
   const steamItemQuery = useSteamItems()
+  //
+  const [steps,setSteps] = useState<[Step,WrappedStep,Step]>(getSteps())
 
+  const [libOverviews, setLibOverviews] = useState<CFamilyGroups_GetSharedLibraryApps_Response_SharedApp[]>([])
+  const [libDetailWithIndex, setLibDetailWithIndex] = useState<LibDetailsWithRangeIndex>({})
 
-  const [dataLoaded,setDataLoaded] = useState(false)
-  const [canDisplay,setCanDisplay] = useState(false)
+  const reset = () => {
+    let curSteps = getSteps()
+    if(!steps[0].ok) {
+      curSteps = steps
+    }
+    setSteps(curSteps)
+    resetFamilyInfo()
+    resetSharedPlaytime()
+    resetSteamPlayers()
 
-  const [steps,setSteps] = useState(getSteps())
-    // console.log("init state", JSON.parse(JSON.stringify(steps)))
-  const [familyStep, [playtimeStep, memberStep, sharedLibsStep], finishStep] = steps
+    setLibOverviews([])
+    setLibDetailWithIndex({})
+    return curSteps
+  }
+  const [familyStep, wrappedStep, finishStep] = steps
+  const [playtimeStep, memberStep, ] = wrappedStep.steps
+  const sharedLibsStep = wrappedStep.steps[2] as SharedLibraryStep
 
   const syncStep = ()=> {
-    // console.log("syncing step", JSON.parse(JSON.stringify(steps)))
-    setSteps([familyStep, [playtimeStep, memberStep, sharedLibsStep], finishStep])
+    //某个步骤的 syncStep 会导致在原始 step更新后，
+    setSteps((state)=> {
+      const [familyStep, wrappedStep, finishStep] = state
+      const [playtimeStep, memberStep, ] = wrappedStep.steps
+      const sharedLibsStep = wrappedStep.steps[2] as SharedLibraryStep
+      if(playtimeStep.ok && memberStep.ok && sharedLibsStep.ok) {
+        finishStep.success('')
+      }else if(finishStep.ok) {
+        finishStep.updateStatus(StepStatus.NotStart)
+      }
+      return [familyStep, wrappedStep, finishStep]
+    })
   }
-  const [steamFamilyInfo, setSteamFamilyInfo] = useState<CFamilyGroups_GetFamilyGroupForUser_Response | null>(null)
-  const [sharedPlaytime, setSharedPlaytime] = useState<SharedPlayTimeItem[] | null>(null)
-  const [familyMembers, setFamilyMembers] = useState<CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails[] | null>(null)
-  const [libOverviews, setLibOverviews] = useState<CFamilyGroups_GetSharedLibraryApps_Response_SharedApp[]>([])
 
-  const [libDetailWithIndex, setLibDetailWithIndex] = useState<LibDetailsWithRangeIndex>({})
-  // 处理 steamFamily // 这一步失败后续都不可以进行，这个retry 本身就是re fetch
-  const handleFamily = useCallback(async() => {
-    const steamFamily = await steamFamilyInfoQuery.mutateAsync(accessToken).then(res=>res!.data)
-    setSteamFamilyInfo(steamFamily)
-    return steamFamily
-  },[accessToken])
-
-  const handlePlaytime = useCallback(async(familyId: string) => {
-    const res = await steamFamilyPlaytimeQuery.mutateAsync({ token:accessToken, id: familyId })
-    setSharedPlaytime(res)
-    return res
-  },[accessToken])
-  const handleMembers = useCallback(async(memberIds: string[]) => {
-    const res = await steamPlayersInfoQuery.mutateAsync({ token:accessToken, ids: memberIds })
-    // 设置 steamFamily
-    setFamilyMembers(res?.data?.accounts!)
-    return res
-  },[accessToken])
+  // const syncSte
 
   const handleLibDetails = useCallback(async (key:string, idChunk: string[])=> {
     const res = await steamItemQuery.mutateAsync(idChunk)
     setLibDetailWithIndex((cur) => {
-      let ans: LibDetailsWithRangeIndex = {
-        ...cur
-      }
+      let ans: LibDetailsWithRangeIndex = { ...cur }
       ans[key] = res?.data!!.storeItems!!
       return ans
     })
-  }, [setLibDetailWithIndex])
+  }, [steamItemQuery])
 
-  const handleSteamLibsWithStep = useCallback(async(familyId: string) => {
+  const handleSteamLibs = useCallback(async(familyId: string) => {
     syncStep()
     const libs = await steamFamilySharedLibsQuery.mutateAsync({token:accessToken, id: familyId})
     const filteredLibs = libs!.data!.apps
@@ -135,41 +104,91 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
     const itemsSteps = libIds.map((idChunk,index)=> new Step(`分块【${getKey(index,idChunk.length)}】库存详情信息`))
     sharedLibsStep.setSubSteps(itemsSteps)
     // 每个放到 store 中的一个 index
-    const res = itemsSteps.map((it,idx) => it.trigger(() => handleLibDetails(getKey(idx,libIds[idx].length),libIds[idx]).then(syncStep)))
-    await Promise.all(res)
+    const res = itemsSteps.map((it,idx) => {
+      it.bindFunc(() => handleLibDetails(getKey(idx,libIds[idx].length),libIds[idx]))
+      it.bindAfter(async () => syncStep())
+      return it.trigger()
+    })
+    await Promise.allSettled(res)
     syncStep()
-    return libs
-  },[syncStep, accessToken])
-
+  },[syncStep, steamFamilySharedLibsQuery, accessToken, sharedLibsStep, handleLibDetails])
 
   const fetch = async ()=> {
+    // 此处保证持有的最新的steps，在下一次 setState的时候同步
+    // reset()
+    //
+    const steps = reset()
+    const [familyStep, wrappedStep, finishStep] = steps
+    const [playtimeStep, memberStep, ] = wrappedStep.steps
+    const sharedLibsStep = wrappedStep.steps[2] as SharedLibraryStep
     // step 1
-    // 五个 step 本身不变，区别在于 step 持有的 message 变化，但是通过变更
-    syncStep()
-    const steamFamily = await familyStep.trigger(() => handleFamily())
+    // syncStep 导致 rerender，但是持有还是原来的step，
+    // 但是在rerender 之前，立马就开始下一轮了请求
+    const steamFamily = await familyStep.trigger(() => fetchFamilyInfo())
+
     syncStep()
     const familyId = steamFamily!.familyGroupid!!.toString()
     const memberIds =steamFamily!.familyGroup!.members!.map((member)=>member.steamid!.toString())
+    playtimeStep.bindFunc(async () => fetchFamilyPlaytime(familyId))
+    memberStep.bindFunc(async () => fetchSteamPlayers(memberIds))
+    sharedLibsStep.bindFunc(async () => handleSteamLibs(familyId))
+
+    playtimeStep.bindAfter(async ()=>{syncStep()})
+    memberStep.bindAfter(async ()=>{syncStep()})
+    sharedLibsStep.bindAfter(async ()=>{syncStep()})
+
+    await wrappedStep.trigger(async () => Promise.allSettled([
+        playtimeStep.trigger(),
+        memberStep.trigger(),
+      sharedLibsStep.trigger()
+    ]))
     syncStep()
-    // step2
-    await Promise.all([
-      Promise.all([
-        playtimeStep.trigger(()=> handlePlaytime(familyId).then(syncStep)),
-        memberStep.trigger(() => handleMembers(memberIds).then(syncStep))
-      ]).then(() => setCanDisplay(true)),
-      sharedLibsStep.trigger(()=> handleSteamLibsWithStep(familyId).then(syncStep))
-    ])
-    syncStep()
-    // step3
-    finishStep.success('')
-    setDataLoaded(true)
   }
+  const {
+    allLibs,
+    allMembers,
+  } = useComputedLibAndMember(steamFamilyInfo,steamPlayers,libOverviews,libDetailWithIndex)
+
+  // 此处setSteps没有先于steamFamilyInfo更新，Why？
+  const dataLoaded = steamFamilyInfo!=null && finishStep.ok
+  const canDisplay = steamFamilyInfo!=null && playtimeStep.ok && memberStep.ok
+  // console.log("execute agagin", steamFamilyInfo)
+  // console.log("familyStep",  familyStep.id)
+  // console.log("wrappedStep",  wrappedStep.id)
+  // console.log("playtimeStep",  playtimeStep.id)
+  // console.log("memberStep", memberStep.id)
+  // console.log("sharedLibsStep", sharedLibsStep.id)
+  // console.log("finishStep",  finishStep.id)
+  return {
+    dataLoaded,
+    canDisplay,
+    fetch,
+    steps,
+    libOverviews,
+    libDetailWithIndex,
+    steamFamilyInfo,
+    sharedPlaytime,
+    allLibs,
+    allMembers
+  }
+
+}
+
+
+// 基于已有数据计算家庭成员信息，
+const useComputedLibAndMember = (
+  steamFamilyInfo: CFamilyGroups_GetFamilyGroupForUser_Response | null,
+  steamPlayers: CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails[],
+  libOverviews: CFamilyGroups_GetSharedLibraryApps_Response_SharedApp[],
+  libDetailWithIndex: LibDetailsWithRangeIndex,
+) => {
   const allMembers = useMemo(()=>{
-    if(!familyMembers) {
+    if(!steamFamilyInfo) {
       return [] as Player[]
     }
+
     const memberFamilyInfos = _.keyBy(steamFamilyInfo!.familyGroup!.members, 'steamid')
-    return familyMembers!.map((account)=> {
+    return steamPlayers!.map((account)=> {
       const id = account!.publicData!.steamid!.toString()
       const avatar_hash = shaDigestAvatarBase64ToStrAvatarHash(account!.publicData!.shaDigestAvatar!.toString())
       return {
@@ -178,7 +197,7 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
         ...memberFamilyInfos[id]
       } as Player
     })
-  },[familyMembers])
+  },[steamPlayers, steamFamilyInfo])
 
   const memberDict = useMemo(()=>{
     return _.keyBy(allMembers, 'steamid')
@@ -210,17 +229,7 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
   }, [libOverviews, libDictionary, memberDict])
 
   return {
-    dataLoaded,
-    canDisplay,
-    fetch,
-    steps,
-    libOverviews,
-    libDetailWithIndex,
-
-    steamFamilyInfo,
-    sharedPlaytime,
     allLibs,
-    allMembers
+    allMembers,
   }
-
 }

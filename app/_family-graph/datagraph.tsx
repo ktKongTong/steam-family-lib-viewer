@@ -5,20 +5,23 @@ import {Button} from "@/components/ui/button";
 import LockBodyScroll from "@/components/lockBodyScroll";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import {Loader2} from "lucide-react";
-import {Overlay} from "@/app/overlay";
+import {Overlay} from "@/components/overlay";
 import dayjs from "dayjs";
-import GamesGrid from "@/app/games-grid";
-import {Player} from "@/app/page";
+import GamesGrid from "./games-grid";
 import duration from 'dayjs/plugin/duration'
-import {SteamAppPlaytime} from "@/interface/steamPlaytime";
+import {Player, SteamAppPlaytime} from "@/interface/steamPlaytime";
 import {PlaytimeGraph} from "@/app/(chart)/playtimeGraph";
+
 dayjs.extend(duration)
 
-import { toPng } from 'html-to-image';
-import {useComputedData} from "@/hooks/use-computed-data";
+import { toJpeg } from 'html-to-image';
+
+import {useComputedData} from "@/hooks/data/useComputedData";
+
 import {cooldownDurationTostring} from "@/lib/utils";
+
 import EchartWordCloud from "@/app/(chart)/echart-worldcloud";
-import {CFamilyGroups_GetFamilyGroupForUser_Response} from "@/proto/gen/web-ui/service_familygroups_pb";
+
 export default function DataGraph(
 {
   libs,
@@ -34,7 +37,7 @@ export default function DataGraph(
   bg: string
 }
 ) {
-  const [filteredPlayer, setFilteredPlayer] = useState<any[]>(players)
+  const [filteredPlayer, setFilteredPlayer] = useState<Player[]>(players)
   const {
     cntData,
     dicts,
@@ -42,15 +45,15 @@ export default function DataGraph(
     appsForUse
   } = useComputedData(libs,filteredPlayer,players, libsPlaytime)
 
-  const setFilterUser = useCallback((user:any) => {
+  const filterUser = useCallback((user:any) => {
     if(filteredPlayer.includes(user)) {
       setFilteredPlayer(filteredPlayer.filter(it=>it!=user))
     }else {
       setFilteredPlayer([...filteredPlayer, user])
     }
   },[filteredPlayer])
-  const checkActive = useCallback((user:any)=> {
-    return filteredPlayer.includes(user)
+  const checkActive = useCallback((user:Player)=> {
+    return filteredPlayer.map(it=>it.steamid).includes(user.steamid)
   },[filteredPlayer])
   const [imgURL, setImgURL] = useState('')
   const [overlayOpen, setOverlayOpen] = useState(false)
@@ -64,11 +67,10 @@ export default function DataGraph(
     // const canvas =await html2canvas(document.querySelector("#data-graph")!)
     // const imgURL = canvas.toDataURL()
     // const ele = document.getElementById("data-graph")!
-    const url = await toPng(ref.current, { cacheBust: true, }).catch((e)=> {
-      console.log("error", e)
-    })
-
-
+    await toJpeg(ref.current)
+    await toJpeg(ref.current)
+    await toJpeg(ref.current)
+    const url = await toJpeg(ref.current)
     setImgURL(url??"")
   },[setImgURL,ref])
   const closeOverlay = useCallback(()=> {
@@ -115,7 +117,7 @@ export default function DataGraph(
                     key={player.steamid}
                     className={`flex dark items-center mx-4 hover:bg-zinc-700/30 cursor-pointer rounded-lg px-1 py-0.5 sm:px-4 sm:py-2 ${checkActive(player) ? '' : 'grayscale'}`}
                     onClick={() => {
-                      setFilterUser(player)
+                      filterUser(player)
                     }}
                   >
                     <img

@@ -1,6 +1,6 @@
 import ReactECharts from "echarts-for-react";
 import React from "react";
-import {Player} from "@/app/page";
+import {Player} from "@/interface/steamPlaytime";
 
 export const axisStyle = {
   axisLine: {
@@ -45,9 +45,9 @@ export function PlaytimeGraph({
   players: Player[]
   style: {height: number, width: number}
 }){
-  console.log("playtime")
-
-  console.log(playtime)
+  // console.log("playtime")
+  //
+  // console.log(playtime)
   const option = {
     darkMode: true,
     axisTick: {

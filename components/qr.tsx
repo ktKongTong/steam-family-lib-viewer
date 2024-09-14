@@ -16,7 +16,7 @@ export default function QR() {
     if(status === PollStatus.accept && token) {
       tokenStore.addAndSetCurrentToken(token)
     }
-  }, [status, token])
+  }, [status, token, tokenStore])
   return (
     <div>
       <div>

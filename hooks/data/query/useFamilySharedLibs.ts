@@ -6,10 +6,7 @@ import {CFamilyGroups_GetSharedLibraryApps_Response} from "@/proto/gen/web-ui/se
 async function fetchFamilySharedLibs(token:string,id:string){
   const data = await fetch(`/api/steam/family/shared/${id}?access_token=${token}`)
     .then(res=>res.json() as Promise<ProxiedAPIResponse<CFamilyGroups_GetSharedLibraryApps_Response>>)
-    .catch(e=> {
-      console.log(e)
-      return null
-    })
+
   return data
 }
 export const useFamilySharedLibs = () => {

@@ -7,10 +7,7 @@ import {useMutation} from "@tanstack/react-query";
 async function fetchFamilyLibItems(ids:string[]){
   const data = await fetch(`/api/steam/items/${ids.join(',')}`)
     .then(res=>res.json() as Promise<ProxiedAPIResponse<CStoreBrowse_GetItems_Response>>)
-    .catch(e=> {
-      console.log(e)
-      return null
-    })
+
   return data
 }
 

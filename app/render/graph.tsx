@@ -4,9 +4,9 @@ import {PlaytimeGraph} from "@/app/(chart)/playtimeGraph";
 import WordCloud from "@/app/(chart)/wordcloud";
 import React from "react";
 import {Player, SteamAppPlaytime} from "@/interface/steamPlaytime";
-import {useComputedData} from "@/hooks/useComputedData";
-import PlayerItem from "@/app/player";
 import Game from "@/app/_family-graph/game";
+import {useComputedData} from "@/hooks/data/useComputedData";
+import PlayerItem from "@/app/_family-graph/player";
 
 export default function Graph({
   libs,

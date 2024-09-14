@@ -8,8 +8,8 @@ import {CStoreBrowse_GetItems_Response} from "@/proto/gen/web-ui/common_pb";
 import React from "react";
 import {shaDigestAvatarBase64ToStrAvatarHash} from "@/lib/steam_utils";
 import {ProxiedAPIResponse} from "@/app/api/[[...routes]]/(api)/interface";
-import {Player} from "@/app/page";
 import Graph from "@/app/render/graph";
+import {Player} from "@/interface/steamPlaytime";
 
 export const revalidate = 3600
 

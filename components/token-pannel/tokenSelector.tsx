@@ -43,7 +43,6 @@ export function TokenSelector() {
                   <div className={"flex items-center text-sm  space-x-2"}>
                       添加Token
                   </div>
-                {/*<div className={"text-sm italic text-zinc-400"}>{token.steamId}</div>*/}
               </div>
           }
         </div>
@@ -55,7 +54,7 @@ export function TokenSelector() {
             {
               tokens.map(t => (
                 <li key={t.steamId} onClick={() => {tokenStore.setCurrentToken(t)}} className={"cursor-pointer"}>
-                  <TokenItem token={t}/>
+                  <TokenItem token={t} selected={false}/>
                 </li>
               ))
             }

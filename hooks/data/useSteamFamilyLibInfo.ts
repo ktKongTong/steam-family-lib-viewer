@@ -14,6 +14,7 @@ import {CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails} from "@/proto/g
 import {StoreItem} from "@/proto/gen/web-ui/common_pb";
 import {shaDigestAvatarBase64ToStrAvatarHash} from "@/lib/steam_utils";
 import {Player} from "@/interface/steamPlaytime";
+import {useToast} from "@/components/ui/use-toast";
 
 type LibDetailsWithRangeIndex = Record<string, StoreItem[]>
 
@@ -113,6 +114,8 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
     syncStep()
   },[syncStep, steamFamilySharedLibsQuery, accessToken, sharedLibsStep, handleLibDetails])
 
+  const { toast } = useToast()
+
   const fetch = async ()=> {
     // 此处保证持有的最新的steps，在下一次 setState的时候同步
     // reset()
@@ -125,8 +128,21 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
     // syncStep 导致 rerender，但是持有还是原来的step，
     // 但是在rerender 之前，立马就开始下一轮了请求
     const steamFamily = await familyStep.trigger(() => fetchFamilyInfo())
+    if(steamFamily?.isNotMemberOfAnyGroup === true) {
+      familyStep.failed('用户不处于任何家庭中')
+      sharedLibsStep.failed('用户不处于任何家庭中')
+      playtimeStep.failed('用户不处于任何家庭中')
+      memberStep.failed('用户不处于任何家庭中')
+      wrappedStep.failed('用户不处于任何家庭中')
+      finishStep.failed('用户不处于任何家庭中')
+      syncStep()
+      toast({
+        title: '获取失败',
+        description: '用户还未处于任何家庭中，无法生成家庭库存图'
+      })
+      return
+    }
 
-    syncStep()
     const familyId = steamFamily!.familyGroupid!!.toString()
     const memberIds =steamFamily!.familyGroup!.members!.map((member)=>member.steamid!.toString())
     playtimeStep.bindFunc(async () => fetchFamilyPlaytime(familyId))

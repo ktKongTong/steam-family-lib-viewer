@@ -162,9 +162,8 @@ export function steamAuth<T extends Env>(app:Hono<T>) {
     })
     const finalRes = await res.json()
     // extract token in header
-    const headers = res.headers
-
-    const setCookie = headers.get('set-cookie')
+    // const headers = res.headers
+    // const setCookie = headers.get('set-cookie')
 
     const steamId = finalRes.steamID
     const setTokenTransferInfo = finalRes.transfer_info[0]

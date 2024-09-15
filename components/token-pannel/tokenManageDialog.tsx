@@ -38,9 +38,7 @@ export function TokenManagerDrawerDialog(
   const currentToken = useStore(useTokenStore, state => state.currentToken)
   const [curToken, setCurToken] = useState<SteamToken>()
   useEffect(() => {
-    if (currentToken) {
-      setCurToken(currentToken)
-    }
+    setCurToken(currentToken ?? undefined)
   }, [currentToken])
 
   const tokens = useStore(useTokenStore, state => state.tokens)

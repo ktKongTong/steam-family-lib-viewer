@@ -29,6 +29,7 @@ interface TokenStore {
 interface TokenStoreAction {
   // addToken: (token: SteamToken) => void,
   // setCurrentToken: (token: SteamToken) => void,
+  removeTokenById: (tokenId: string) => void,
   addAndSetCurrentToken: (token: SteamToken) => void,
   setCurrentToken: (token: SteamToken) => void,
   updateToken: (token: SteamToken) => void,
@@ -72,8 +73,24 @@ export const useTokenStore = create<TokenStore & TokenStoreAction>()(
       setCurrentToken: (token: SteamToken) => {
         set((s)=>({...s, currentToken: token }))
       },
-      nothing: () => {
-        set((state) => ({ ...state }))
+      removeTokenById: (tokenId) => {
+        set((state) => {
+          let tokens = {...state.tokens}
+          if(tokens[tokenId]) {
+            delete tokens[tokenId]
+          }
+          let currentToken = null
+          if(state.currentToken && state.currentToken.id === tokenId) {
+            let tokenArr = Object.values(tokens)
+            if(tokenArr.length > 0) {
+              currentToken = tokenArr[0]
+            }
+          }
+          return {
+            tokens,
+            currentToken,
+          }
+        })
       },
     }),
   {

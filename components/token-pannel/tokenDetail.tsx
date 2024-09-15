@@ -54,13 +54,13 @@ export function TokenDetail(
   const {isExpired: refreshTokenExpired} = useSteamToken(token.refreshToken ?? "")
   const {refreshWebAccessToken} = useRefreshAccessToken(token.refreshToken ?? "")
   // setTokenID to Invalid
-  const onRenewAccessToken = () => {
+  const onRenewRefreshToken = () => {
     // 成功时刷新当前token
   }
   const tokenStore = useTokenStore()
   const [refreshing, setRefreshing] = useState(false)
 
-  const onRenewRefreshToken = () => {
+  const onRenewAccessToken = () => {
     setRefreshing(true)
     refreshWebAccessToken()
       .then(res => {
@@ -72,6 +72,11 @@ export function TokenDetail(
       })
       .finally(() => setRefreshing(false))
   }
+
+  const onRemoveToken = ()=> {
+    tokenStore.removeTokenById(token.id)
+  }
+
   return (
     <div className={"flex flex-col gap-2"}>
       <div>
@@ -87,15 +92,17 @@ export function TokenDetail(
                 {
                   !refreshTokenExpired &&
                     <div className={"flex items-center space-x-2"}>
-                        <Button variant={'ghost'} className={'py-1 px-2'} size={'sm'} onClick={onRenewRefreshToken}
-                                disabled={refreshing}>刷新</Button>
-                        <Button variant={'ghost'} className={'py-1'} size={'sm'} disabled={refreshing}>注销</Button>
+                        <Button variant={'ghost'} className={'py-1 px-2'} size={'sm'} onClick={()=>onRenewAccessToken()} disabled={refreshing}>刷新</Button>
+                    {/*    */}
                     </div>
                 }
               </div>
               <Token token={token.refreshToken ?? ""} key={token.id}/>
           </div>
       }
+      <div className={'self-end'}>
+        <Button variant={'destructive'} className={'py-1'} size={'sm'} disabled={refreshing} onClick={()=>onRemoveToken()}>删除</Button>
+      </div>
     </div>
   )
 }

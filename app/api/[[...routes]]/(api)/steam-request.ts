@@ -119,8 +119,6 @@ async function RawSteamAPICall<REQ extends Message<REQ>,RES extends Message<RES>
     headers: header
   })
 
-  console.log("header", resp.headers)
-
   if(useProto) {
     let tmp =await resp.arrayBuffer()
     const arr = new Uint8Array(tmp);

@@ -30,7 +30,7 @@ export function StepItem(
         {step.title}
       </div>
       {
-        step.stepStatus === StepStatus.Error && <div >
+        step.stepStatus === StepStatus.Error && step.retryable && <div >
               <RotateCw
                   className={
                     cn(

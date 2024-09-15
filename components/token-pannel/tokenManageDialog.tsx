@@ -87,8 +87,8 @@ export function TokenManagerDrawerDialog(
                         tokensArr.map(t => (
                           <DropdownMenuItem key={t.steamId} onClick={() => {
                             setCurToken(t)
-                          }} className={"cursor-pointer"}>
-                            <TokenDetailHeader token={t}/>
+                          }} className={"cursor-pointer w-full"}>
+                            <TokenDetailHeader token={t} className={'w-full'}/>
                           </DropdownMenuItem>
                         ))
                       }

@@ -56,8 +56,10 @@ export class Step {
     await this.after()
     return null as unknown as T
   }
-  failed(message: string) {
+  retryable: boolean = true
+  failed(message: string, retryable = true) {
     // console.log(`setting failed status ${this.title}`)
+    this.retryable = retryable
     this.status = StepStatus.Error
     this.message = message
   }
@@ -71,6 +73,9 @@ export class Step {
   }
 
   async retry() {
+    if(!this.retryable) {
+      return
+    }
     this.status = StepStatus.Processing
     try {
       await this.func()

@@ -129,12 +129,12 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
     // 但是在rerender 之前，立马就开始下一轮了请求
     const steamFamily = await familyStep.trigger(() => fetchFamilyInfo())
     if(steamFamily?.isNotMemberOfAnyGroup === true) {
-      familyStep.failed('用户不处于任何家庭中')
-      sharedLibsStep.failed('用户不处于任何家庭中')
-      playtimeStep.failed('用户不处于任何家庭中')
-      memberStep.failed('用户不处于任何家庭中')
-      wrappedStep.failed('用户不处于任何家庭中')
-      finishStep.failed('用户不处于任何家庭中')
+      familyStep.failed('用户不处于任何家庭中',false)
+      sharedLibsStep.failed('用户不处于任何家庭中',false)
+      playtimeStep.failed('用户不处于任何家庭中',false)
+      memberStep.failed('用户不处于任何家庭中',false)
+      wrappedStep.failed('用户不处于任何家庭中',false)
+      finishStep.failed('用户不处于任何家庭中',false)
       syncStep()
       toast({
         title: '获取失败',
@@ -166,8 +166,8 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
   } = useComputedLibAndMember(steamFamilyInfo,steamPlayers,libOverviews,libDetailWithIndex)
 
   // 此处setSteps没有先于steamFamilyInfo更新，Why？
-  const dataLoaded = steamFamilyInfo!=null && finishStep.ok
-  const canDisplay = steamFamilyInfo!=null && playtimeStep.ok && memberStep.ok
+  const dataLoaded = steamFamilyInfo!=null && !steamFamilyInfo.isNotMemberOfAnyGroup && finishStep.ok
+  const canDisplay = steamFamilyInfo!=null && !steamFamilyInfo.isNotMemberOfAnyGroup && playtimeStep.ok && memberStep.ok
   // console.log("execute agagin", steamFamilyInfo)
   // console.log("familyStep",  familyStep.id)
   // console.log("wrappedStep",  wrappedStep.id)
@@ -199,7 +199,7 @@ const useComputedLibAndMember = (
   libDetailWithIndex: LibDetailsWithRangeIndex,
 ) => {
   const allMembers = useMemo(()=>{
-    if(!steamFamilyInfo) {
+    if(!steamFamilyInfo || steamFamilyInfo.isNotMemberOfAnyGroup) {
       return [] as Player[]
     }
 

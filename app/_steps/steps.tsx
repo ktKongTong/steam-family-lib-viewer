@@ -24,7 +24,8 @@ export function Steps(
           " h-1 translate-y-1/2 top-full left-1/2 w-1/2 mt-4",
           steps[0].stepStatus === StepStatus.NotStart && 'bg-gray-300',
           steps[0].stepStatus === StepStatus.Processing && 'bg-blue-100',
-          steps[0].stepStatus === StepStatus.OK && 'bg-green-300'
+          steps[0].stepStatus === StepStatus.OK && 'bg-green-300',
+          steps[0].stepStatus === StepStatus.Error && 'bg-red-300',
         )}>
           <div className={"absolute -translate-y-1/2 top-1/2 -left-3"}>
             <StepPhaseIcon stepStatus={steps[0].stepStatus}/>
@@ -65,7 +66,8 @@ export function Steps(
           " h-1 translate-y-1/2 top-full right-1/2 w-1/2 mt-4",
           steps[2].stepStatus === StepStatus.NotStart && 'bg-gray-300',
           steps[2].stepStatus === StepStatus.Processing && 'bg-blue-100',
-          steps[2].stepStatus === StepStatus.OK && 'bg-green-300'
+          steps[2].stepStatus === StepStatus.OK && 'bg-green-300',
+          steps[2].stepStatus === StepStatus.Error && 'bg-red-300',
         )}>
           <div className={" absolute -translate-y-1/2 top-1/2 -right-3"}>
             <div className={'relative'}>

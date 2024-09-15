@@ -160,31 +160,36 @@ export function steamAuth<T extends Env>(app:Hono<T>) {
       },
       body: form
     })
-    const finalRes = await res.json()
-    // extract token in header
-    // const headers = res.headers
-    // const setCookie = headers.get('set-cookie')
+    try {
+      const finalRes = await res.json()
 
-    const steamId = finalRes.steamID
-    const setTokenTransferInfo = finalRes.transfer_info[0]
-    const setTokenUrl = setTokenTransferInfo.url
-    const setTokenAuth = setTokenTransferInfo.params.auth
-    const setTokenNonce = setTokenTransferInfo.params.nonce
-    const setTokenForm = new FormData()
-    setTokenForm.set("nonce", setTokenNonce)
-    setTokenForm.set("auth", setTokenAuth)
-    setTokenForm.set("steamID", steamId)
-    const resp = await fetch(setTokenUrl, {method: 'POST', body: setTokenForm})
-    const cookie = resp.headers.get('set-cookie')!.split(';')[0]
-    const tokenRegex = /steamLoginSecure=(.+)/
-    const [, token] =  tokenRegex.exec(cookie)!
-    const decodedToken = decodeURIComponent(token)
-    return c.json({
-      data: {
-        accessToken: decodedToken.replace(`${steamId}||`,''),
-        steamId: steamId
-      }
-    })
+      // extract token in header
+      // const headers = res.headers
+      // const setCookie = headers.get('set-cookie')
+
+      const steamId = finalRes.steamID
+      const setTokenTransferInfo = finalRes.transfer_info[0]
+      const setTokenUrl = setTokenTransferInfo.url
+      const setTokenAuth = setTokenTransferInfo.params.auth
+      const setTokenNonce = setTokenTransferInfo.params.nonce
+      const setTokenForm = new FormData()
+      setTokenForm.set("nonce", setTokenNonce)
+      setTokenForm.set("auth", setTokenAuth)
+      setTokenForm.set("steamID", steamId)
+      const resp = await fetch(setTokenUrl, {method: 'POST', body: setTokenForm})
+      const cookie = resp.headers.get('set-cookie')!.split(';')[0]
+      const tokenRegex = /steamLoginSecure=(.+)/
+      const [, token] =  tokenRegex.exec(cookie)!
+      const decodedToken = decodeURIComponent(token)
+      return c.json({
+        data: {
+          accessToken: decodedToken.replace(`${steamId}||`,''),
+          steamId: steamId
+        }
+      })
+    }catch(err){
+      return res
+    }
   })
 
   app.get('/api/steam/auth/generateAccessToken', async (c)=>{

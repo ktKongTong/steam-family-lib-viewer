@@ -20,9 +20,8 @@ export function TokenList(
     <ul className={"w-40 space-y-2"}>
       {
         token.map(t => (
-          <li key={t.steamId} onClick={()=>{onSelectToken(t)}} className={"cursor-pointer"}>
-            {/*add active */}
-            <TokenItem token={t} selected={curToken === t}/>
+          <li key={t.id} onClick={()=>{onSelectToken(t)}} className={"cursor-pointer"}>
+            <TokenItem token={t} selected={curToken?.id === t.id}/>
           </li>
         ))
       }

@@ -1,4 +1,5 @@
 import {
+  CAuthentication_AccessToken_GenerateForApp_Request, CAuthentication_AccessToken_GenerateForApp_Response,
   CAuthentication_BeginAuthSessionViaQR_Request,
   CAuthentication_BeginAuthSessionViaQR_Response,
   CAuthentication_PollAuthSessionStatus_Request,
@@ -35,4 +36,14 @@ export class SteamAuthApi {
     })
   }
 
+  generateAccessToken(param: PartialMessage<CAuthentication_AccessToken_GenerateForApp_Request>) {
+    return SteamAPICall({
+      method: "POST",
+      serviceName: "IAuthenticationService",
+      itemName: "GenerateAccessTokenForApp",
+      reqClass: CAuthentication_AccessToken_GenerateForApp_Request,
+      respClass: CAuthentication_AccessToken_GenerateForApp_Response,
+      param: param
+    })
+  }
 }

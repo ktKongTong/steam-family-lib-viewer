@@ -1,15 +1,19 @@
 import {Env, Hono} from "hono";
 import {SteamAPI} from "@/app/api/[[...routes]]/(api)";
+import {jwtDecode} from "jwt-decode";
 
 export function steamAuth<T extends Env>(app:Hono<T>) {
   const steam = new SteamAPI()
   app.get('/api/steam/auth/qr', async (c)=>{
     const data = await steam.auth.beginAuthSessionViaQR({
+      websiteId: 'Store',
+      platformType: 2,
+      deviceFriendlyName: "ChromeSteam",
+      // device details are sent for web logins
       deviceDetails: {
         deviceFriendlyName: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0",
-        platformType: 1
-      },
-      websiteId: 'Store'
+        platformType: 2,
+      }
     })
     return c.json(data)
   })
@@ -75,14 +79,10 @@ export function steamAuth<T extends Env>(app:Hono<T>) {
   app.get('/api/steam/auth/finalize-login', async (c)=>{
     const nonce= c.req.query('nonce')!!
     const sessionid= c.req.query('sessionid')!!
-    const ak_bmsc = c.req.query('ak_bmsc')!!
-    // get cookie
-
-    // const buf = Buffer.from(request_id!, 'base64')
     const form = new FormData()
     form.set("nonce", nonce)
     form.set("sessionid", sessionid)
-    form.set("redir", "https://store.steampowered.com/login/?redir=&redir_ssl=1&snr=1_4_4__global-header")
+    form.set("redir", "https://steamcommunity.com/login/home/?goto=")
 
     const res = await fetch("https://login.steampowered.com/jwt/finalizelogin", {
       method: 'POST',
@@ -90,11 +90,26 @@ export function steamAuth<T extends Env>(app:Hono<T>) {
         "Referer": "https://store.steampowered.com/",
         "Origin":"https://store.steampowered.com",
         "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 Edg/127.0.0.0",
-        "Cookie":`ak_bmsc=${ak_bmsc}`
       },
       body: form
-    }).then(res=>res.json())
-    return c.json(res)
+    })
+
+    // extract token in header
+    const headers = res.headers
+    const setCookie = headers.get('set-cookie')
+    let newToken = ""
+    let steamid = ""
+    if(setCookie) {
+      const token = decodeURIComponent(setCookie.split(';')[0])
+      newToken = token.split("||")[1]
+      steamid = token.split("||")[0]
+    }
+    return c.json({
+      data: {
+        refreshToken: newToken,
+        steamid: steamid,
+      }
+    })
   })
 
   app.get('/api/steam/auth/settoken', async (c)=>{
@@ -127,28 +142,30 @@ export function steamAuth<T extends Env>(app:Hono<T>) {
   })
 
 
-  // 1. getQR
-  // 2. PollForTokenGetter
-  // 3. getFinalToken
   // combine finalize-login and settoken
   app.get('/api/steam/auth/getToken', async (c)=>{
     const nonce= c.req.query('nonce')!!
-    const sessionid= c.req.query('sessionid')!!
-    const ak_bmsc = c.req.query('ak_bmsc')!!
+    const sessionid = c.req.query('sessionid')!!
+    // const buf = Buffer.from(request_id!, 'base64')
     const form = new FormData()
     form.set("nonce", nonce)
     form.set("sessionid", sessionid)
-    form.set("redir", "https://store.steampowered.com/login/?redir=&redir_ssl=1&snr=1_4_4__global-header")
-    const finalRes = await fetch("https://login.steampowered.com/jwt/finalizelogin", {
+    form.set("redir", "https://steamcommunity.com/login/home/?goto=")
+    const res = await fetch("https://login.steampowered.com/jwt/finalizelogin", {
       method: 'POST',
       headers: {
         "Referer": "https://store.steampowered.com/",
         "Origin":"https://store.steampowered.com",
         "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 Edg/127.0.0.0",
-        "Cookie":`ak_bmsc=${ak_bmsc}`
       },
       body: form
-    }).then(res=>res.json())
+    })
+    const finalRes = await res.json()
+    // extract token in header
+    const headers = res.headers
+
+    const setCookie = headers.get('set-cookie')
+
     const steamId = finalRes.steamID
     const setTokenTransferInfo = finalRes.transfer_info[0]
     const setTokenUrl = setTokenTransferInfo.url
@@ -158,26 +175,31 @@ export function steamAuth<T extends Env>(app:Hono<T>) {
     setTokenForm.set("nonce", setTokenNonce)
     setTokenForm.set("auth", setTokenAuth)
     setTokenForm.set("steamID", steamId)
-    const resp = await fetch("https://store.steampowered.com/login/settoken", {
-      method: 'POST',
-      headers: {
-        "Referer": "https://store.steampowered.com/login/?redir=&redir_ssl=1&snr=1_4_4__global-header",
-        "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 Edg/127.0.0.0"
-      },
-      body: setTokenForm
-    })
-
+    const resp = await fetch(setTokenUrl, {method: 'POST', body: setTokenForm})
     const cookie = resp.headers.get('set-cookie')!.split(';')[0]
-
-    //
-
     const tokenRegex = /steamLoginSecure=(.+)/
     const [, token] =  tokenRegex.exec(cookie)!
     const decodedToken = decodeURIComponent(token)
-    // store steam
     return c.json({
-      token: decodedToken.replace(`${steamId}||`,''),
-      steamId: steamId
+      data: {
+        accessToken: decodedToken.replace(`${steamId}||`,''),
+        steamId: steamId
+      }
+    })
+  })
+
+  app.get('/api/steam/auth/generateAccessToken', async (c)=>{
+    const refreshToken= c.req.query('refresh_token')!!
+    let  renewType = c.req.query('renew')
+    const renewalType = renewType === "true" ? 1: 0
+    const id = jwtDecode(refreshToken).sub!
+    const res =  await steam.auth.generateAccessToken({
+        refreshToken: refreshToken,
+        steamid: BigInt(id),
+        renewalType: renewalType
+      })
+    return c.json({
+      ...res
     })
   })
 }

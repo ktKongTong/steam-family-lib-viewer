@@ -2,7 +2,7 @@
 
 import QRCode from "react-qr-code"
 import {TablerLoader2} from "@/components/Loader";
-import {useQRAuth} from "@/hooks/auth/query/useQRAuth";
+import {useQRAuth} from "@/hooks/auth/useQRAuth";
 import {PollStatus} from "@/hooks/auth/interface";
 import {useTokenStore} from "@/hooks/auth/store/useTokenStore";
 import {useEffect} from "react";
@@ -10,13 +10,7 @@ import {useEffect} from "react";
 
 
 export default function QR() {
-  const { refreshQR, status, pollTime, isRefetching, challengeURL, token } = useQRAuth()
-  const tokenStore = useTokenStore()
-  useEffect(() => {
-    if(status === PollStatus.accept && token) {
-      tokenStore.addAndSetCurrentToken(token)
-    }
-  }, [status, token, tokenStore])
+  const { refreshQR, status, pollTime, isRefetching, challengeURL } = useQRAuth()
   return (
     <div>
       <div>

@@ -74,7 +74,7 @@ export default function Home() {
       {
         canDisplay &&
           <DataGraph libs={allLibs} players={allMembers} libsPlaytime={sharedPlaytime!} family={steamFamilyInfo!}
-                     bg={background}/>
+                     bg={background} allDataLoaded={dataLoaded}/>
       }
     </main>
   );

@@ -1,6 +1,7 @@
 import {Message} from "@bufbuild/protobuf";
 import {ProxiedAPIResponse, SteamRoutes} from "@/app/api/[[...routes]]/(api)/interface";
 import {encodeProtobuf} from "@/lib/steam_utils";
+import EAuthTokenPlatformType from "steam-session/src/enums-steam/EAuthTokenPlatformType";
 
 
 interface Decoder {
@@ -53,6 +54,30 @@ export async function SteamAPICall<REQ extends Message<REQ>,RES extends Message<
 
 
 async function RawSteamAPICall<REQ extends Message<REQ>,RES extends Message<RES>>(route:SteamRoutes<REQ,RES>) {
+
+  let machineName = "Steam赛博家庭库存查看器(store in browser)"
+
+  let refererQuery = {
+    IN_CLIENT: 'true',
+    WEBSITE_ID: 'Client',
+    LOCAL_HOSTNAME: machineName,
+    WEBAPI_BASE_URL: 'https://api.steampowered.com/',
+    STORE_BASE_URL: 'https://store.steampowered.com/',
+    USE_POPUPS: 'true',
+    DEV_MODE: 'false',
+    LANGUAGE: 'english',
+    PLATFORM: 'windows',
+    COUNTRY: 'US',
+    LAUNCHER_TYPE: '0',
+    IN_LOGIN: 'true'
+  };
+
+  let param = new URLSearchParams(refererQuery)
+  const header = {
+    'user-agent': 'Mozilla/5.0 (Windows; U; Windows NT 10.0; en-US; Valve Steam Client/default/1665786434; ) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36',
+      origin: 'https://store.steampowered.com/',
+      referer: 'https://store.steampowered.com/'
+  }
   let useProto = route.useBuf == undefined ? true : route.useBuf
   let url = `https://api.steampowered.com/${route.serviceName}/${route.itemName}/v1`
   let req = new route.reqClass(route.param)
@@ -87,20 +112,15 @@ async function RawSteamAPICall<REQ extends Message<REQ>,RES extends Message<RES>
     form.append("input_protobuf_encoded", bufParam)
     body = form
   }
-  //
-  // CeRjDQAAAAAAEAEYASoIc2NoaW5lc2U%3D
-  // https://api.steampowered.com/IFamilyGroupsService/GetSharedLibraryApps/v1
-    // ?access_token=eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInI6MEVGOV8yNDUxRDkzOV83NDBCQSIsICJzdWIiOiAiNzY1NjExOTgzMzk5ODY1NDQiLCAiYXVkIjogWyAid2ViOnN0b3JlIiBdLCAiZXhwIjogMTcxNTk4ODE5NSwgIm5iZiI6IDE3MDcyNjEzMjksICJpYXQiOiAxNzE1OTAxMzI5LCAianRpIjogIjBFRUJfMjQ2RDg5MTNfRTcxNkIiLCAib2F0IjogMTcxNDQ5MDMzNSwgInJ0X2V4cCI6IDE3MzI0OTM5MDMsICJwZXIiOiAwLCAiaXBfc3ViamVjdCI6ICIxOC4xNjIuOTYuOTciLCAiaXBfY29uZmlybWVyIjogIjE4LjE2Mi45Ni45NyIgfQ.vQOc168_uCa7sOEs1ckdP9X4_haf9Q_tbe8iITy_xnefNS4-5jDmlVVSVW27CGacowjmYx3db3L545fYKw3ODA
-    // &spoof_steamid=&origin=https:%2F%2Fstore.steampowered.com&input_protobuf_encoded=CeRjDQAAAAAAEAEYASoIc2NoaW5lc2U%3D
+
   const resp = await fetch(url, {
     method: route.method,
     body: body,
-    headers: {
-      'Origin':'https://store.steampowered.com',
-      'Referer':'https://store.steampowered.com/',
-      'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0'
-    }
+    headers: header
   })
+
+  console.log("header", resp.headers)
+
   if(useProto) {
     let tmp =await resp.arrayBuffer()
     const arr = new Uint8Array(tmp);

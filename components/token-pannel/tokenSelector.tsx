@@ -11,6 +11,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import dayjs from "dayjs";
 import {formatTime} from "@/lib/utils";
 import {Separator} from "@/components/ui/separator";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 
 export function TokenSelector() {
 
@@ -24,23 +25,23 @@ export function TokenSelector() {
         <div className={"rounded"}>
           {
             currentToken &&
-                  <div className={"flex items-center space-x-2 pr-4"}>
+                  <div className={"flex items-center space-x-2 "}>
                       <Avatar>
                           <AvatarImage src={currentToken.avatarUrl}/>
                           <AvatarFallback>{currentToken.username}</AvatarFallback>
                       </Avatar>
-                      <div>
+                      <div className={"hidden sm:block"}>
                           <div className={"text-sm"}>{currentToken.username}</div>
                       </div>
                   </div>
           }
           {
             !currentToken &&
-              <div className="flex items-center space-x-2 pr-4">
+              <div className="flex items-center space-x-2 ">
                   <Avatar>
                       <AvatarFallback>{"+"}</AvatarFallback>
                   </Avatar>
-                  <div className={"flex items-center text-sm  space-x-2"}>
+                  <div className={" text-sm  space-x-2 hidden sm:block"}>
                       添加Token
                   </div>
               </div>
@@ -50,21 +51,20 @@ export function TokenSelector() {
       <PopoverContent className={"p-0 py-2 w-full"}>
         {/*token list Token */}
         <div className={"flex flex-col items-center"}>
-          <ul className={"w-40 space-y-2"}>
+          <ul className={"space-y-2"}>
             {
               tokens.map(t => (
                 <li key={t.steamId} onClick={() => {tokenStore.setCurrentToken(t)}} className={"cursor-pointer"}>
-                  <TokenItem token={t} selected={false}/>
+                  <TokenItem token={t} selected={false} className={'w-full'}/>
                 </li>
               ))
             }
           </ul>
-          <Separator className={"my-2"}/>
-          <TokenManagerDrawerDialog>
-            <button className={"w-full px-2 text-sm text-primary"}>
-              添加新Token
-            </button>
-          </TokenManagerDrawerDialog>
+            <TokenManagerDrawerDialog>
+              <button className={"w-full p-2 text-sm text-primary"}>
+                添加新Token
+              </button>
+            </TokenManagerDrawerDialog>
         </div>
 
       </PopoverContent>

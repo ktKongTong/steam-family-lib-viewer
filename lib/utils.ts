@@ -19,9 +19,45 @@ export const cooldownDurationTostring = (duration:number)=> {
 export const formatTime = (time: string|number|Date, template = 'YY-MM-DD') => {
   return dayjs(time).format(template)
 }
-export const formatRelativeTime = () => {
-  return "dayjs(time).format(template)"
+export const formatDurationTime = (duration: number) => {
+  if(duration > 0) {
+    if(duration < 60) {
+      return (duration).toFixed(0) + "秒"
+    }
+    if(duration < ( 3600)) {
+      return (duration/60).toFixed(0) + "分钟"
+    }
+    if(duration < (24 * 3600)) {
+      return (duration/3600).toFixed(0) + "小时"
+    }
+    return (duration / (24 * 3600)).toFixed(0) + "天"
+  }
+  if(Math.abs(duration) < 60) {
+    return (-duration).toFixed(0) + "秒前"
+  }
+  if(Math.abs(duration) < 3600) {
+    return (-duration/60).toFixed(0) + "分钟前"
+  }
+  if(Math.abs(duration) < (24 * 3600)) {
+    return (-duration/3600).toFixed(0) + "小时前"
+  }
+  return (-duration / (24 * 3600)).toFixed(0) + "天前"
+
+
 }
+
+export const formatRelativeTime = (time: number) => {
+  const duration = dayjs(dayjs(time)).diff() / 1000
+  return formatDurationTime(duration)
+}
+
+
+export const getRandomId =() => {
+  const randomStr = Math.random().toString(36).slice(2, 9)
+  const dateStr = Date.now().toString(36)
+  return `${dateStr}.${randomStr}`
+}
+
 function validToken(token: JwtPayload | null) {
   if (!token || !token.exp) {
 

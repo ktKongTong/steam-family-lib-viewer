@@ -48,15 +48,10 @@
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FktKongTong%2Fsteam-family-lib-viewer)
 
 ## Todo
-- [ ] more filter
+- [x] more filter
 - [ ] more data panel
 - [ ] ui improve
 
-## Sponsor
-如果觉得这个玩具还不错，可以考虑赞助一杯快乐水哦。
 
-<img src="doc/wechat_pay_qrcode.png" width="256">
-
-<img src="doc/alipay_qrcode.png" width="256">
 
 

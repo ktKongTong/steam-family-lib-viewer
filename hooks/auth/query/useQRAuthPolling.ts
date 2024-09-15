@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import {ProxiedAPIResponse} from "@/app/api/[[...routes]]/(api)/interface";
 import {CAuthentication_PollAuthSessionStatus_Response} from "@/proto/gen/web-ui/service_authentication_pb";
@@ -7,22 +7,24 @@ import {PollStatus} from "@/hooks/auth/interface";
 
 export default function useQRAuthPolling(
   enabled: boolean,
-  qrInfo?: {
-    clientId: bigint,
-    requestId: string,
-    challengeUrl: string,
-  }
+  requestId?: string,
 ) {
-  const [challengeURL, setChallengeURL] = useState(qrInfo?.challengeUrl ?? "")
-  const [clientId, setClientId] = useState(qrInfo?.clientId)
+  const [challengeURL, setChallengeURL] = useState("")
+  const [clientId, setClientId] = useState<bigint| undefined>()
+  const clientIdRef  = useRef<bigint| undefined>()
+  // console.log("new clientId", clientIdRef.current)
   const [pollTime, setPollTime] = useState(0)
   const [status, setStatus] = useState(PollStatus.notScan)
   const {data, isLoading, error } = useQuery({
-    queryKey: ['pollForAuth',clientId, qrInfo?.requestId],
+    queryKey: ['pollForAuth', requestId],
     queryFn: async () => {
+      const clientId = clientIdRef.current
+      if(!clientId) {
+        return
+      }
       setPollTime((it)=> it + 1)
       // let params:{clientId: bigint, requestId: string} = {} as any
-      const res = await fetch(`/api/steam/auth/poll?client_id=${clientId}&request_id=${qrInfo?.requestId}`)
+      const res = await fetch(`/api/steam/auth/poll?client_id=${clientId}&request_id=${requestId}`)
         .then(res=>res.json() as Promise<ProxiedAPIResponse<CAuthentication_PollAuthSessionStatus_Response>>)
       return res.data
     },
@@ -36,7 +38,7 @@ export default function useQRAuthPolling(
       }
       return 2000
     },
-    enabled: enabled
+    enabled: enabled && (status === PollStatus.notScan || status === PollStatus.interactButNotAccept)
   })
 
   useEffect(()=> {
@@ -55,18 +57,23 @@ export default function useQRAuthPolling(
         setChallengeURL(data.newChallengeUrl)
       }
       if(data?.newClientId && clientId != data?.newClientId) {
+        clientIdRef.current = data?.newClientId
         setClientId(data?.newClientId)
       }
     }
-  }, [pollTime, data, challengeURL, clientId, setChallengeURL, setClientId])
+  }, [pollTime, data, challengeURL, clientId])
 
+  const setC = (id: bigint)=> {
+    clientIdRef.current = id
+    setClientId(id)
+  }
   const refresh = () => {
     setStatus(PollStatus.notScan)
     setPollTime(0)
   }
 
   return {
-    status, pollTime, data, isLoading, error, clientId, challengeURL, refresh, setClientId, setChallengeURL
+    status, pollTime, data, isLoading, error, clientId, challengeURL, refresh, setClientId:setC, setChallengeURL
   }
 }
 

@@ -6,12 +6,13 @@ import {useTokenStore} from "@/hooks/auth/store/useTokenStore";
 import {Check} from "lucide-react";
 import {cn} from "@/lib/utils";
 
-export function TokenItem({token, selected = false }:{token: SteamToken, selected: boolean}) {
+export function TokenItem({token, selected, className }:{token: SteamToken, selected: boolean, className?: string}) {
   const curToken = useTokenStore(state => state.currentToken);
   return (
     <div className={cn(
       "p-2 flex items-center justify-between hover:bg-zinc-200/70 rounded-md",
-      selected && "bg-zinc-200/70"
+      selected && "bg-zinc-200/70",
+      className
     )}>
       <div className={"flex items-center space-x-2 pr-4"}>
         <Avatar>

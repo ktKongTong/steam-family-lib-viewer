@@ -7,20 +7,22 @@ export interface AuthBasicInfo {
   },
   sessionInfo: {
     sessionId: string,
-    ak_bmsc: string
+    ak_bmsc?: string
   }
 }
 
 
 
 export interface SteamToken {
+  id: string
   steamId: string
   accessToken: string
   // getBasicInfo
+  accountName: string
   avatarUrl: string
   username: string
   addedAt: number
-  refreshToken: string
+  refreshToken?: string
   authType: AuthType
   valid?: boolean
   other?: any
@@ -30,7 +32,7 @@ export enum AuthType {
   InputToken = "InputToken",
 }
 export enum PollStatus {
-  notBegin= "Not Begin",
+  loadQR = "LoadingQR",
   notScan  = "Not Scanned",
   interactButNotAccept = "Interact ButNotAccept",
   accept = "Accept",

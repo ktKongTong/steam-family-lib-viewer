@@ -28,13 +28,15 @@ export default function DataGraph(
   players,
   libsPlaytime,
   family,
-  bg
+  bg,
+  allDataLoaded
 }:{
   libs: any[],
   players: Player[],
   libsPlaytime: SteamAppPlaytime[],
   family: any,
-  bg: string
+  bg: string,
+  allDataLoaded: boolean,
 }
 ) {
   const [filteredPlayer, setFilteredPlayer] = useState<Player[]>(players)
@@ -147,10 +149,12 @@ export default function DataGraph(
                 players={players}
                 style={{height: 400, width: isSmallDevice ? window.innerWidth - 40 : 1000}}
               />
-            <EchartWordCloud
-              words={dicts} height={800} width={isSmallDevice ? window.innerWidth - 40 : 800}
-              className={'flex items-center'}
-            />
+            <div className={'h-[800px]'}>
+              {allDataLoaded && <EchartWordCloud
+                  words={dicts} height={800} width={isSmallDevice ? window.innerWidth - 40 : 800}
+                  className={'flex items-center'}
+              />}
+            </div>
           </div>
           <img src={bg} crossOrigin="anonymous" className={'inset-0 absolute -z-10 object-cover h-full'}
                loading={'eager'}/>

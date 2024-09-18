@@ -38,6 +38,24 @@ export function steamCommon<T extends Env>(app:Hono<T>) {
     return c.json(data)
   })
 
+  app.get('/api/steam/detail/:ids', async(c) => {
+    const idParam = c.req.param('ids')
+    const res = await steam.common.getSteamItemsDetailsByIds(idParam)
+    return c.json(res)
+  })
+  app.get('/api/steam/player/summaries', async(c) => {
+    const idParam = c.req.query('steamids')
+    const apiKey = c.req.query('key')
+    return fetch(`https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${apiKey}&steamids=${idParam}`)
+  })
+
+  app.get('/api/steam/player/ownedGames', async(c) => {
+    const idParam = c.req.query('steamid')
+    const apiKey = c.req.query('key')
+    return fetch(`https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=${apiKey}&steamid=${idParam}&include_appinfo=true&include_extended_appinfo=true`)
+  })
+
+
   app.get('/api/steam/player/:ids',async (c)=>{
     const idParam = c.req.param('ids')
     const tokenParam = c.req.query('access_token')
@@ -68,12 +86,6 @@ export function steamCommon<T extends Env>(app:Hono<T>) {
     //   }
     // })))
     return c.json(converted)
-  })
-
-  app.get('/api/steam/detail/:ids', async(c) => {
-    const idParam = c.req.param('ids')
-    const res = await steam.common.getSteamItemsDetailsByIds(idParam)
-    return c.json(res)
   })
 
 }

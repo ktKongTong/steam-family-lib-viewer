@@ -1,17 +1,14 @@
+'use client'
+
 import useStore from "@/hooks/useStore";
 import {useTokenStore} from "@/hooks/auth/store/useTokenStore";
 import {useMemo} from "react";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {TokenItem} from "@/components/token-pannel/tokenItem";
-import {TokenList} from "@/components/token-pannel/tokenList";
 import {TokenManagerDrawerDialog} from "@/components/token-pannel/tokenManageDialog";
-import {Button} from "@/components/ui/button";
+
 import * as React from "react";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import dayjs from "dayjs";
-import {formatTime} from "@/lib/utils";
-import {Separator} from "@/components/ui/separator";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 
 export function TokenSelector() {
 

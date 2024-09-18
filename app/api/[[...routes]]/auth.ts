@@ -2,6 +2,8 @@ import {Env, Hono} from "hono";
 import {SteamAPI} from "@/app/api/[[...routes]]/(api)";
 import {jwtDecode} from "jwt-decode";
 
+const proxyHost = process.env.STEAM_TOKEN_PROXY_HOST as string;
+
 export function steamAuth<T extends Env>(app:Hono<T>) {
   const steam = new SteamAPI()
   app.get('/api/steam/auth/qr', async (c)=>{
@@ -141,6 +143,12 @@ export function steamAuth<T extends Env>(app:Hono<T>) {
     })
   })
 
+  app.get('/api/steam/auth/getTokenByProxy', async (c)=>{
+    const nonce= c.req.query('nonce')!!
+    const sessionid = c.req.query('sessionid')!!
+    return  await fetch(`${proxyHost}/api/steam/auth/getToken?nonce=${nonce}&sessionid=${sessionid}`)
+  })
+
 
   // combine finalize-login and settoken
   app.get('/api/steam/auth/getToken', async (c)=>{
@@ -162,11 +170,6 @@ export function steamAuth<T extends Env>(app:Hono<T>) {
     })
     try {
       const finalRes = await res.json()
-
-      // extract token in header
-      // const headers = res.headers
-      // const setCookie = headers.get('set-cookie')
-
       const steamId = finalRes.steamID
       const setTokenTransferInfo = finalRes.transfer_info[0]
       const setTokenUrl = setTokenTransferInfo.url

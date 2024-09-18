@@ -8,11 +8,11 @@ import {CStoreBrowse_GetItems_Response} from "@/proto/gen/web-ui/common_pb";
 import React from "react";
 import {shaDigestAvatarBase64ToStrAvatarHash} from "@/lib/steam_utils";
 import {ProxiedAPIResponse} from "@/app/api/[[...routes]]/(api)/interface";
-import Graph from "@/app/_render/graph";
+import Graph from "@/app/render/graph";
 import {Player} from "@/interface/steamPlaytime";
 
 export const revalidate = 3600
-export const runtime = 'edge';
+
 let host = process.env.BASE_URL as string
 async function fetchFamilyInfo(token:string):Promise<null| ProxiedAPIResponse<CFamilyGroups_GetFamilyGroupForUser_Response>>{
   const data = await fetch(`${host}/api/steam/family?access_token=${token}`)

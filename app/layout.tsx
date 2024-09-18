@@ -5,6 +5,8 @@ const inter = Inter({ subsets: ["latin"] });
 import {Metadata} from "next";
 import {Toaster} from "@/components/ui/toaster";
 import QueryProvider from "@/components/providers/QueryClient";
+import Header from "@/app/header";
+import React from "react";
 
 
 
@@ -22,14 +24,17 @@ export default function RootLayout({
     <QueryProvider>
       <html lang="en">
       <head>
-        <script defer src="https://us.umami.is/script.js"
-                data-website-id="950a9fe2-f18d-48f8-8c6c-1504c0f8aa0a"></script>
+        <script defer src="https://us.umami.is/script.js" data-website-id="950a9fe2-f18d-48f8-8c6c-1504c0f8aa0a"></script>
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <main className="flex min-h-screen flex-col items-center max-w-[1024px] ml-auto mr-auto">
+          <Header/>
+          {children}
+        </main>
+      </body>
       <Toaster/>
       </html>
     </QueryProvider>
 
-)
-  ;
+  )
 }

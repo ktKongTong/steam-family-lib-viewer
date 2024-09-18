@@ -29,13 +29,11 @@ export const useRefreshAccessToken = (token: string) => {
   // setToken
   const { mutateAsync: refreshWebAccessToken } = useMutation({
     mutationFn: async () => {
-      const res = await fetch(`/api/steam/auth/getToken?nonce=${token}&sessionid=${sessionId}`)
-        // const token = await fetch(`/api/steam/auth/getToken?nonce=${nonce}&sessionId=${sessionId}&ak_bmsc=${ak_bmsc}`)
+      const res = await fetch(`/api/steam/auth/getTokenByProxy?nonce=${token}&sessionid=${sessionId}`)
         .then(res => res.json())
       return res.data.accessToken
     },
   })
-
 
   return {
     refreshWebAccessToken: refreshWebAccessToken

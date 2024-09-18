@@ -35,8 +35,7 @@ interface TokenStoreAction {
   updateToken: (token: SteamToken) => void,
 }
 
-//todo 1. store in localstorage
-//todo 2. crypto
+//todo 2. crypto?
 export const useTokenStore = create<TokenStore & TokenStoreAction>()(
   persist(
     (set, get) => ({

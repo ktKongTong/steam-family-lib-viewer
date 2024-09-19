@@ -1,32 +1,25 @@
 'use client'
 
 import {useToast} from "@/components/ui/use-toast";
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 
-import SteamID from "steamid";
-
 import {PlayerInfo, usePlayer} from "@/hooks/data/usePlayerStore";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {useDiffGames, usePlayerInfoMapToGame} from "@/hooks/data/usePlayerMap";
 import {LibItem} from "@/hooks/data/query/useSteamPulicLib";
-import {cn, getAvatar} from "@/lib/utils";
-import {Ellipsis} from "lucide-react";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import {Grid} from 'react-virtualized';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {DND} from "@/app/compare/dnd";
-import {Player} from "@/app/compare/player";
-import {GameItem} from "@/app/compare/gameItem";
 import {closestCorners, DndContext, DragOverlay} from "@dnd-kit/core";
 import {DraggablePlayerContainer, DroppablePlayerContainer} from "@/app/compare/playerContainer";
 import {WrappedPlayer} from "@/app/compare/wrappedPlayer";
 import {usePlayerDND} from "@/app/compare/usePlayerDND";
+import {useMeasure} from "react-use";
+import {VirtualizedGameGrid} from "@/app/compare/virtualizedList";
+import GamesGrid from "@/app/compare/pagedGameGrid";
 
-interface GameProps {
-  game:LibItem,
-  owners: any[]
-}
+;
+
 
 export interface PlayersMap {
   targetA:  (PlayerInfo & { id: string })[],
@@ -57,7 +50,7 @@ export default function Home() {
       }
     })
   }, [players])
-
+// : {allGames:MappedGame[] }
   const {allGames} = usePlayerInfoMapToGame([...playersMap.targetB, ...playersMap.targetA])
   const {
     groupAOnly,
@@ -187,10 +180,12 @@ export default function Home() {
     })),
   }]
 
+  const [tabRef, {  height:tabHeight }] = useMeasure();
+  const [tabListRef, {  height:tabListHeight }] = useMeasure();
   return (
-    <section className={"flex flex-col items-center w-full min-w-full md:min-w-96 px-4 md:px-20"}>
+    <section className={"flex flex-col items-center w-full min-w-full h-full grow md:min-w-96 px-4 md:px-20"}>
 
-      <div className="flex w-full items-center space-x-2 grow justify-between">
+      <div className="flex w-full items-center space-x-2  justify-between ">
         <Input type="text" placeholder="steamID" onInput={onInput}/>
         <Button type="submit" onClick={()=>addPlayer(steamID)}>添加</Button>
       </div>
@@ -230,8 +225,10 @@ export default function Home() {
           </DndContext>
         </div>
       </div>
-      <Tabs defaultValue="all" className="max-h-[800px] w-full">
-        <TabsList className='flex items-center justify-start flex-wrap h-auto space-y-1'>
+      {/*@ts-ignore*/}
+      <Tabs defaultValue="all" className="w-full h-full grow flex flex-col" ref={tabRef}>
+        {/*@ts-ignore*/}
+        <TabsList className='flex items-center justify-start flex-wrap h-auto space-y-1' ref={tabListRef}>
           {
             groups.map(it => (
               <TabsTrigger key={it.name} value={it.name}>{it.name}</TabsTrigger>
@@ -240,23 +237,9 @@ export default function Home() {
         </TabsList>
         {
           groups.map(it => (
-            <TabsContent value={it.name} key={it.name}>
-              <div>
-                <div>
-                  所有游戏数：{it.games.length}
-                </div>
-                <ul className={"grid gap-2 grid-cols-3 md:grid-cols-5  max-h-full overflow-scroll"}>
-                  {
-                    it.games
-                      .slice(0,30)
-                      .map((game: GameProps) => (
-                        <li key={game.game.appid}>
-                          <GameItem game={game}/>
-                        </li>
-                      ))
-                  }
-                </ul>
-              </div>
+            // @ts-ignore
+            <TabsContent value={it.name} key={it.name} className={'grow h-full'} >
+              <GamesGrid games={it.games}/>
             </TabsContent>
           ))
         }
@@ -264,5 +247,10 @@ export default function Home() {
     </section>
   );
 }
+
+
+
+
+
 
 

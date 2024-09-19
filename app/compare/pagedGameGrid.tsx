@@ -6,13 +6,12 @@ import {useMediaQuery} from "@uidotdev/usehooks";
 import {convertTag, Tags} from "@/lib/tagdict";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
-import {App, Player} from "@/interface/steamPlaytime";
-import Game from "@/app/_family-graph/game";
 import {Paging} from "@/components/paging";
+import {GameItem, GameProps} from "@/app/compare/gameItem";
+import {MappedGame} from "@/hooks/data/usePlayerMap";
 
 interface GamesGridProps {
-  apps: App[],
-  players: Player[]
+  games: GameProps[]
 }
 enum Order {
   ASC= -1,
@@ -23,17 +22,19 @@ enum Rule {
   Name,
   Date
 }
-type OrderFunc = (order:Order, rule:Rule) => (a:App,b:App)=>number
+type OrderFunc = (order:Order, rule:Rule) => (a:MappedGame,b:MappedGame)=>number
 
 const sortFunc:OrderFunc = (order: Order, rule:Rule)=> {
-  return (a:App,b:App)=> {
+  return (a:MappedGame,b:MappedGame)=> {
     if(Rule.Date == rule) {
-      const diff = ((b?.rtTimeAcquired ?? 0) - (a?.rtTimeAcquired ?? 0))
-      return diff * order
+      // const diff = ((b.game ?? 0) - (a?.rtTimeAcquired ?? 0))
+      // return diff * order
+      return 0
     }
+
     if(Rule.Name == rule) {
-      let bn = (b.sortAs ?? b.name)?.toUpperCase() ?? ""
-      let an = (a.sortAs ?? a.name)?.toUpperCase() ?? ""
+      let bn = ( b.game.name)?.toUpperCase() ?? ""
+      let an = ( a.game.name)?.toUpperCase() ?? ""
       return (order == Order.ASC) ? (an > bn ? 1 : -1) : (an > bn) ? -1 : 1
     }
     return 0
@@ -41,31 +42,23 @@ const sortFunc:OrderFunc = (order: Order, rule:Rule)=> {
 }
 
 export default function GamesGrid({
-  apps,
-  players
-}:GamesGridProps
+                                    games,
+                                  }:GamesGridProps
 ) {
   const [order,setOrder] = useState(Order.DESC)
   const [ruleKey,setRuleKey] = useState(Rule.Date)
   const [keyword, setKeyword] = useState<string>("")
   const [tagFilter,setTagFilter] = useState<number[]>([])
   const filteredApps = useMemo(()=> {
-    return apps
-      .filter(x=>keyword?x.name?.toUpperCase()?.includes(keyword?.toUpperCase()) : true)
-      .filter(x=> {
-        // if(tagFilter.length == 0) return true
-        // for (let filter of tagFilter) {
-        //   if(!x.detail.tagids.includes(filter)) {
-        //     return false
-        //   }
-        // }
-        // return  true
-        return tagFilter.length == 0 || !tagFilter.find(filter=>!x.detail.tagids.includes(filter))
-      })
+    return games
+      .filter(x=>keyword?x.game.name?.toUpperCase()?.includes(keyword?.toUpperCase()) : true)
+      // .filter(x=> {
+      //   if(tagFilter.length == 0) return true
+      //   const tag = tagFilter.find(filter=>!x.detail.tagids.includes(filter))
+      //   return !tag;
+      // })
       .sort(sortFunc(order, ruleKey))
-  },[apps, keyword, order, ruleKey, tagFilter])
-
-
+  },[games, keyword, order, ruleKey, tagFilter])
   const sm = useMediaQuery("only screen and (max-width : 768px)")
   const md = useMediaQuery("only screen and (max-width : 1024px)")
   // const lg = useMediaQuery("only screen and (max-width : 1024px)")
@@ -76,8 +69,8 @@ export default function GamesGrid({
   },[sm,md])
   const [currentPage,setCurrentPage] = useState(1)
   const pagingApps = useMemo(()=> {
-        return filteredApps.slice((currentPage-1)*pageSize, currentPage*pageSize)
-    },[currentPage, filteredApps, pageSize])
+    return filteredApps.slice((currentPage-1) * pageSize, currentPage*pageSize)
+  },[currentPage, filteredApps, pageSize])
 
 
 
@@ -103,10 +96,10 @@ export default function GamesGrid({
             {
               tagFilter.map(tag =>
                 <span key={tag}
-                  className={'px-1 py-0.5 bg-zinc-200/70 shadow rounded-md flex space-x-1 items-center'}
-                  onClick={()=>{
-                    setTagFilter([...tagFilter.filter(it=>it != tag)])
-                  }}
+                      className={'px-1 py-0.5 bg-zinc-200/70 shadow rounded-md flex space-x-1 items-center'}
+                      onClick={()=>{
+                        setTagFilter([...tagFilter.filter(it=>it != tag)])
+                      }}
                 >
                   <span>{convertTag(tag)}</span>
                   <span><X className={'h-3 w-3'}/></span>
@@ -125,28 +118,28 @@ export default function GamesGrid({
                     <CommandList>
                       {
                         Tags
-                      .map((tag) => (
-                      <CommandItem
-                        key={tag.id}
-                        value={tag.id}
-                        onSelect={(currentValue) => {
-                          if(tagFilter.includes(parseInt(tag.id))) {
-                            setTagFilter([...tagFilter.filter(tag=>tag != parseInt(currentValue))])
-                          }else {
-                            setTagFilter([...tagFilter,parseInt(currentValue)])
-                          }
-                          setOpen(false)
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            tagFilter.includes(parseInt(tag.id)) ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {tag.name}
-                      </CommandItem>
-                    ))}
+                          .map((tag) => (
+                            <CommandItem
+                              key={tag.id}
+                              value={tag.id}
+                              onSelect={(currentValue) => {
+                                if(tagFilter.includes(parseInt(tag.id))) {
+                                  setTagFilter([...tagFilter.filter(tag=>tag != parseInt(currentValue))])
+                                }else {
+                                  setTagFilter([...tagFilter,parseInt(currentValue)])
+                                }
+                                setOpen(false)
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  tagFilter.includes(parseInt(tag.id)) ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {tag.name}
+                            </CommandItem>
+                          ))}
 
                     </CommandList>
                   </CommandGroup>
@@ -170,15 +163,15 @@ export default function GamesGrid({
             </div>
             <Input type="text" placeholder="搜索"
                    className={'max-w-32 sm:max-w-64 py-0.5 h-auto '}
-            onInput={(e)=> {
-              setKeyword(e.currentTarget.value)
-            }}
+                   onInput={(e)=> {
+                     setKeyword(e.currentTarget.value)
+                   }}
             />
           </div>
         </div>
         {
           pagingApps
-            .map(app => <Game key={app.appid} game={app} players={players}/>)
+            .map(app => <GameItem key={app.game.appid} game={app.game} owners={app.owners}/>)
         }
         <div className={'col-span-full'}>
           <Paging curPage={currentPage} onUpdatePage={setCurrentPage} totalPage={Math.ceil(filteredApps.length/pageSize)} />

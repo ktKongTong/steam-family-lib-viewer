@@ -2,6 +2,14 @@ import {PlayerInfo} from "@/hooks/data/usePlayerStore";
 import _ from "lodash";
 import {useState} from "react";
 import {useToast} from "@/components/ui/use-toast";
+import {LibItem} from "@/hooks/data/query/useSteamPulicLib";
+
+export type GameOwner = ReturnType<typeof usePlayerInfoMapToGame>['allGames'][number]['owners'][number]
+
+export interface MappedGame {
+  game: LibItem,
+  owners: GameOwner[],
+}
 
 export const usePlayerInfoMapToGame = (players: PlayerInfo[]) => {
   const games = players.flatMap(player=>player.ownedGames.map(it=>({game: it, owner: {...player.summary, playtime_forever: it.playtime_forever}})))

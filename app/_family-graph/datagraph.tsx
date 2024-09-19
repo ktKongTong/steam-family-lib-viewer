@@ -3,7 +3,6 @@ import React, {forwardRef, useCallback, useRef, useState} from "react";
 import {Piegraph} from "@/app/(chart)/piegraph";
 import {Button} from "@/components/ui/button";
 import LockBodyScroll from "@/components/lockBodyScroll";
-import { useMediaQuery } from "@uidotdev/usehooks";
 import {Loader2} from "lucide-react";
 import {Overlay} from "@/components/overlay";
 import dayjs from "dayjs";
@@ -23,6 +22,7 @@ import {cooldownDurationTostring} from "@/lib/utils";
 import EchartWordCloud from "@/app/(chart)/echart-worldcloud";
 import {useRandomBackground} from "@/hooks/useRandomBackground";
 import {CFamilyGroups_GetFamilyGroupForUser_Response} from "@/proto/gen/web-ui/service_familygroups_pb";
+import {useMediaQuery} from "@/hooks/useMediaQuery";
 
 export default function DataGraph(
 {

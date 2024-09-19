@@ -6,7 +6,6 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {cn, getAvatar, getGameAsset, getGameCapsule, getGameHeader, getGameTrailer} from "@/lib/utils";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {convertTag} from "@/lib/tagdict";
-import {useMediaQuery} from "@uidotdev/usehooks";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {App, Player} from "@/interface/steamPlaytime";
 import Link from "next/link";
@@ -119,7 +118,8 @@ export default function Game({
  players
 }: GameProps
 ) {
-  const sm = useMediaQuery("only screen and (max-width : 768px)")
+  const sm = false
+    // useMediaQuery("only screen and (max-width : 768px)")
   return (
     <div key={game.appid}
          className={'relative w-24 sm:w-36 md:w-36 aspect-[6/9] rounded-lg text-xs text-zinc-600/60'}>

@@ -1,4 +1,5 @@
-import {useMediaQuery} from "@uidotdev/usehooks";
+'use client'
+import {useMediaQuery} from "@/hooks/useMediaQuery";
 import {useMeasure} from "react-use";
 import {GridCellProps} from "react-virtualized/dist/es/Grid";
 import {GameItem, GameProps} from "@/app/compare/gameItem";

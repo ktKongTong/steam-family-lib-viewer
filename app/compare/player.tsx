@@ -2,7 +2,7 @@ import {PlayerInfo} from "@/hooks/data/usePlayerStore";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
-import {Ellipsis, Lock} from "lucide-react";
+import { Ellipsis } from "lucide-react";
 import React from "react";
 import {IcomoonFreeLock} from "@/components/LockIcon";
 import Link from "next/link";

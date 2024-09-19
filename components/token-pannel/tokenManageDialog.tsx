@@ -3,7 +3,6 @@ import {useTokenStore} from "@/hooks/auth/store/useTokenStore";
 import {useEffect, useState} from "react";
 import {SteamToken} from "@/hooks/auth/interface";
 import * as React from "react";
-import {useMediaQuery} from "@uidotdev/usehooks";
 import {Dialog, DialogContent, DialogHeader, DialogTrigger} from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
 import {
@@ -44,7 +43,7 @@ export function TokenManagerDrawerDialog(
   const tokens = useStore(useTokenStore, state => state.tokens)
   const tokensArr = Object.values(tokens??{})
   const [open, setOpen] = React.useState(false)
-  const isDesktop = useMediaQuery("(min-width: 768px)")
+  // const isDesktop = useMediaQuery("(min-width: 768px)")
 
   const [mobilePopoverSelectorOpen, setMobilePopoverSelectorOpen] = useState(false)
   // if (isDesktop) {

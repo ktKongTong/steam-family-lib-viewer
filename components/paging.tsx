@@ -1,4 +1,4 @@
-import {useMediaQuery} from "@uidotdev/usehooks";
+import {useMediaQuery} from "@/hooks/useMediaQuery";
 import React, {useCallback, useMemo} from "react";
 import {
   Pagination,

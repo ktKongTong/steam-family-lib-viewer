@@ -1,8 +1,8 @@
+'use client'
 import React, { useEffect, useMemo, useState} from "react";
 import {Check, MoveDown, MoveUp, Plus, X} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {Input} from "@/components/ui/input";
-import {useMediaQuery} from "@uidotdev/usehooks";
 import {convertTag, Tags} from "@/lib/tagdict";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
@@ -59,8 +59,10 @@ export default function GamesGrid({
       // })
       .sort(sortFunc(order, ruleKey))
   },[games, keyword, order, ruleKey, tagFilter])
-  const sm = useMediaQuery("only screen and (max-width : 768px)")
-  const md = useMediaQuery("only screen and (max-width : 1024px)")
+  // const sm = useMediaQuery("only screen and (max-width : 768px)")
+  // const md = useMediaQuery("only screen and (max-width : 1024px)")
+  const sm = false
+  const md = false
   // const lg = useMediaQuery("only screen and (max-width : 1024px)")
   const pageSize = useMemo(()=>{
     if(sm) return 12

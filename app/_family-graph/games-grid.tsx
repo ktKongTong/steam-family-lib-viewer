@@ -1,8 +1,9 @@
+'use client'
 import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {Check, MoveDown, MoveUp, Plus, X} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {Input} from "@/components/ui/input";
-import {useMediaQuery} from "@uidotdev/usehooks";
+import {useMediaQuery} from "@/hooks/useMediaQuery";
 import {convertTag, Tags} from "@/lib/tagdict";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";

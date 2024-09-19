@@ -7,16 +7,14 @@ import {Input} from "@/components/ui/input";
 
 import {PlayerInfo, usePlayer} from "@/hooks/data/usePlayerStore";
 import {useDiffGames, usePlayerInfoMapToGame} from "@/hooks/data/usePlayerMap";
-import {LibItem} from "@/hooks/data/query/useSteamPulicLib";
-import {Grid} from 'react-virtualized';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {closestCorners, DndContext, DragOverlay} from "@dnd-kit/core";
 import {DraggablePlayerContainer, DroppablePlayerContainer} from "@/app/compare/playerContainer";
 import {WrappedPlayer} from "@/app/compare/wrappedPlayer";
 import {usePlayerDND} from "@/app/compare/usePlayerDND";
 import {useMeasure} from "react-use";
-import {VirtualizedGameGrid} from "@/app/compare/virtualizedList";
 import GamesGrid from "@/app/compare/pagedGameGrid";
+import {useAPIKey} from "@/hooks/data/useAPIKeyStore";
 
 ;
 
@@ -27,7 +25,7 @@ export interface PlayersMap {
   source:  (PlayerInfo & { id: string })[],
 }
 export default function Home() {
-
+  // const {apiKey, setAPIKey, clearAPIKey} = useAPIKey()
   const [steamID, setSteamID] = useState<string>("")
 
   const {players, addPlayer, removePlayerById, refreshPlayerById} = usePlayer()
@@ -50,7 +48,6 @@ export default function Home() {
       }
     })
   }, [players])
-// : {allGames:MappedGame[] }
   const {allGames} = usePlayerInfoMapToGame([...playersMap.targetB, ...playersMap.targetA])
   const {
     groupAOnly,
@@ -58,7 +55,6 @@ export default function Home() {
     groupAOfOverlap,
     groupBOfOverlap
   } = useDiffGames(playersMap.targetA, playersMap.targetB);
-
 
   const groups = [
     {

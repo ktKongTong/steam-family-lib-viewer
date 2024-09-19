@@ -9,6 +9,7 @@ import {convertTag} from "@/lib/tagdict";
 import {useMediaQuery} from "@uidotdev/usehooks";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {App, Player} from "@/interface/steamPlaytime";
+import Link from "next/link";
 
 interface GameProps {
   game: App,
@@ -159,16 +160,16 @@ export default function Game({
         <div className={'absolute text-white text-[8px] top-0 left-0 bg-zinc-700/50 px-1 py-0.5 rounded-md text-xs'}>
           <div>{dayjs.unix(game.rtTimeAcquired!).format('YY年MM月DD日')}</div>
         </div>
-        <div className={'absolute bottom-0 left-0 p-1 flex text-white space-x-2'}>
+        <div className={'absolute bottom-0 left-0 px-1 rounded-md  bg-black/[.8] flex text-white space-x-2'}>
           {
             game.playtime &&
             (
-              <div>
+              <div className={''}>
                 {game.playtime.players.map((playtime:any) => {
                   const player = players.find(it=>it.steamid?.toString() == playtime.steamid)
                   return (
-                    <div key={playtime.steamid}>
-                      {player?.personaName}: {(playtime.secondsPlayed/3600).toFixed(1)} h
+                    <div key={playtime.steamid} className={playtime.isOwner ? 'text-red-300':'text-green-200'}>
+                      {player?.personaName}: {(playtime.secondsPlayed/3600).toFixed(2)} h
                     </div>
                   )
                 })}
@@ -180,14 +181,14 @@ export default function Game({
           <div className={'mt-auto ml-auto flex flex-col group '}>
             {
               game.owners.map((it, index) =>
-                < div key={index}>
+                <Link key={index} href={`https://steamcommunity.com/profile/${it.steamid}`} target={'_blank'}>
 
                   <Avatar
                           className={cn('h-6 w-6 border-[2px] border-zinc-700', '-mt-[10px] group-hover:mb-[10px]  transition-all ease-in-out')}>
                     <AvatarImage src={getAvatar(it?.avatar_hash??"")} alt={`@${it?.personaName}`}/>
                     <AvatarFallback>{it?.personaName}</AvatarFallback>
                   </Avatar>
-                </div>
+                </Link>
               )
             }
           </div>

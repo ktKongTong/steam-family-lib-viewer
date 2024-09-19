@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, { useEffect, useMemo, useState} from "react";
 import {Check, MoveDown, MoveUp, Plus, X} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {Input} from "@/components/ui/input";

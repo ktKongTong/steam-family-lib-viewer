@@ -11,7 +11,7 @@ import React from "react";
 
 
 export const metadata: Metadata = {
-  title: "Steam 赛博家庭库存查看器",
+  title: "Steam 赛博家庭助手",
   description: "一个查看Steam家庭共享库存的小玩具",
 };
 

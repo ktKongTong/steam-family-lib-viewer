@@ -5,6 +5,7 @@ import {Button} from "@/components/ui/button";
 import {Ellipsis, Lock} from "lucide-react";
 import React from "react";
 import {IcomoonFreeLock} from "@/components/LockIcon";
+import Link from "next/link";
 
 
 export interface PlayerMenuItem {
@@ -30,20 +31,14 @@ export const Player = (
           </Avatar>
           {
             player.openLib ? null:
-              // <div className={'absolute right-0 bottom-0 w-4 h-4 flex items-center justify-center p-1 font-extrabold text-zinc-50 bg-black/[.4] bg-blend-darken rounded-full'}>
-              //   L
-              // </div>
             <IcomoonFreeLock className={'absolute right-0 bottom-0 w-4 h-4 flex items-center pl-1 justify-center font-extrabold text-zinc-50 bg-black/[.4] bg-blend-darken rounded-full'}/>
           }
         </div>
 
         <div className={"flex"}>
           <div>
-            <div>{player.summary.personaname}</div>
+            <Link href={`https://steamcommunity.com/profiles/${player.steamID}/`} target={'_blank'} className={'animate-underline'}>{player.summary.personaname}</Link>
             <div className={" text-zinc-300 text-xs italic"}>{player.summary.steamid}</div>
-          </div>
-          <div>
-
           </div>
         </div>
         <DropdownMenu>

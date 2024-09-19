@@ -4,7 +4,6 @@ import {Button} from "@/components/ui/button";
 import DataGraph from "@/app/_family-graph/datagraph";
 import {useToast} from "@/components/ui/use-toast";
 import {useTokenStore} from "@/hooks/auth/store/useTokenStore";
-import {useRandomBackground} from "@/hooks/useRandomBackground";
 import {Steps} from "@/app/_steps/steps";
 import {useSteamFamilyLibInfo} from "@/hooks/data/useSteamFamilyLibInfo";
 
@@ -14,7 +13,6 @@ import {useSteamFamilyLibInfo} from "@/hooks/data/useSteamFamilyLibInfo";
 export default function Home() {
 
   const {toast} = useToast()
-  const {background} = useRandomBackground()
   const token = useTokenStore(state => state.currentToken)
   const {
     dataLoaded,
@@ -60,7 +58,7 @@ export default function Home() {
         {
           canDisplay &&
             <DataGraph libs={allLibs} players={allMembers} libsPlaytime={sharedPlaytime!} family={steamFamilyInfo!}
-                       bg={background} allDataLoaded={dataLoaded}/>
+                       allDataLoaded={dataLoaded}/>
         }
     </section>
   );

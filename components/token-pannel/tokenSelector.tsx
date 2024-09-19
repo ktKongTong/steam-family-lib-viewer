@@ -59,7 +59,7 @@ export function TokenSelector() {
           </ul>
             <TokenManagerDrawerDialog>
               <button className={"w-full p-2 text-sm text-primary"}>
-                添加新Token
+                管理Token
               </button>
             </TokenManagerDrawerDialog>
         </div>

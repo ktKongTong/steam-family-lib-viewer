@@ -1,19 +1,37 @@
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {useEffect, useState} from "react";
 
 async function getRandomBackground(){
-  // const data = await fetch(`https://www.loliapi.com/acg/bg`)
-  // return data.pics[0] as string
+    const data = await fetch(`https://www.loliapi.com/acg/pe`, {
+      redirect: 'follow'
+    })
+    return data.url
 }
 
 export const useRandomBackground = () => {
-  // const {data, ...rest} = useQuery({
-  //   queryKey: ["randomBackground"],
-  //   queryFn: ()=> {
-  //     return getRandomBackground()
-  //   }
-  // })
+  const {mutateAsync, ...rest} = useMutation({
+    mutationKey: ["randomBackground"],
+    mutationFn: ()=> {
+      return getRandomBackground()
+    }
+  })
+  const [background, setBackground] = useState(`https://www.loliapi.com/acg/pe`)
+
+  const queryClient = useQueryClient()
+  const switchOne = ()=> {
+    mutateAsync()
+      .then(result => {
+        result && setBackground(result)
+      }).catch(error => {})
+  }
+
+  useEffect(()=>{
+    switchOne()
+  }, [])
+
   return {
     // ...rest,
-    background: `https://www.loliapi.com/acg/pe/`
+    background,
+    switchOne
   }
 }

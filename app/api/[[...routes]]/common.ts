@@ -45,13 +45,19 @@ export function steamCommon<T extends Env>(app:Hono<T>) {
   })
   app.get('/api/steam/player/summaries', async(c) => {
     const idParam = c.req.query('steamids')
-    const apiKey = c.req.query('key')
+    let apiKey = c.req.query('key')
+    if(!apiKey) {
+      apiKey = process.env.STEAM_API_KEY as string
+    }
     return fetch(`https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${apiKey}&steamids=${idParam}`)
   })
 
   app.get('/api/steam/player/ownedGames', async(c) => {
     const idParam = c.req.query('steamid')
-    const apiKey = c.req.query('key')
+    let apiKey = c.req.query('key')
+    if(!apiKey) {
+      apiKey = process.env.STEAM_API_KEY as string
+    }
     return fetch(`https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=${apiKey}&steamid=${idParam}&include_appinfo=true&include_extended_appinfo=true`)
   })
 

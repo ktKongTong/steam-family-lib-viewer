@@ -2,7 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@layer utilities {
+
+
+  .animate-underline {
+    @apply relative after:content-[''] after:bg-zinc-700/70 after:h-[3px] after:duration-300 after:w-[0%] after:left-0 after:rounded-xl after:-bottom-[0px] after:absolute hover:after:w-[100%];
+  }
+}
 @layer base {
+
+
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;

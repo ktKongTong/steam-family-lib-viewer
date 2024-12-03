@@ -1,10 +1,9 @@
-import {Env, Hono} from "hono";
+import { Hono } from "hono";
 import {jwtDecode} from "jwt-decode";
-import {SteamAPI} from "@/app/api/[[...routes]]/(api)";
+import { steamAPI as steam } from "@/app/api/[[...routes]]/(api)";
 
-export function steamFamilyGroup<T extends Env>(app:Hono<T>) {
+const app = new Hono()
 
-  const steam = new SteamAPI()
   app.get('/api/steam/family', async (c)=>{
     const tokenParam = c.req.query('access_token')
     if(!tokenParam) {
@@ -91,4 +90,5 @@ export function steamFamilyGroup<T extends Env>(app:Hono<T>) {
     }, tokenParam)
     return c.json({data: data})
   })
-}
+
+export default app

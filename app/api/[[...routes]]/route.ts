@@ -1,39 +1,24 @@
 import { Hono} from 'hono'
 import {handle} from 'hono/vercel'
-import {Env as HEnv, Schema} from 'hono'
 
-import {steamFamilyGroup} from "@/app/api/[[...routes]]/familygroup";
-import {steamCommon} from "@/app/api/[[...routes]]/common";
-import {steamAuth} from "@/app/api/[[...routes]]/auth";
-import {steamHelper} from "@/app/api/[[...routes]]/helper";
+import steamFamilyGroup from "./_routes/familygroup";
+import steamCommon from "./_routes/common";
+import steamAuth from "./_routes/auth";
+import steamHelper from "./_routes/helper";
 
 export const runtime = 'edge';
 
+const app = new Hono()
 
-class App<E extends HEnv, S extends Schema = {}, BasePath extends string = '/api'> extends Hono<E,S,BasePath> {
-  apply(func: <T extends HEnv>(app: Hono<E,S,BasePath>) => void) {
-    func(this)
-    return this
-  }
-  constructor() {
-    super();
-    this
-      .apply(steamFamilyGroup)
-      .apply(steamCommon)
-      .apply(steamAuth)
-      .apply(steamHelper)
-  }
-}
+app.route('/', steamFamilyGroup)
+app.route('/', steamCommon)
+app.route('/', steamAuth)
+app.route('/', steamHelper)
 
-const app = new App()
 
 app.get('/api/ping', async(c) => {
   return c.json({data: "pong"})
 })
-
-
-
-
 
 export const GET = handle(app)
 export const POST = handle(app)

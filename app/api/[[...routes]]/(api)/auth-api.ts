@@ -15,7 +15,7 @@ export class SteamAuthApi {
   }
 
   pollAuthSessionStatus(param: PartialMessage<CAuthentication_PollAuthSessionStatus_Request>) {
-    return  SteamAPICall({
+    return SteamAPICall({
       method: "POST",
       serviceName: "IAuthenticationService",
       itemName: "PollAuthSessionStatus",

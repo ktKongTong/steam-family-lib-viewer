@@ -1,11 +1,10 @@
-
-
+import SteamID from "steamid";
 
 const FRIEND_CODE_REPLACEMENTS = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 't', 'v', 'w'];
 
 export const createFriendCodeFromSteamId = (steamId: string) => {
-  const id = BigInt(steamId)
-  let acctIdHex = id.toString(16);
+  const id = new SteamID(steamId);
+  let acctIdHex = id.accountid.toString(16);
   let friendCode = '';
 
   for (let i = 0; i < acctIdHex.length; i++) {

@@ -31,7 +31,7 @@ export interface PlayerSummary {
 }
 
 async function fetchSteamPlayerSummaries(apikey:string,ids:string[]){
-  const data = await fetch(`/api/steam/player/summaries?key=${apikey}&steamids=${ids.join(',')}`)
+  const data = await fetch(`/api/steam/player/summaries?steamids=${ids.join(',')}&key=${apikey}`)
     .then(res=>res.json() as any)
   return data.response as PlayerSummariesResponse
 }
@@ -52,7 +52,7 @@ export const useSteamPlayerSummaries = () => {
   const [steamPlayers, setSteamPlayers] = useState<PlayerSummary[]>([])
   const fetchPlayerSummaries = useCallback(async(steamIds: string[]) => {
     const res = await mutateAsync({ apikey:apiKey!!, ids: steamIds })
-    // setSteamPlayers(res.players)
+    setSteamPlayers(res.players ?? [])
     // toMap
     return res
   },[apiKey, mutateAsync])

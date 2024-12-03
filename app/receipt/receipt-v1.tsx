@@ -1,6 +1,6 @@
 import {forwardRef} from "react";
 import {Barcode} from "@/app/receipt/BarCode";
-import {PlayerStatsData} from "@/hooks/data/query/usePlayerStats";
+import {PlayerStatsData} from "@/interface/playerStatsData";
 
 interface ReceiptV1Props {
   data: PlayerStatsData
@@ -120,7 +120,7 @@ export const ReceiptV1 = forwardRef<HTMLDivElement,ReceiptV1Props>(({ data: _dat
         <div className="text-center">
           <p className="mb-4">THANK YOU FOR GAMING!</p>
           <div className="w-full h-10">
-            <Barcode value={`steamcommunity.com/profile/{data.id}`}/>
+            <Barcode value={`https://steamcommunity.com/profile/${data.id}`}/>
           </div>
           <p className="mt-2 opacity-75">steamcommunity.com/profile/{data.id}</p>
         </div>

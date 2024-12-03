@@ -3,7 +3,6 @@ import {getGamesByIds} from "@/db";
 import {jwtDecode} from "jwt-decode";
 
 import * as cheerio from 'cheerio';
-import {PlayerStatsData} from "@/hooks/data/query/usePlayerStats";
 const app = new Hono()
 
 app.get('/api/steam/info/:ids', async (c) => {
@@ -62,4 +61,66 @@ app.get('/api/steam/player-stats/:id',async (c)=>{
   })
 })
 
+app.get('/api/steam/player-community-stats/:id',async (c)=>{
+  // https://steamcommunity.com/profile/id
+  const tokenParam = c.req.query('access_token')
+  const queryId = c.req.param('id')
+  // const tokenInfo = jwtDecode(tokenParam??"")
+  // const user = tokenInfo.sub
+  // if(!user) {
+  //   return c.json({
+  //     data:null
+  //   })
+  // }
+  const guideRes = await fetch(`https://steamcommunity.com/profiles/${queryId}/myworkshopfiles/?section=guides`)
+
+  const res = await fetch(`https://steamcommunity.com/profiles/${queryId}`)
+  const guideHtml = await guideRes.text()
+  const html = await res.text()
+  const $ = cheerio.load(html)
+  const $guide = cheerio.load(guideHtml)
+  const data = $.extract({
+    links: [
+      {
+        selector: '.profile_item_links a',
+        value: {
+          // label: {
+          //   selector: '.count_link_label',
+          //   value: 'innerText',
+          // },
+          count: {
+            selector: '.profile_count_link_total',
+            value: (el, key) => {
+              const text = $(el).text();
+              const trimmed = text.trim()
+              const v = parseInt(trimmed)
+              return Number.isNaN(v) ? 0 : v
+            },
+          },
+        },
+      },
+    ],
+  });
+  const regex = /\s(?<total>\d+)\s/;
+  const guideData = $guide.extract({
+    count: {
+      selector: '.workshopBrowsePagingInfo',
+      value: (el, key) => {
+        const text = $guide(el).text();
+        const may = regex.exec(text)?.groups?.total
+        const v = parseInt(may ?? '0')
+        return Number.isNaN(v) ? 0 : v
+      },
+    }
+  })
+  const [, inventory, screenshots, workshop, reviews] = data.links
+
+  return c.json({
+    guide: guideData?.count??0,
+    inventory: inventory?.count??0,
+    screenshots: screenshots?.count??0,
+    workshopItems: workshop?.count??0,
+    reviews: reviews?.count??0,
+  })
+})
 export default app

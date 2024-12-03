@@ -13,6 +13,8 @@ app.get('/api/steam/wishlist/:ids', async (c)=> {
 
 app.get('/api/steam/items/:ids',async (c)=>{
   const idParam = c.req.param('ids')
+  const countryCode = c.req.query('country_code')
+  const language = c.req.query('language')
   const ids = idParam.split(',').slice(0,30)
     .map(it=> parseInt(it))
     .filter(it => !Number.isNaN(it))
@@ -22,8 +24,8 @@ app.get('/api/steam/items/:ids',async (c)=>{
   const data = await steam.common.getSteamItemsById( {
     ids: ids,
     context: {
-      language: 'schinese',
-      countryCode: 'US',
+      language: language ?? 'schinese',
+      countryCode: countryCode ?? 'US',
       steamRealm: 1
     },
     dataRequest: {

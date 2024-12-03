@@ -23,6 +23,7 @@ export default function Header({
         <div className={'md:flex hidden space-x-2'}>
           <Link href={'/'} className={'animate-underline font-bold'}>家庭库存统计</Link>
           <Link href={'/compare'} className={'animate-underline font-bold'}>库存分组对比</Link>
+          <Link href={'/receipt'} className={'animate-underline font-bold'}>RECEIPT</Link>
           <About/>
         </div>
         <Dialog>
@@ -31,6 +32,7 @@ export default function Header({
             <DropdownMenuContent>
               <DropdownMenuItem><Link href={'/'} className={'font-bold'}>家庭库存统计</Link></DropdownMenuItem>
               <DropdownMenuItem><Link href={'/compare'} className={'font-bold'}>库存分组对比</Link></DropdownMenuItem>
+              <DropdownMenuItem><Link href={'/receipt'} className={'font-bold'}>RECEIPT</Link></DropdownMenuItem>
               <DropdownMenuItem>
                 <DialogTrigger  className={'font-semibold'}>关于</DialogTrigger>
               </DropdownMenuItem>

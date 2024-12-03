@@ -3,6 +3,7 @@ import {getGamesByIds} from "@/db";
 import {jwtDecode} from "jwt-decode";
 
 import * as cheerio from 'cheerio';
+import {PlayerStatsData} from "@/hooks/data/query/usePlayerStats";
 const app = new Hono()
 
 app.get('/api/steam/info/:ids', async (c) => {

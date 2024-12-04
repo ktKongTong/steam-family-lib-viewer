@@ -25,7 +25,12 @@ export default function GetToken() {
 
                 <Link href={"https://store.steampowered.com/pointssummary/ajaxgetasyncconfig"}
                       className={'text-blue-400'}
-                      target={'_blank'}>https://store.steampowered.com/pointssummary/ajaxgetasyncconfig</Link>
+                      target={'_blank'}>https://store.steampowered.com/pointssummary/ajaxgetasyncconfig</Link>(该Token 仅 Steam 商店有效，适用于家庭信息获取)
+                <br/>
+                <Link href={"https://steamcommunity.com/pointssummary/ajaxgetasyncconfig"}
+                      className={'text-blue-400'}
+                      target={'_blank'}>https://steamcommunity.com/pointssummary/ajaxgetasyncconfig</Link>
+                (该Token 仅 Steam Community 有效，适用于 Receipt)
                 <br/>
                 提取 webapi_token 部分的内容即为 access_token
 

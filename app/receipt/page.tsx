@@ -108,7 +108,7 @@ export default function Home() {
   }
   return (
     <LocaleProvider value={locale}>
-      <main className="min-h-screen mx-auto px-4 py-8 sm:py-16">
+      <main className="min-h-[calc(screen-64px)] mx-auto px-4 py-8 sm:py-16">
 
         <div className="text-center mb-8">
 

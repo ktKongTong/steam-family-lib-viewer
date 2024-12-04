@@ -8,6 +8,7 @@ const proxyHost = process.env.STEAM_TOKEN_PROXY_HOST as string;
 
 const app = new Hono()
 
+// steam qr login
 app.get('/api/steam/auth/qr', async (c)=>{
   const data = await steam.auth.beginAuthSessionViaQR({
     websiteId: 'Store',
@@ -135,8 +136,6 @@ app.get('/api/steam/auth/getTokenByProxy', async (c)=>{
   const nonce= c.req.query('nonce')!!
   const sessionid = c.req.query('sessionid')!!
   const res = await f.get(`${proxyHost}/api/steam/auth/getToken`, { query: { nonce, sessionid } })
-  // const r = await res?.text()
-  // return  await fetch(`${proxyHost}/api/steam/auth/getToken?nonce=${nonce}&sessionid=${sessionid}`)
   return c.json(res)
 })
 
@@ -150,14 +149,17 @@ app.get('/api/steam/auth/getToken', async (c)=>{
   form.set("nonce", nonce)
   form.set("sessionid", sessionid)
   form.set("redir", "https://steamcommunity.com/login/home/?goto=")
-  const res = await fetch("https://login.steampowered.com/jwt/finalizelogin", {
-    method: 'POST',
+  const res = await f.post("https://login.steampowered.com/jwt/finalizelogin", {
     headers: {
       "Referer": "https://store.steampowered.com/",
       "Origin":"https://store.steampowered.com",
-      "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 Edg/127.0.0.0",
+      "User-Agent": ua.edgeBrowser,
     },
-    body: form
+    form: {
+      redir: "https://store.steampowered.com/",
+      nonce,
+      sessionid,
+    }
   })
   try {
     const finalRes = await res.json()

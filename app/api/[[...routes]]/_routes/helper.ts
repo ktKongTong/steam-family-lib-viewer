@@ -28,10 +28,13 @@ app.get('/api/steam/info/:ids', async (c) => {
   })
 })
 
+// crawl for https://steamcommunity.com/profiles/${id}/games?tab=all
+// .gameslist_config[data-profile-gameslist]
+// this page need login, so we need access_token
 app.get('/api/steam/player-stats/:id',async (c)=>{
   const tokenParam = c.req.query('access_token')
-  // env access param
   const queryId = c.req.param('id')
+
   const tokenInfo = jwtDecode(tokenParam??"")
   const user = tokenInfo.sub
   if(!user) {
@@ -70,19 +73,11 @@ app.get('/api/steam/player-stats/:id',async (c)=>{
   return c.json(r)
 })
 
+// crawl for https://steamcommunity.com/profiles/${id}
+// and https://steamcommunity.com/profiles/${queryId}/myworkshopfiles/?section=guides
 app.get('/api/steam/player-community-stats/:id',async (c)=>{
-  // https://steamcommunity.com/profile/id
-  const tokenParam = c.req.query('access_token')
   const queryId = c.req.param('id')
-  // const tokenInfo = jwtDecode(tokenParam??"")
-  // const user = tokenInfo.sub
-  // if(!user) {
-  //   return c.json({
-  //     data:null
-  //   })
-  // }
   const guideRes = await fetch(`https://steamcommunity.com/profiles/${queryId}/myworkshopfiles/?section=guides`)
-
   const res = await fetch(`https://steamcommunity.com/profiles/${queryId}`)
   const guideHtml = await guideRes.text()
   const html = await res.text()

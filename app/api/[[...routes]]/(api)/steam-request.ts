@@ -1,7 +1,6 @@
 import {Message} from "@bufbuild/protobuf";
 import {ProxiedAPIResponse, SteamRoutes} from "@/app/api/[[...routes]]/(api)/interface";
 import {encodeProtobuf} from "@/lib/steam_utils";
-import EAuthTokenPlatformType from "steam-session/src/enums-steam/EAuthTokenPlatformType";
 
 
 interface Decoder {

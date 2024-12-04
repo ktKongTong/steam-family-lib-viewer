@@ -14,6 +14,7 @@ import {Button} from "@/components/ui/button";
 import {Ellipsis, Info} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {AvailableLocales, LocaleProvider} from "@/app/receipt/use-locale-ctx";
+import Link from "next/link";
 
 
 
@@ -129,6 +130,7 @@ export default function Home() {
                   </p>
                 </PopoverContent>
               </Popover>
+              <div>Login Steam First, Then <Link className={'text-blue-500'} href={'https://steamcommunity.com/pointssummary/ajaxgetasyncconfig'}>Get Community Token</Link></div>
             </p>
           </div>
 

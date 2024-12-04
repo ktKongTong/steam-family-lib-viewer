@@ -10,7 +10,7 @@ const en: i18nRecord = {
     'game-cnt': 'GAMES',
     'perfect-game-cnt': 'PERFECT GAMES',
     'achievement-cnt': 'ACHIEVEMENTS',
-    'hour-on-record': 'HOURS ON RECORD',
+    'hours-on-record': 'HOURS ON RECORD',
     'account-age': 'ACCOUNT AGE',
     'account-age-unit': 'YEARS',
     'top-played-game':'TOP PLAYED GAMES',

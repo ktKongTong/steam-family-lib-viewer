@@ -96,7 +96,7 @@ app.get('/api/steam/player-community-stats/:id',async (c)=>{
             selector: '.profile_count_link_total',
             value: (el, key) => {
               const text = $(el).text();
-              const trimmed = text.trim()
+              const trimmed = text.trim().replace(/,/g, '');
               const v = parseInt(trimmed)
               return Number.isNaN(v) ? 0 : v
             },

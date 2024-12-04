@@ -82,23 +82,23 @@ export const AccountReceipt = forwardRef<HTMLDivElement, ReceiptV2Props>(({playe
           <tbody>
           <tr>
             <td>GAMES</td>
-            <td className="text-right">{data.playedGameCount}/{data.totalGameCount}</td>
+            <td className="text-right w-[100px]">{data.playedGameCount}/{data.totalGameCount}</td>
           </tr>
           <tr>
             <td>PERFECT GAMES</td>
-            <td className="text-right">{data.fullAchievementGameCount}</td>
+            <td className="text-right w-[100px]">{data.fullAchievementGameCount}</td>
           </tr>
           <tr>
             <td>ACHIEVEMENTS</td>
-            <td className="text-right">{data.unlockedAchievements}/{data.totalAchievements}</td>
+            <td className="text-right w-[100px]">{data.unlockedAchievements}/{data.totalAchievements}</td>
           </tr>
           <tr>
             <td>HOURS ON RECORD</td>
-            <td className="text-right">{(data.totalPlaytimeInMinutes / 60).toFixed(1)}H</td>
+            <td className="text-right w-[100px]">{(data.totalPlaytimeInMinutes / 60).toFixed(1)}H</td>
           </tr>
           <tr>
             <td>ACCOUNT AGE</td>
-            <td className="text-right">{age.toFixed(1)} YEARS</td>
+            <td className="text-right w-[100px]">{age.toFixed(1)} YEARS</td>
           </tr>
           </tbody>
         </table>
@@ -110,7 +110,7 @@ export const AccountReceipt = forwardRef<HTMLDivElement, ReceiptV2Props>(({playe
           data.top3Games.map(game => {
             return <div key={game.appid} className={'flex justify-between items-center'}>
               <p>{game.name}</p>
-              <p>{(game.playtime_forever / 60).toFixed(1)} H</p>
+              <p className={'w-[100px] text-right'}>{(game.playtime_forever / 60).toFixed(1)} H</p>
             </div>
           })
         }</div>
@@ -164,7 +164,7 @@ export const AccountReceipt = forwardRef<HTMLDivElement, ReceiptV2Props>(({playe
       </div>
 
       <div className="mb-6 opacity-75 grid grid-cols-2 gap-x-2">
-        <p>CARD #: **** **** **** {new Date().getFullYear()}</p>
+        <p>CARD #: **** **** {new Date().getFullYear()}</p>
         <p>FRIEND CODE: {id.accountid}</p>
         <p>CARDHOLDER: {data.name}</p>
         <p>CS CODE: {csFriendCode}</p>
@@ -179,7 +179,7 @@ export const AccountReceipt = forwardRef<HTMLDivElement, ReceiptV2Props>(({playe
         <div className={'absolute left-0 bottom-0'}>
           <p>inspired by ankit</p>
           <p>made with ❤️ by ktkongtong </p>
-          <p> powered by sflv.ktlab.io/receipt</p>
+          <p> powered by sflv.ktlab.io</p>
         </div>
         <div className={'flex ml-auto items-end mr-0 justify-end right-0 bottom-0'}>
           <div className={'items-center flex flex-col'}>

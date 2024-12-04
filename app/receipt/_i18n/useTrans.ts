@@ -42,8 +42,6 @@ export const useTrans = (ops?: TransOpts) => {
       const keys = id.split('.')
       let obj: any = l
       for (const key of keys) {
-        logger.log('key', key)
-        logger.log('key', obj)
         if (obj[key]) {
           obj = obj[key]
         } else return id

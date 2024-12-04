@@ -124,13 +124,12 @@ export default function Home() {
                 <PopoverTrigger className={'ml-1  my-auto inline-flex'}><Info className={' w-4 h-4'}/></PopoverTrigger>
                 <PopoverContent>
                   <p className="text-sm sm:text-base text-zinc-600/60 dark:text-zinc-400/60">
-                    1. add token<br/>
-                    2. enter steamid<br/>
-                    3. generate<br/>
+                    It should work without steam token. If it fails, try adding your Steam Community token.
+                    <div> <Link className={'text-blue-500'} href={'https://steamcommunity.com/pointssummary/ajaxgetasyncconfig'}>Get Community Token</Link></div>
                   </p>
                 </PopoverContent>
               </Popover>
-              <div>Login Steam First, Then <Link className={'text-blue-500'} href={'https://steamcommunity.com/pointssummary/ajaxgetasyncconfig'}>Get Community Token</Link></div>
+
             </p>
           </div>
 

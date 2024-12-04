@@ -99,12 +99,12 @@ export default function Home() {
       <div className="text-center mb-8">
 
         <h1 className="text-2xl sm:text-4xl font-bold mb-2 text-zinc-900 dark:text-white">
-          STEAM Receipt
+          STEAM RECEIPT
         </h1>
-        <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400">
-          Generate a receipt-style summary of your Steam profile
+        <p className="text-sm sm:text-base text-zinc-600/60 dark:text-zinc-400/60">
+          Generate a receipt-style summary of your steam profile
         </p>
-        <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400">
+        <p className="text-sm sm:text-base text-zinc-600/60 dark:text-zinc-400/60">
           1. add token<br/>
           2. enter steamid<br/>
           3. generate

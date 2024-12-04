@@ -1,6 +1,5 @@
 import {ProxiedAPIResponse} from "@/app/api/[[...routes]]/(api)/interface";
 import {CStoreBrowse_GetItems_Response} from "@/proto/gen/web-ui/common_pb";
-import {useMemo} from "react";
 import {useMutation} from "@tanstack/react-query";
 
 

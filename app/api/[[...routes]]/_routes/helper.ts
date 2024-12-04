@@ -3,6 +3,7 @@ import {getGamesByIds} from "@/db";
 import {jwtDecode} from "jwt-decode";
 
 import * as cheerio from 'cheerio';
+import {steamAPI as steam} from "@/app/api/[[...routes]]/(api)";
 const app = new Hono()
 
 app.get('/api/steam/info/:ids', async (c) => {
@@ -29,6 +30,7 @@ app.get('/api/steam/info/:ids', async (c) => {
 
 app.get('/api/steam/player-stats/:id',async (c)=>{
   const tokenParam = c.req.query('access_token')
+  // env access param
   const queryId = c.req.param('id')
   const tokenInfo = jwtDecode(tokenParam??"")
   const user = tokenInfo.sub
@@ -36,6 +38,11 @@ app.get('/api/steam/player-stats/:id',async (c)=>{
     return c.json({
       data:null
     })
+  }
+  const tokenResp = await steam.common.getSteamPlayerLinkDetails({steamids: [BigInt(user)]},tokenParam ?? "")
+
+  if(!tokenResp.ok) {
+    return c.json(tokenResp, tokenResp.status as any)
   }
 
   const res = await fetch(`https://steamcommunity.com/profiles/${queryId ?? user}/games?tab=all&games_in_common=false`, {
@@ -46,6 +53,9 @@ app.get('/api/steam/player-stats/:id',async (c)=>{
   const html = await res.text()
 
   const $ = cheerio.load(html)
+  if($('.login_modal').length > 0) {
+    return c.text('Token Invalid To access data', 401)
+  }
   const data = $('#gameslist_config').attr('data-profile-gameslist')
   // html unescape &quot;
   const text = data?.replaceAll('&quot;', '"')
@@ -53,12 +63,11 @@ app.get('/api/steam/player-stats/:id',async (c)=>{
   const j = text?.replace(/\\u[\dA-F]{4}/gi, (match) => {
     return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16));
   })
-
-  const r = JSON.parse(j ?? "{}")
-
-  return c.json({
-    data: r
-  })
+  if(!j) {
+    return c.text("Not Found", 404)
+  }
+  const r = JSON.parse(j)
+  return c.json(r)
 })
 
 app.get('/api/steam/player-community-stats/:id',async (c)=>{

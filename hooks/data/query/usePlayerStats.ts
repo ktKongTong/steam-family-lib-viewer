@@ -2,12 +2,18 @@
 import {useMutation} from "@tanstack/react-query";
 import {useCallback, useState} from "react";
 import {PlayerCommunityData, PlayerStatsData} from "@/interface/playerStatsData";
+import {f as fetch} from '@/lib/ofetch'
+import logger from "@/lib/logger";
 
+const f = fetch.extend({
+  onResponseError: (error) => {
+    logger.log(error)
+  }
+})
 
-async function _fetchPlayerStats(id:string, token:string):Promise<null| PlayerStatsData>{
-  const data = await fetch(`/api/steam/player-stats/${id}?access_token=${token}`)
-    .then(res=>res.json())
-  return data.data
+async function _fetchPlayerStats(id:string, token:string){
+  const data = await f.get<PlayerStatsData>(`/api/steam/player-stats/${id}?access_token=${token}`)
+  return data
 }
 
 
@@ -21,9 +27,9 @@ export const usePlayerStats = (accessToken: string) => {
   })
   const fetchPlayerStats = useCallback(async(id: string) => {
     const playerStats = await mutateAsync(id)
-    // console.log("set Family")
-    setPlayerStats(playerStats)
-
+    if(playerStats) {
+      setPlayerStats(playerStats)
+    }
     return playerStats
   },[ mutateAsync])
 
@@ -39,8 +45,7 @@ export const usePlayerStats = (accessToken: string) => {
 }
 
 async function _fetchPlayerCommunityStats(id:string):Promise<null| PlayerCommunityData>{
-  const data = await fetch(`/api/steam/player-community-stats/${id}`)
-    .then(res=>res.json())
+  const data = await f.get<PlayerCommunityData>(`/api/steam/player-community-stats/${id}`)
   return data
 }
 

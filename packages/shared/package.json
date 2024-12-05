@@ -1,0 +1,30 @@
+{
+  "name": "@repo/shared",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsup && tsc",
+    "types": "tsc"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/esm/index.mjs"
+    }
+  },
+  "dependencies": {
+    "consola": "^3.2.3",
+    "ofetch": "^1.4.1",
+    "dayjs": "^1.11.10",
+    "jwt-decode": "^4.0.0",
+    "steamid": "^2.1.0",
+    "ts-md5": "^1.3.1"
+  },
+  "devDependencies": {
+    "esbuild-plugin-file-path-extensions": "^2.1.4",
+    "@types/node": "^20",
+    "tsup": "^8.3.5",
+    "typescript": "^5"
+  }
+}

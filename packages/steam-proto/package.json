@@ -1,0 +1,38 @@
+{
+  "name": "@repo/steam-proto",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "proto-gen": "buf generate proto",
+    "build": "tsup && tsc",
+    "types": "tsc"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.mjs"
+    }
+  },
+  "dependencies": {
+    "@bufbuild/buf": "^1.30.0",
+    "@bufbuild/protobuf": "^1.8.0",
+    "@bufbuild/protoc-gen-es": "^1.8.0",
+    "consola": "^3.2.3",
+    "dayjs": "^1.11.10",
+    "jwt-decode": "^4.0.0",
+    "lodash": "^4.17.21",
+    "long": "^5.2.3",
+    "protobufjs": "^7.2.6",
+    "steam-session": "^1.9.0",
+    "steamid": "^2.1.0",
+    "ts-proto": "^1.170.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "protobufjs-cli": "^1.1.2",
+    "esbuild-plugin-file-path-extensions": "^2.1.4",
+    "typescript": "^5",
+    "tsup": "^8.3.5"
+  }
+}

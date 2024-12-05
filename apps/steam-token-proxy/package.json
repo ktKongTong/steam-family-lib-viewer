@@ -1,0 +1,11 @@
+{
+  "name": "@repo/steam-token-proxy",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "deno-dev": "deno run src/index.ts --allow-net"
+  },
+  "dependencies": {
+    "hono": "^4.6.12"
+  }
+}

@@ -35,4 +35,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+.next
+
 .wrangler
+dist
+node_modules
+.turbo
+.idea
+.env

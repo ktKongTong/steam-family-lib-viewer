@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "outDir": "dist/types",
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "proto"]
+}

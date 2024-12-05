@@ -11,8 +11,8 @@ import React from "react";
 
 
 export const metadata: Metadata = {
-  title: "Steam 赛博家庭助手",
-  description: "一个查看Steam家庭共享库存的小玩具",
+  title: "Steam Toys",
+  description: "一些 Steam 小玩具",
 };
 
 export default function RootLayout({

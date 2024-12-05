@@ -15,7 +15,7 @@ export default function Header({
 }) {
   return (
     <header className={"w-full flex justify-between items-center h-16 px-2 sm:px-20 py-4"}>
-      <Link href={'/'} className={'animate-underline  text-xl'}>steam 家庭助手</Link>
+      <Link href={'/'} className={'animate-underline  text-xl'}>Steam Toys</Link>
       <div className={'flex items-center space-x-4'}>
         <Suspense fallback={<div>Loading...</div>}>
           <TokenSelector />

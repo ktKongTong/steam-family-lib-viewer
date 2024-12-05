@@ -4,7 +4,13 @@ const nextConfig = {
         config.plugins.push(new webpack.IgnorePlugin({
             resourceRegExp: /^pg-native$|^cloudflare:sockets$/,
         }))
-
+        config.module.rules.push({
+            resolve: {
+                extensionAlias: {
+                    '.js': ['.ts', '.js'],
+                },
+            }
+        })
         return config
     },
 }

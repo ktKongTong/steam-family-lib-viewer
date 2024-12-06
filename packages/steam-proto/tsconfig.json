@@ -12,10 +12,7 @@
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "tsBuildInfoFile": ".tsbuildinfo"
   },
   "include": ["src"],
   "exclude": ["node_modules", "proto"]

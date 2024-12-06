@@ -1,12 +1,10 @@
-import {ProxiedAPIResponse} from "@repo/steam-proto";
-import {CStoreBrowse_GetItems_Response} from "@repo/steam-proto";
-import {useMutation} from "@tanstack/react-query";
 
+import {SteamStdResponseType} from "@repo/steam-proto";
+import {useMutation} from "@tanstack/react-query";
+import {f} from '@/lib/omfetch'
 
 async function fetchFamilyLibItems(ids:string[]){
-  const data = await fetch(`/api/steam/items/${ids.join(',')}`)
-    .then(res=>res.json() as Promise<ProxiedAPIResponse<CStoreBrowse_GetItems_Response>>)
-
+  const data = await f.get<SteamStdResponseType<'StoreBrowse', 'GetItems'>>(`/api/steam/items/${ids.join(',')}`)
   return data
 }
 

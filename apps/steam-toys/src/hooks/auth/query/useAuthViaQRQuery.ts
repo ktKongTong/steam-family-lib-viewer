@@ -1,7 +1,10 @@
 import {useQuery} from "@tanstack/react-query";
-import {CAuthentication_BeginAuthSessionViaQR_Response, ProxiedAPIResponse} from "@repo/steam-proto";
+import {
+  SteamStdResponseType
+} from "@repo/steam-proto";
 import {AuthBasicInfo} from "@/hooks/auth/interface";
 import {randomBytes} from "crypto";
+import {f} from '@/lib/omfetch'
 
 export const useAuthViaQRQuery = () => {
   return useQuery({
@@ -9,8 +12,9 @@ export const useAuthViaQRQuery = () => {
     // beginAuthViaQR
     queryKey: ['getQR'],
     queryFn: async () => {
-      const qrData = await fetch(`/api/steam/auth/qr`)
-        .then(res=>res.json() as Promise<ProxiedAPIResponse<CAuthentication_BeginAuthSessionViaQR_Response>>)
+      const qrData = await f.get<SteamStdResponseType<'Authentication', 'BeginAuthSessionViaQR'>>(`/api/steam/auth/qr`)
+      // const qrData = await fetch(`/api/steam/auth/qr`)
+      //   .then(res=>res.json() as Promise<ProxiedAPIResponse<CAuthentication_BeginAuthSessionViaQR_Response>>)
       // const basicInfo  = await fetch(`/api/steam/auth/basic`)
       //   .then(res=>res.json())
       return {

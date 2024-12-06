@@ -33,7 +33,7 @@ export default defineConfig((options) => {
       outDir: './dist/esm/',
       esbuildPlugins: [esbuildPluginFilePathExtensions({ filter: /^\./ })],
       // Yes, bundle: true => https://github.com/favware/esbuild-plugin-file-path-extensions?tab=readme-ov-file#usage
-      bundle: true,
+      bundle: false,
       dts: false
       // dts: {
       //   compilerOptions: {

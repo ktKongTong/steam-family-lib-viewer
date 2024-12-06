@@ -1,20 +1,16 @@
 import {Env, Hono} from "hono";
 import {getGamesByIds} from "@/db";
-import {jwtDecode} from "jwt-decode";
 
 import * as cheerio from 'cheerio';
-import {steamAPI as steam} from "@repo/steam-proto";
-import {getAccessToken} from "@/app/api/[[...routes]]/cron";
-const app = new Hono()
+import {steamWebStdAPI} from "@repo/steam-proto";
+import { getAccessTokenFromKV } from "@/app/api/[[...routes]]/cron";
+import {getAccessToken} from "../_middlewares/query-extractor";
+import { handlerAccessToken } from "@repo/shared";
+import {f} from '@/lib/omfetch'
+import { logger } from '@/lib/logger'
+import {TokenInvalidError} from "@/app/api/[[...routes]]/errors";
 
-const decodeJwt = (token: string) => {
-  try {
-    const decoded = jwtDecode(token)
-    return decoded
-  }catch (e) {
-    return undefined
-  }
-}
+const app = new Hono()
 
 app.get('/api/steam/info/:ids', async (c) => {
   const {ids} = c.req.param()
@@ -42,37 +38,36 @@ app.get('/api/steam/info/:ids', async (c) => {
 // .gameslist_config[data-profile-gameslist]
 // this page need login, so we need access_token
 app.get('/api/steam/player-stats/:id',async (c)=>{
-  const tokenParam = c.req.query('access_token')
   const queryId = c.req.param('id')
-  const possibleToken = await getAccessToken()
+  const userToken = getAccessToken(c)
+  const siteOwnerToken = handlerAccessToken(await getAccessTokenFromKV())
+  if (!userToken.valid && !siteOwnerToken.valid) throw new TokenInvalidError('Not Found Any Valid Token')
+  const validTokens = [userToken, siteOwnerToken].filter(token=>token.valid)
+  const tokenValidRes = await Promise.all(validTokens.map(
+    it => steamWebStdAPI.player.getPlayerLinkDetails({steamids: [BigInt(it.steamid ?? 0)]}, { accessToken: it?.token })
+  ))
 
-  const constTokenInfo = decodeJwt(possibleToken??"")
-  const tokenInfo = decodeJwt(tokenParam??"")
-  const user = tokenInfo?.sub ?? ''
-  const constUser = constTokenInfo?.sub ?? ''
-  const [tokenResp, possibleTokenResp] = await Promise.all([
-    steam.common.getSteamPlayerLinkDetails({steamids: [BigInt(user)]},tokenParam ?? ""),
-    steam.common.getSteamPlayerLinkDetails({steamids: [BigInt(constUser)]},possibleToken ?? ""),
-  ])
-
-  if(!tokenResp.ok && !possibleTokenResp.ok) {
-    return c.json(tokenResp, 401)
+  if(!tokenValidRes.find(it => it.success)) {
+    const resp = tokenValidRes.find(it => it.success)
+    return c.json(resp, 401)
   }
+  // token must available for community
   const fetchGameProfile =async (id: string,communityToken?: string) => {
     try {
-      const res =await fetch(`https://steamcommunity.com/profiles/${queryId ?? id}/games?tab=all&games_in_common=false`, {headers: {
-          cookie: `steamLoginSecure=${id}%7C%7C${communityToken};`
-        }
+      const res = await f.get(`https://steamcommunity.com/profiles/${queryId ?? id}/games?tab=all&games_in_common=false`, {
+        headers: { cookie: `steamLoginSecure=${id}%7C%7C${communityToken};` },
+        raw: true
       })
+      // const res =await fetch(`https://steamcommunity.com/profiles/${queryId ?? id}/games?tab=all&games_in_common=false`, {headers: {
+      //     cookie: `steamLoginSecure=${id}%7C%7C${communityToken};`
+      //   }
+      // })
       return res
     } catch (e) {
       return null
     }
   }
-  const [res, possibleRes] = await Promise.all([
-    fetchGameProfile(user, tokenParam),
-    fetchGameProfile(constUser ?? '', possibleToken ?? ''),
-  ])
+  const validTokenResponse = await Promise.all(validTokens.map(it => fetchGameProfile(it.steamid!, it.token!)))
   const extractData = async (res: Response | null) => {
     if(!res) {
       return Promise.reject("null response is not allowed")
@@ -80,7 +75,7 @@ app.get('/api/steam/player-stats/:id',async (c)=>{
     const html = await res.text()
     const $ = cheerio.load(html)
     if($('.login_modal').length > 0) {
-      throw new Error('Token Invalid To access data')
+      throw new TokenInvalidError('Not Found Access Token For Steam Community')
     }
     const data = $('#gameslist_config').attr('data-profile-gameslist')
     // html unescape &quot;
@@ -90,19 +85,21 @@ app.get('/api/steam/player-stats/:id',async (c)=>{
       return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16));
     })
     if(!j) {
-      return null
+      return Promise.reject("No Data Found")
     }
     return JSON.parse(j)
   }
-  const [r, possibleR] = await Promise.allSettled([
-    extractData(res),
-    extractData(possibleRes)
-  ])
-  if(r.status === 'fulfilled' && r.value) {
-    return c.json(r.value)
-  } if(possibleR.status === 'fulfilled' && possibleR.value) {
-    return c.json(possibleR.value)
+
+  const validExtractedData = await Promise.allSettled(validTokenResponse.map(extractData))
+
+  for (const r of validExtractedData) {
+    if(r.status === 'fulfilled' && r.value) {
+      return c.json(r.value)
+    }else if(r.status === 'rejected'){
+      logger.error(r.reason)
+    }
   }
+  return c.json({success: false, errorMessage: 'not found available data'}, 400)
 })
 
 // crawl for https://steamcommunity.com/profiles/${id}
@@ -159,4 +156,5 @@ app.get('/api/steam/player-community-stats/:id',async (c)=>{
     reviews: reviews?.count??0,
   })
 })
+
 export default app

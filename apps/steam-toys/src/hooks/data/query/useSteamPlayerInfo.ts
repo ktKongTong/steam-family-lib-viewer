@@ -1,15 +1,18 @@
 import {useMutation} from "@tanstack/react-query";
-import {ProxiedAPIResponse} from "@repo/steam-proto";
+import {useCallback, useState} from "react";
+import {f} from '@/lib/omfetch'
 import {
-  CPlayer_GetPlayerLinkDetails_Response,
+  SteamStdResponseType,
+  InferRespType,
   CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails
 } from "@repo/steam-proto";
-import {useCallback, useState} from "react";
+
+type R = SteamStdResponseType<'Player', 'GetPlayerLinkDetails'>
+type R1 = InferRespType<'Player', 'GetPlayerLinkDetails'>
 
 async function fetchFamilyMembers(token:string,ids:string[]){
-  const data = await fetch(`/api/steam/player/${ids.join(',')}?access_token=${token}`)
-    .then(res=>res.json() as any as ProxiedAPIResponse<CPlayer_GetPlayerLinkDetails_Response>)
 
+  const data = await f.get<SteamStdResponseType<'Player', 'GetPlayerLinkDetails'>>(`/api/steam/player/${ids.join(',')}?access_token=${token}`)
   return data
 }
 
@@ -30,7 +33,11 @@ export const useSteamPlayerInfo = (accessToken: string) => {
 
   const fetchSteamPlayers = useCallback(async(memberIds: string[]) => {
     const res = await mutateAsync({ token:accessToken, ids: memberIds })
-    setFamilyMembers(res?.data?.accounts!)
+
+    if(res.data) {
+      setFamilyMembers(res.data.accounts)
+    }
+
     return res
   },[accessToken, mutateAsync])
 

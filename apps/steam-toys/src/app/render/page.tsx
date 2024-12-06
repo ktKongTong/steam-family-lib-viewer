@@ -1,41 +1,41 @@
-import {
-  CFamilyGroups_GetFamilyGroupForUser_Response, CFamilyGroups_GetPlaytimeSummary_Response,
-  CFamilyGroups_GetSharedLibraryApps_Response, CFamilyGroups_PlaytimeEntry
+import type {
+  CFamilyGroups_PlaytimeEntry,
+  SteamStdResponseType
 } from "@repo/steam-proto";
+import { f } from '@/lib/omfetch'
 import _ from "lodash";
-import {CStoreBrowse_GetItems_Response} from "@repo/steam-proto";
 
+import {logger} from '@/lib/logger'
 import React from "react";
-import {shaDigestAvatarBase64ToStrAvatarHash} from "@repo/shared";
-import {ProxiedAPIResponse} from "@repo/steam-proto";
+import { shaDigestAvatarBase64ToStrAvatarHash } from "@repo/shared";
+
 import Graph from "@/app/render/graph";
+
 import {Player} from "@/interface/steamPlaytime";
+
 
 export const revalidate = 3600
 
 let host = process.env.BASE_URL as string
-async function fetchFamilyInfo(token:string):Promise<null| ProxiedAPIResponse<CFamilyGroups_GetFamilyGroupForUser_Response>>{
-  const data = await fetch(`${host}/api/steam/family?access_token=${token}`)
-    .then(res=>res.json())
+async function fetchFamilyInfo(token:string) {
+  return await f.get<SteamStdResponseType<'FamilyGroups', 'GetFamilyGroupForUser'>>(`${host}/api/steam/family?access_token=${token}`)
     .catch(e=> {
-      console.log(e)
+      logger.log(e)
       return null
     })
-  return data
 }
 async function fetchFamilyPlayTime(token:string,id:string) {
   let url = `${host}/api/steam/family/playtime/${id}?access_token=${token}`
-  const data = (await fetch(url)
-    .then(res=>res.json())
+  const data = await f.get<SteamStdResponseType<'FamilyGroups', 'GetPlaytimeSummary'>>(url)
     .catch(e=> {
-      console.log(e)
+      logger.log(e)
       return null
-    })) as ProxiedAPIResponse<CFamilyGroups_GetPlaytimeSummary_Response>
-  const appids:number[] = data.data!.entries.flatMap((it:any)=>it.appid)
-  const appidsByOwner = data.data!.entriesByOwner.flatMap(it => it.appid!)
+    })
+  const appids:number[] = data?.data!.entries!.flatMap((it)=>it.appid!)!
+  const appidsByOwner = data?.data!.entriesByOwner!.flatMap((it) => it.appid!)!
   const allIds = _.uniq(appids.concat(appidsByOwner))
-  const appPlaytimeDict = _.groupBy(data.data!.entries,'appid')
-  const appPlaytimeByOwnerDict = _.groupBy(data.data!.entriesByOwner, 'appid')
+  const appPlaytimeDict = _.groupBy(data?.data!.entries,'appid')
+  const appPlaytimeByOwnerDict = _.groupBy(data?.data!.entriesByOwner, 'appid')
   return allIds.map(id=> {
     let res:any[] = []
     let owners = appPlaytimeByOwnerDict[id]
@@ -54,30 +54,27 @@ async function fetchFamilyPlayTime(token:string,id:string) {
   })
 }
 async function fetchFamilyMembers(token:string,ids:string[]){
-  const data = await fetch(`${host}/api/steam/player/${ids.join(',')}?access_token=${token}`)
-    .then(res=>res.json())
+  const data = await f.get(`${host}/api/steam/player/${ids.join(',')}?access_token=${token}`)
     .catch(e=> {
-      console.log(e)
+      logger.log(e)
       return null
     })
   return data
 }
 
 async function fetchFamilySharedLibs(token:string,id:string){
-  const data = await fetch(`${host}/api/steam/family/shared/${id}?access_token=${token}`)
-    .then(res=>res.json() as Promise<ProxiedAPIResponse<CFamilyGroups_GetSharedLibraryApps_Response>>)
+  const data = await f.get<SteamStdResponseType<'FamilyGroups', 'GetSharedLibraryApps'>>(`${host}/api/steam/family/shared/${id}?access_token=${token}`)
     .catch(e=> {
-      console.log(e)
+      logger.log(e)
       return null
     })
   return data
 }
 
 async function fetchFamilyLibItems(ids:string[]){
-  const data = await fetch(`${host}/api/steam/items/${ids.join(',')}`)
-    .then(res=>res.json() as Promise<ProxiedAPIResponse<CStoreBrowse_GetItems_Response>>)
+  const data = await f.get<SteamStdResponseType<'StoreBrowse', 'GetItems'>>(`${host}/api/steam/items/${ids.join(',')}`)
     .catch(e=> {
-      console.log(e)
+      logger.log(e)
       return null
     })
   return data
@@ -101,9 +98,8 @@ async function getRandomBackground(){
 async function prepareData(accessToken:string) {
   const bg = getRandomBackground()
   const familyInfo = await fetchFamilyInfo(accessToken)
-  console.log(familyInfo)
   let familyData = familyInfo?.data?.familyGroup!
-  const memberIds = familyData.members!.map((member)=>member.steamid!.toString())
+  const memberIds = familyData.members!.map((member: any)=>member.steamid!.toString())
   const memberFamilyInfos = _.keyBy(familyData.members, 'steamid')
 
   let familyGroupId = familyInfo?.data?.familyGroupid
@@ -124,7 +120,7 @@ async function prepareData(accessToken:string) {
     }
   })
   const memberDict = _.keyBy(members, 'steamid')
-  const libs = libOverviewInfos!.data!.apps
+  const libs = libOverviewInfos!.data!.apps!
     .filter( (app) => app.excludeReason == undefined || app.excludeReason == 0)
 
 
@@ -135,14 +131,14 @@ async function prepareData(accessToken:string) {
   }))
   const items = res
     .filter((it,index) => {
-      return !(!it || it.data!.storeItems.length == 0);
+      return !(!it || it.data!.storeItems!.length == 0);
     })
     .map(resp=>resp!.data!.storeItems).flatMap(it=>it)
   const libDictionary = _.keyBy(items, 'id')
-  const allLib = libs.map((lib)=> ({
+  const allLib = libs.map((lib:any)=> ({
     ...lib,
     detail: libDictionary[lib.appid!],
-    owners:lib.ownerSteamids.map((id) => {
+    owners:lib.ownerSteamids.map((id:any) => {
       return memberDict[id.toString()]
     })
   }))

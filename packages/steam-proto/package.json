@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "proto-gen": "buf generate proto",
+    "gen:proto": "buf generate proto",
+    "gen:steam-type": "node scripts/proto-generate-type.mjs",
     "build": "tsup && tsc",
     "types": "tsc"
   },
@@ -14,6 +15,11 @@
       "import": "./dist/esm/index.mjs"
     }
   },
+  "files": [
+    "src",
+    "package.json",
+    "dist"
+  ],
   "dependencies": {
     "@bufbuild/buf": "^1.30.0",
     "@bufbuild/protobuf": "^1.8.0",
@@ -24,7 +30,6 @@
     "lodash": "^4.17.21",
     "long": "^5.2.3",
     "protobufjs": "^7.2.6",
-    "steam-session": "^1.9.0",
     "steamid": "^2.1.0",
     "ts-proto": "^1.170.0"
   },

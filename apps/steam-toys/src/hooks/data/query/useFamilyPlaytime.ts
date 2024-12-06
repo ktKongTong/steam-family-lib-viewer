@@ -1,11 +1,12 @@
-import {ProxiedAPIResponse} from "@repo/steam-proto";
 import {
-  CFamilyGroups_GetPlaytimeSummary_Response,
+  SteamStdResponseType,
   CFamilyGroups_PlaytimeEntry
 } from "@repo/steam-proto";
 import _ from "lodash";
 import {useMutation} from "@tanstack/react-query";
 import {useCallback, useState} from "react";
+
+import {f} from '@/lib/omfetch'
 
 export interface SharedPlayTimeItem {
   appid: number,
@@ -13,12 +14,9 @@ export interface SharedPlayTimeItem {
 }
 
 async function fetchFamilyPlayTime(token:string,id:string) {
-  const data = (await fetch(`/api/steam/family/playtime/${id}?access_token=${token}`)
-    .then(res=>res.json())
-    ) as ProxiedAPIResponse<CFamilyGroups_GetPlaytimeSummary_Response>
-  // console.log(data.data)
-  const appids:number[] = data.data!.entries.flatMap((it:any)=>it.appid)
-  const appidsByOwner = data.data!.entriesByOwner.flatMap(it => it.appid!)
+  const data = await f.get<SteamStdResponseType<'FamilyGroups', 'GetPlaytimeSummary'>>(`/api/steam/family/playtime/${id}?access_token=${token}`)
+  const appids:number[] = data?.data!.entries!.flatMap((it)=>it.appid!)
+  const appidsByOwner = data.data!.entriesByOwner!.flatMap((it) => it.appid!)
   const allIds = _.uniq(appids.concat(appidsByOwner))
   const appPlaytimeDict = _.groupBy(data.data!.entries,'appid')
   const appPlaytimeByOwnerDict = _.groupBy(data.data!.entriesByOwner, 'appid')

@@ -2,7 +2,12 @@
   "name": "steam-toy-monorepo",
   "version": "0.1.0",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "build:toys": "turbo build --filter @repo/steam-toys",
+    "build:deps": "turbo build --filter='!@repo/steam-toys'",
+    "start:toys": "pnpm run --filter @repo/steam-toys  start",
+    "dev:toys": "pnpm run --filter @repo/steam-toys  dev"
+  },
   "devDependencies": {
     "@types/lodash": "^4.17.0",
     "@types/node": "^20",

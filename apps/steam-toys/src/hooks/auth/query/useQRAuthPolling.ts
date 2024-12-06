@@ -1,9 +1,8 @@
 import {useEffect, useRef, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
-import {ProxiedAPIResponse} from "@repo/steam-proto";
-import {CAuthentication_PollAuthSessionStatus_Response} from "@repo/steam-proto";
 import {PollStatus} from "@/hooks/auth/interface";
-
+import { SteamStdResponseType } from "@repo/steam-proto"
+import { f } from '@/lib/omfetch'
 
 export default function useQRAuthPolling(
   enabled: boolean,
@@ -12,7 +11,6 @@ export default function useQRAuthPolling(
   const [challengeURL, setChallengeURL] = useState("")
   const [clientId, setClientId] = useState<bigint| undefined>()
   const clientIdRef  = useRef<bigint| undefined>()
-  // console.log("new clientId", clientIdRef.current)
   const [pollTime, setPollTime] = useState(0)
   const [status, setStatus] = useState(PollStatus.notScan)
   const {data, isLoading, error } = useQuery({
@@ -23,9 +21,7 @@ export default function useQRAuthPolling(
         return
       }
       setPollTime((it)=> it + 1)
-      // let params:{clientId: bigint, requestId: string} = {} as any
-      const res = await fetch(`/api/steam/auth/poll?client_id=${clientId}&request_id=${requestId}`)
-        .then(res=>res.json() as Promise<ProxiedAPIResponse<CAuthentication_PollAuthSessionStatus_Response>>)
+      const res = await f.get<SteamStdResponseType<'Authentication', 'PollAuthSessionStatus'>>(`/api/steam/auth/poll?client_id=${clientId}&request_id=${requestId}`)
       return res.data
     },
     refetchInterval: (query) => {
@@ -84,10 +80,7 @@ export const useAuthPollQuery = (clientId: bigint, requestId: string) => {
     // beginAuthViaQR
     queryKey: ['pollForAuth',clientId, requestId],
     queryFn: async () => {
-      // let params:{clientId: bigint, requestId: string} = {} as any
-      const res = await fetch(`/api/steam/auth/poll?client_id=${clientId}&request_id=${requestId}`)
-        .then(res=>res.json() as Promise<ProxiedAPIResponse<CAuthentication_PollAuthSessionStatus_Response>>)
-      // 当刷新 qr 的时候，需要？
+      const res = await f.get<SteamStdResponseType<'Authentication', 'PollAuthSessionStatus'>>(`/api/steam/auth/poll?client_id=${clientId}&request_id=${requestId}`)
       return res
     },
     refetchInterval: (data) => !data ? 5000 : undefined

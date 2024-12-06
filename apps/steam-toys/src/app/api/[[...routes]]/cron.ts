@@ -1,7 +1,8 @@
 import {Hono} from "hono";
 import { createClient } from '@vercel/kv';
-import {jwtDecode} from "jwt-decode";
-import {steamAPI as steam} from "@repo/steam-proto";
+import {steamWebStdAPI} from "@repo/steam-proto";
+import {handlerAccessToken} from "@repo/shared";
+
 const cron = new Hono()
 
 cron.get('/api/cron/token-refresh', async ( c )=> {
@@ -18,15 +19,14 @@ export const refreshTokenTask = async () => {
     token: process.env.VERCEL_KV_API_TOKEN,
   });
   const [refreshToken, accessToken] = await kv.mget<[string, string]>('sflv:cron:refresh-token','sflv:cron:access-token')
-
-  const exp = jwtDecode(refreshToken).exp!
-  const remainInSec = exp - Math.floor(Date.now()/1000)
+  const token = handlerAccessToken(refreshToken, true)
+  const remainInSec = token.remaining
   let renew = false
   if(remainInSec <= 3*24*60*60) {
     renew = true
   }
-  const id = jwtDecode(refreshToken).sub!
-  const res =  await steam.auth.generateAccessToken({
+  const id = token.steamid
+  const res =  await steamWebStdAPI.auth.accessToken_GenerateForApp({
     refreshToken: refreshToken,
     steamid: BigInt(id),
     renewalType: renew ? 1 : 0
@@ -39,7 +39,7 @@ export const refreshTokenTask = async () => {
   })
 }
 
-export const getAccessToken = async () => {
+export const getAccessTokenFromKV = async () => {
   const kv = createClient({
     url: process.env.VERCEL_KV_REST_API_URL,
     token: process.env.VERCEL_KV_API_TOKEN,

@@ -87,6 +87,7 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
     const res = await steamItemQuery.mutateAsync(idChunk)
     setLibDetailWithIndex((cur) => {
       let ans: LibDetailsWithRangeIndex = { ...cur }
+      // @ts-ignore
       ans[key] = res?.data!!.storeItems!!
       return ans
     })
@@ -95,9 +96,9 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
   const handleSteamLibs = useCallback(async(familyId: string) => {
     syncStep()
     const libs = await steamFamilySharedLibsQuery.mutateAsync({token:accessToken, id: familyId})
-    const filteredLibs = libs!.data!.apps
-      .filter( (app:any) => app.excludeReason == undefined || app.excludeReason == 0)
-    setLibOverviews(filteredLibs)
+    const filteredLibs = libs!.data!.apps!
+      .filter( (app) => app.excludeReason == undefined || app.excludeReason == 0)
+    setLibOverviews(filteredLibs as CFamilyGroups_GetSharedLibraryApps_Response_SharedApp[])
     const libIds:string[][] = _.chunk(filteredLibs.map((it)=>it.appid!.toString()), 30)
 
     const getKey = (index: number, size: number)=> {

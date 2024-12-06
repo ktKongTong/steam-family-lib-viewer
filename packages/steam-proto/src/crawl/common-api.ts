@@ -1,12 +1,10 @@
 import _ from "lodash";
-import {steamStdAPI} from "./base";
 
 export class SteamCommonApi {
   private readonly accessToken: string|undefined
   constructor(accessToken?:string) {
     this.accessToken = accessToken
   }
-
   async getWishlistBySteamIds(ids:string) {
     const wishesByPlayer = await Promise.all(ids.split(',').map(async (id)=>{
       const url = `https://store.steampowered.com/wishlist/profiles/${id}/wishlistdata/?p=0&v=`
@@ -38,7 +36,6 @@ export class SteamCommonApi {
     }
   }
 
-  // @wrapperAPI()
   async getSteamItemsDetailsByIds(ids: string) {
     const idArr = ids.split(',').slice(0,10)
     let baseURL = "https://store.steampowered.com/api/appdetails?appids="
@@ -60,17 +57,4 @@ export class SteamCommonApi {
     )
     return {data: res}
   }
-
-  getSteamItemsById = steamStdAPI.storeBrowse.getItems
-
-  getSteamPlayerLinkDetails = steamStdAPI.player.getPlayerLinkDetails
-  //
-  // (params: InferReqType<'Player', 'GetPlayerLinkDetails'>,token:string){
-  //   return callHttpSteamStdAPI({
-  //     accessToken: token,
-  //     serviceName: "Player",
-  //     serviceMethod: "GetPlayerLinkDetails",
-  //     requestData: params
-  //   })
-  // }
 }

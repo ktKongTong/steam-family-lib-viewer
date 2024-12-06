@@ -1,5 +1,5 @@
 import {Message, PartialMessage} from "@bufbuild/protobuf";
-import { EResult } from "../../enums/std-err-result";
+import { EResult } from "../enums/std-err-result";
 import {steamStdServiceRecord, InferSteamStdReqOrRespTypeFromString, steamStdServiceClazzMap} from "./gen";
 
 

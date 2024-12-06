@@ -127,7 +127,7 @@ CStoreBrowse_GetDLCForAppsSolr_Request, CStoreBrowse_GetDLCForAppsSolr_Response,
 CStoreBrowse_GetHardwareItems_Request, CStoreBrowse_GetHardwareItems_Response,
 CStoreBrowse_GetStoreCategories_Request, CStoreBrowse_GetStoreCategories_Response,
 CStoreBrowse_GetItems_Request, CStoreBrowse_GetItems_Response
-}  from "../../../proto";
+}  from "../../proto";
 
 
 export const steamStdServiceRecord = {

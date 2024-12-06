@@ -1,6 +1,6 @@
 import {EResult} from "../../enums/std-err-result";
-import {InferReqType, ServiceDict, ServiceMethodDict, SteamStdRequestType, SteamStdResponseType} from "./type";
-import {getProtoClazzForService} from "./util";
+import {InferReqType, ServiceDict, ServiceMethodDict, SteamStdRequestType, SteamStdResponseType} from "../type";
+import {getProtoClazzForService} from "../util";
 import {uint8ArrayToBase64} from "../../utils";
 
 
@@ -110,7 +110,15 @@ export const callHttpSteamStdAPI = async <
 type FirstLetterLowerCase<T extends string> = T extends `${infer First}${infer Rest}` ? `${Lowercase<First>}${Rest}` : T
 
 type SteamHTTPAPI<S extends ServiceDict> = {
-  [K in ServiceMethodDict<S> as FirstLetterLowerCase<K>]: (param: InferReqType<S, K>, token?: string) => Promise<SteamStdResponseType<S, K>>
+  [K in ServiceMethodDict<S> as FirstLetterLowerCase<K>]: (requestParam: InferReqType<S, K>, opts?: RequestOpts) => Promise<SteamStdResponseType<S, K>>
+}
+
+export type RequestOpts = {
+  accessToken?: string | null
+  apiVersion?: number
+  headers?: Record<string, string>,
+  method?: 'GET' | 'POST',
+  codec?: 'json' | 'proto'
 }
 
 export const createSteamStdAPI = <T extends ServiceDict>(serviceName: T, token?: string) => {
@@ -119,11 +127,15 @@ export const createSteamStdAPI = <T extends ServiceDict>(serviceName: T, token?:
     get: <M extends ServiceMethodDict<T>>(target: any, serviceMethod: M) => {
       // make serviceMethod First Letter to UpperCase
       let s = serviceMethod.charAt(0).toUpperCase() + serviceMethod.slice(1) as M
-      return (param:InferReqType<T, M>, accessToken?: string) => callHttpSteamStdAPI({
+      return (param:InferReqType<T, M>, requestOpts?: RequestOpts) => callHttpSteamStdAPI({
+        apiVersion: requestOpts?.apiVersion,
+        headers: requestOpts?.headers,
         serviceName,
         serviceMethod: s,
-        accessToken: ak ?? accessToken,
+        accessToken: requestOpts?.accessToken ?? ak,
         requestData: param,
+        method: requestOpts?.method,
+        codec: requestOpts?.codec,
       })
     }
   })

@@ -23,6 +23,11 @@ export type ExtendFetchOptions = {
   raw?: boolean
 } & FetchOptions
 
+type ISRawFetch<T extends ExtendFetchOptions> = T extends ExtendFetchOptions ? T['raw'] extends boolean ? T['raw'] : false : never
+
+type FetchReturnType<T, F extends ExtendFetchOptions> = ISRawFetch<F> extends true ? Response : T
+
+
 export class Fetch {
   private options?: FetchOptions
   private ofetchInstance: $Fetch
@@ -50,10 +55,10 @@ export class Fetch {
       delete options.searchParams;
     }
     if(options?.raw) {
-      const res = await this.ofetchInstance.raw(request, {
+      const res = await this.ofetchInstance.native(request, {
         ...this.options,
         ...options,
-      });
+      } as any);
       return res
     }
     const res = await this.ofetchInstance(request, {
@@ -62,23 +67,23 @@ export class Fetch {
     });
     return res
   }
-  get<T extends any = any>(request: string, options?: ExtendFetchOptions):Promise<T> {
-    return this.fetch(request, { ...options, method: 'GET' }) as Promise<T>;
+  get<T extends any = any, F extends ExtendFetchOptions = ExtendFetchOptions>(request: string, options?: F):Promise<FetchReturnType<T,F>> {
+    return this.fetch(request, { ...options, method: 'GET' })
   }
-  post<T extends any = any>(request: string, options?: ExtendFetchOptions):Promise<T> {
-    return this.fetch(request, { ...options, method: 'POST' }) as Promise<T>;
+  post<T extends any = any, F extends ExtendFetchOptions = ExtendFetchOptions>(request: string, options?: ExtendFetchOptions):Promise<FetchReturnType<T,F>> {
+    return this.fetch(request, { ...options, method: 'POST' })
   }
-  put<T extends any = any>(request: string, options?: ExtendFetchOptions):Promise<T> {
-    return this.fetch(request, { ...options, method: 'PUT' }) as Promise<T>;
+  put<T extends any = any, F extends ExtendFetchOptions = ExtendFetchOptions>(request: string, options?: ExtendFetchOptions):Promise<FetchReturnType<T,F>> {
+    return this.fetch(request, { ...options, method: 'PUT' })
   }
-  patch<T extends any = any>(request: string, options?: ExtendFetchOptions):Promise<T> {
-    return this.fetch(request, { ...options, method: 'PATCH' }) as Promise<T>;
+  patch<T extends any = any, F extends ExtendFetchOptions = ExtendFetchOptions>(request: string, options?: ExtendFetchOptions):Promise<FetchReturnType<T,F>> {
+    return this.fetch(request, { ...options, method: 'PATCH' })
   }
-  delete<T extends any = any>(request: string, options?: ExtendFetchOptions):Promise<T> {
-    return this.fetch(request, { ...options, method: 'DELETE' }) as Promise<T>;
+  delete<T extends any = any, F extends ExtendFetchOptions = ExtendFetchOptions>(request: string, options?: ExtendFetchOptions):Promise<FetchReturnType<T,F>> {
+    return this.fetch(request, { ...options, method: 'DELETE' })
   }
-  head(request: string, options?: ExtendFetchOptions) {
-    return this.fetch(request, { ...options, method: 'HEAD' });
+  head<F extends ExtendFetchOptions = ExtendFetchOptions>(request: string, options?: ExtendFetchOptions):Promise<FetchReturnType<any,F>> {
+    return this.fetch(request, { ...options, method: 'HEAD' })
   }
 
   extend(options: FetchOptions) {

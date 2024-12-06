@@ -1,16 +1,16 @@
-import {Env, Hono} from "hono";
-import { steamAPI as steam } from "@repo/steam-proto";
-import {jwtDecode} from "jwt-decode";
+import {Hono} from "hono";
+import {steamWebStdAPI} from "@repo/steam-proto";
 import {ua} from "@/lib/ua";
 import {f} from "@/lib/omfetch";
-
+import {getAccessToken} from "@/app/api/[[...routes]]/_middlewares/query-extractor";
+import { handlerAccessToken } from "@repo/shared";
 const proxyHost = process.env.STEAM_TOKEN_PROXY_HOST as string;
 
 const app = new Hono()
 
 // steam qr login
 app.get('/api/steam/auth/qr', async (c)=>{
-  const data = await steam.auth.beginAuthSessionViaQR({
+  const data = await steamWebStdAPI.auth.beginAuthSessionViaQR({
     websiteId: 'Store',
     platformType: 2,
     deviceFriendlyName: "ChromeSteam",
@@ -27,7 +27,7 @@ app.get('/api/steam/auth/poll', async (c)=>{
   const client_id= c.req.query('client_id')
   const request_id= c.req.query('request_id')
   const buf = Buffer.from(request_id!, 'base64')
-  const data = await steam.auth.pollAuthSessionStatus({
+  const data = await steamWebStdAPI.auth.pollAuthSessionStatus({
     clientId: BigInt(client_id!),
     requestId: new Uint8Array(buf)
   })
@@ -189,15 +189,24 @@ app.get('/api/steam/auth/getToken', async (c)=>{
 })
 
 app.get('/api/steam/auth/generateAccessToken', async (c)=>{
-  const refreshToken= c.req.query('refresh_token')!!
+  const refreshToken= c.req.query('refresh_token')
   let  renewType = c.req.query('renew')
   const renewalType = renewType === "true" ? 1: 0
-  const id = jwtDecode(refreshToken).sub!
-  const res =  await steam.auth.generateAccessToken({
+  const token = handlerAccessToken(refreshToken)
+  if(!token.valid) {
+    return c.json({
+      success: false,
+      errorMessage: 'Invalid token',
+      errorType: 'InvalidToken',
+    }, 400)
+  }
+
+  const id = token.steamid!
+  const res =  await steamWebStdAPI.auth.accessToken_GenerateForApp({
       refreshToken: refreshToken,
       steamid: BigInt(id),
       renewalType: renewalType
-    })
+  })
   return c.json({
     ...res
   })
@@ -205,8 +214,9 @@ app.get('/api/steam/auth/generateAccessToken', async (c)=>{
 
 
 app.get('/api/steam/account/private-app', async (c) => {
-  const accessToken= c.req.query('access_token')!!
-  const res = await steam.accountPrivate.getPrivateAppList({}, accessToken)
+  const token = getAccessToken(c, true)
+  const res = await steamWebStdAPI.accountPrivate
+    .getPrivateAppList({}, {accessToken: token.token})
   return c.json(res)
 })
 

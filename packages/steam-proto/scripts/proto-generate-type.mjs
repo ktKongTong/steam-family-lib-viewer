@@ -38,26 +38,6 @@ function scanProtoFiles(directoryPath) {
                 serviceMap.get(serviceName).push(method)
             }
         })
-
-        // console.log(services)
-        // // 使用正则表达式匹配 service 定义
-        // const serviceMatch = fileContent.match(/service\s+(\w+)\s*{([\s\S]*?)}/);
-        //
-        // if (serviceMatch) {
-        //     const serviceName = serviceMatch[1];
-        //     const serviceContent = serviceMatch[2];
-        //
-        //     // 使用正则表达式提取方法名
-        //     const methodMatches = serviceContent.match(/rpc\s+(\w+)\s*\(/g);
-        //
-        //     if (methodMatches) {
-        //         const methods = methodMatches.map(match =>
-        //             match.replace(/rpc\s+/, '').replace(/\s*\(/, '')
-        //         );
-        //
-        //         serviceMap.set(serviceName, methods);
-        //     }
-        // }
     });
     return serviceMap;
 }
@@ -106,7 +86,7 @@ export const steamStdServiceRecord = {
     generateTypes () {
         const that = this
         const text = Object.entries(this.services).map(([name, methods]) => methods.map(method => that.#serviceToTypeStr(name, method))).flat().join(',\n')
-        const result = `import {\n${ text }\n}  from "../../../proto";`
+        const result = `import {\n${ text }\n}  from "../../proto";`
         return result
     }
     generateMap () {

@@ -1,5 +1,5 @@
 
-import {createSteamStdAPI} from "../std/http-transport";
+import {createSteamStdAPI} from "./http-transport";
 
 const FamilyGroupApi = createSteamStdAPI('FamilyGroups')
 const AuthenticationApi = createSteamStdAPI('Authentication')
@@ -9,7 +9,7 @@ const StoreBrowseAPI = createSteamStdAPI('StoreBrowse')
 const StoreAPI = createSteamStdAPI('Store')
 const ClientCommAPI = createSteamStdAPI('ClientComm')
 
-export const steamStdAPI = {
+export const steamWebStdAPI = {
   auth: AuthenticationApi,
   familyGroup: FamilyGroupApi,
   accountPrivate: AccountPrivateAppsApi,

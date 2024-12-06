@@ -21,5 +21,4 @@ export class SteamAPI {
 
 export const steamAPI = new SteamAPI()
 
-
-export * from './interface'
+export type { InferReqType, InferRespType, SteamStdResponseType } from './std'

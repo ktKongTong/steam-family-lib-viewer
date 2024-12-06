@@ -55,7 +55,7 @@ app.get('/api/steam/player-stats/:id',async (c)=>{
     steam.common.getSteamPlayerLinkDetails({steamids: [BigInt(constUser)]},possibleToken ?? ""),
   ])
 
-  if(!tokenResp.ok && !possibleTokenResp.ok) {
+  if(!tokenResp.success && !possibleTokenResp.success) {
     return c.json(tokenResp, 401)
   }
   const fetchGameProfile =async (id: string,communityToken?: string) => {

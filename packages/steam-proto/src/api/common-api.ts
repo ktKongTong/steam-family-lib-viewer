@@ -1,12 +1,5 @@
 import _ from "lodash";
-import {ProxiedAPIResponse} from "./interface";
-import {SteamAPICall} from "./steam-request";
-import {PartialMessage} from "@bufbuild/protobuf";
-import {
-  CPlayer_GetPlayerLinkDetails_Request,
-  CPlayer_GetPlayerLinkDetails_Response
-} from "../proto";
-import {CStoreBrowse_GetItems_Request, CStoreBrowse_GetItems_Response} from "../proto";
+import {steamStdAPI} from "./base";
 
 export class SteamCommonApi {
   private readonly accessToken: string|undefined
@@ -68,61 +61,16 @@ export class SteamCommonApi {
     return {data: res}
   }
 
-  getSteamItemsById(params:PartialMessage<CStoreBrowse_GetItems_Request>) {
-    return  SteamAPICall({
-      method: "GET",
-      serviceName: "IStoreBrowseService",
-      itemName: "GetItems",
-      reqClass: CStoreBrowse_GetItems_Request,
-      respClass: CStoreBrowse_GetItems_Response,
-      param: params
-    })
-  }
+  getSteamItemsById = steamStdAPI.storeBrowse.getItems
 
-  getSteamPlayerLinkDetails(params:PartialMessage<CPlayer_GetPlayerLinkDetails_Request> ,token:string){
-    return SteamAPICall({
-      method: "GET",
-      token: token,
-      serviceName: "IPlayerService",
-      itemName: "GetPlayerLinkDetails",
-      reqClass: CPlayer_GetPlayerLinkDetails_Request,
-      respClass: CPlayer_GetPlayerLinkDetails_Response,
-      param: params
-    })
-  }
-}
-
-// class Greeter {
-//   greeting: string;
-//   constructor(message: string) {
-//     this.greeting = message;
-//   }
-//
-//   @enumerable(false)
-//   greet() {
-//     return "Hello, " + this.greeting;
-//   }
-// }
-// function enumerable(value: boolean) {
-//   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-//     descriptor.enumerable = value;
-//   };
-// }
-
-export function wrapperAPI<T>() {
-  return function (targetClassPrototype: any, methodName: any, propertyDescriptor: PropertyDescriptor) {
-    let method = propertyDescriptor.value
-    propertyDescriptor.value = function (...args:any) {
-      try {
-        return method.call(this, args)
-      }catch (e) {
-        return {
-          ok: false,
-          status: 500,
-          message: `unknown error during execute ${methodName}, ${e?.toString()}`,
-          data: null
-        } as ProxiedAPIResponse<T>
-      }
-    }
-  };
+  getSteamPlayerLinkDetails = steamStdAPI.player.getPlayerLinkDetails
+  //
+  // (params: InferReqType<'Player', 'GetPlayerLinkDetails'>,token:string){
+  //   return callHttpSteamStdAPI({
+  //     accessToken: token,
+  //     serviceName: "Player",
+  //     serviceMethod: "GetPlayerLinkDetails",
+  //     requestData: params
+  //   })
+  // }
 }

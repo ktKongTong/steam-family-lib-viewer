@@ -4,15 +4,15 @@ const nextConfig = {
         '@repo/shared',
         '@repo/steam-proto',
     ],
-    webpack: (config, { webpack }) => {
-        config.module.rules.push({
-            resolve: {
-                extensionAlias: {
-                    '.js': ['.ts', '.js'],
-                },
-            }
-        })
-        return config
-    },
+    // webpack: (config, { webpack }) => {
+    //     config.module.rules.push({
+    //         resolve: {
+    //             extensionAlias: {
+    //                 '.js': ['.ts', '.js'],
+    //             },
+    //         }
+    //     })
+    //     return config
+    // },
 }
 export default nextConfig;

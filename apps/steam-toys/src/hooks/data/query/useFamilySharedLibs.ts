@@ -1,12 +1,12 @@
 import {useMutation} from "@tanstack/react-query";
-import {ProxiedAPIResponse} from "@repo/steam-proto";
-import {CFamilyGroups_GetSharedLibraryApps_Response} from "@repo/steam-proto";
+import { SteamStdResponseType } from "@repo/steam-proto";
 
+import {
+  f
+} from '@/lib/omfetch'
 
 async function fetchFamilySharedLibs(token:string,id:string){
-  const data = await fetch(`/api/steam/family/shared/${id}?access_token=${token}`)
-    .then(res=>res.json() as Promise<ProxiedAPIResponse<CFamilyGroups_GetSharedLibraryApps_Response>>)
-
+  const data = await f.get<SteamStdResponseType<'FamilyGroups', 'GetSharedLibraryApps'>>(`/api/steam/family/shared/${id}?access_token=${token}`)
   return data
 }
 export const useFamilySharedLibs = () => {

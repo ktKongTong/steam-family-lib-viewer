@@ -1,6 +1,6 @@
 import {Message} from "@bufbuild/protobuf";
 import {ProxiedAPIResponse, SteamRoutes} from "./interface";
-import {uint8ArrayToBase64} from "@/utils";
+import {uint8ArrayToBase64} from "../../utils";
 
 
 interface Decoder {

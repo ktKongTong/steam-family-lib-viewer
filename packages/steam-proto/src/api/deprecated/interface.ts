@@ -21,3 +21,4 @@ export interface SteamRoutes<REQ extends Message<REQ>, RES extends Message<RES>>
   respClass: SteamMessageType<RES>,
   param: PartialMessage<REQ>
 }
+// deprecated

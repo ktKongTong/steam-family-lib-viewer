@@ -1,4 +1,4 @@
-import {Env, Hono} from "hono";
+import { Hono } from "hono";
 import { steamAPI as steam } from "@repo/steam-proto";
 import {jwtDecode} from "jwt-decode";
 
@@ -84,7 +84,6 @@ app.get('/api/steam/player/:ids',async (c)=>{
   let steamids = ids.map(it=> BigInt(it))
   const data = await steam.common
     .getSteamPlayerLinkDetails({steamids: steamids},tokenParam ?? "")
-
   const converted = data
   // .accounts
   //   .map((account=>({

@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build:deps": "turbo build --filter=./packages/*",
     "build:toys": "turbo build --filter @repo/steam-toys",
-    "build:deps": "turbo build --filter='!@repo/steam-toys'",
     "start:toys": "pnpm run --filter @repo/steam-toys  start",
-    "dev:toys": "pnpm run --filter @repo/steam-toys  dev"
+    "dev:toys": "pnpm run --filter @repo/steam-toys  dev",
+    "build:receipt": "turbo build --filter @repo/steam-receipt",
+    "start:receipt": "pnpm run --filter @repo/steam-receipt  start",
+    "dev:receipt": "pnpm run --filter @repo/steam-receipt  dev"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.0",

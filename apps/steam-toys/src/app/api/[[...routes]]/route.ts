@@ -7,6 +7,7 @@ import steamHelper from "./_routes/helper";
 import steamAuth from "./_routes/auth";
 import cron from "@/app/api/[[...routes]]/cron";
 import {CommonExtractor} from "./_middlewares/query-extractor";
+import {BizError} from "@/app/api/[[...routes]]/errors";
 
 export const runtime = 'edge';
 
@@ -18,6 +19,17 @@ app.route('/', steamCommon)
 app.route('/', steamAuth)
 app.route('/', steamHelper)
 app.route('/', cron)
+
+app.onError((err, c) => {
+  if (err instanceof BizError) {
+    return c.json({
+      success: false,
+      errorType: err.name,
+      errorMessage: err.message
+    }, err?.code as any ?? 400)
+  }
+  return c.json({ success: false, errorType: "Unknown Error"}, 500)
+})
 
 app.get('/api/ping', async(c) => {
   return c.json({data: "pong"})

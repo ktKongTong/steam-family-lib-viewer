@@ -1,12 +1,16 @@
 export class BizError extends Error {
-  constructor(message: string) {
+  code?: number
+  constructor(message: string, code?: number) {
     super(message)
+    this.code = code
   }
 }
 
 
 export class TokenInvalidError extends BizError {
-  constructor(message: string) {
+  code?: number
+  constructor(message: string, code?: number) {
     super(message)
+    this.code = code
   }
 }

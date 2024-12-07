@@ -1,1 +1,1 @@
-../apps/steam-toys/README.md
+./apps/steam-toys/README.md

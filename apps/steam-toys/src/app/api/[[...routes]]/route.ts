@@ -4,6 +4,7 @@ import {handle} from 'hono/vercel'
 import steamFamilyGroup from "./_routes/familygroup";
 import steamCommon from "./_routes/common";
 import steamHelper from "./_routes/helper";
+import info from "./_routes/info";
 import steamAuth from "./_routes/auth";
 import cron from "@/app/api/[[...routes]]/cron";
 import {CommonExtractor} from "./_middlewares/query-extractor";
@@ -18,6 +19,7 @@ app.route('/', steamFamilyGroup)
 app.route('/', steamCommon)
 app.route('/', steamAuth)
 app.route('/', steamHelper)
+app.route('/', info)
 app.route('/', cron)
 
 app.onError((err, c) => {

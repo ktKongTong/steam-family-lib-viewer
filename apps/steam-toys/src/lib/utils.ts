@@ -8,6 +8,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export const isServerSide = () => {
+  return typeof window === "undefined"
+}
+export const isClientSide = () => {
+  return typeof window !== "undefined"
+}
+
 export const cooldownDurationTostring = (duration:number)=> {
   if(duration == 0) return "暂无冷静期"
   if(duration < (24 * 3600)) {

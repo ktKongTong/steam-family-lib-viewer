@@ -1,9 +1,4 @@
 import {useCallback, useMemo, useState} from "react";
-import {useFamilyPlaytime} from "@/hooks/data/query/useFamilyPlaytime";
-import {useSteamItems} from "@/hooks/data/query/useSteamItems";
-import {useFamilyInfo} from "@/hooks/data/query/useFamilyInfo";
-import {useFamilySharedLibs} from "@/hooks/data/query/useFamilySharedLibs";
-import {useSteamPlayerInfo} from "@/hooks/data/query/useSteamPlayerInfo";
 import {SharedLibraryStep, Step, StepStatus, WrappedStep} from "./step";
 import {
   CFamilyGroups_GetFamilyGroupForUser_Response,
@@ -16,6 +11,8 @@ import _ from "lodash";
 import {Player} from "@/interface/steamPlaytime";
 import {useToast} from "@/components/ui/use-toast";
 import {shaDigestAvatarBase64ToStrAvatarHash} from "@repo/shared";
+import {useMutate} from "@/hooks/data/query/use-mutate";
+import {APIService} from "@/hooks/data/query/api";
 
 type LibDetailsWithRangeIndex = Record<string, StoreItem[]>
 
@@ -32,16 +29,19 @@ const getSteps:()=>[Step,WrappedStep,Step] = ()=> [
 export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
 
 
-  const {fetchFamilyInfo, reset: resetFamilyInfo, steamFamilyInfo, error: familyInfoError} = useFamilyInfo(accessToken)
+  const {mutateAsync: fetchFamilyInfo, reset: resetFamilyInfo, data: steamFamilyInfo, error: familyInfoError} = useMutate(APIService.getFamilyGroupForUser)
 
-  const { fetchFamilyPlaytime, reset: resetSharedPlaytime, sharedPlaytime, error:sharedPlaytimeError} = useFamilyPlaytime(accessToken)
+  const { mutateAsync: fetchFamilyPlaytime, data: _sharedPlaytime, error:sharedPlaytimeError, reset:resetSharedPlaytime} =  useMutate(APIService.getPlaytimeSummary)
 
-  const { fetchSteamPlayers, reset: resetSteamPlayers, steamPlayers, error:steamPlayersError}  = useSteamPlayerInfo(accessToken)
+  const sharedPlaytime = _sharedPlaytime ?? []
 
+  const { mutateAsync: fetchSteamPlayers, data: _steamPlayers, error:steamPlayersError, reset: resetSteamPlayers } = useMutate(APIService.getPlayerLinkDetails)
 
-  const steamFamilySharedLibsQuery = useFamilySharedLibs()
+  const steamPlayers = _steamPlayers?.accounts ?? []
 
-  const steamItemQuery = useSteamItems()
+  const steamFamilySharedLibsQuery = useMutate(APIService.getSharedLibraryApps)
+
+  const steamItemQuery = useMutate(APIService.getStoreItems)
   //
   const [steps,setSteps] = useState<[Step,WrappedStep,Step]>(getSteps())
 
@@ -81,22 +81,19 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
     })
   }
 
-  // const syncSte
-
   const handleLibDetails = useCallback(async (key:string, idChunk: string[])=> {
     const res = await steamItemQuery.mutateAsync(idChunk)
     setLibDetailWithIndex((cur) => {
       let ans: LibDetailsWithRangeIndex = { ...cur }
-      // @ts-ignore
-      ans[key] = res?.data!!.storeItems!!
+      ans[key] = res.storeItems!
       return ans
     })
   }, [steamItemQuery])
 
   const handleSteamLibs = useCallback(async(familyId: string) => {
     syncStep()
-    const libs = await steamFamilySharedLibsQuery.mutateAsync({token:accessToken, id: familyId})
-    const filteredLibs = libs!.data!.apps!
+    const libs = await steamFamilySharedLibsQuery.mutateAsync({accessToken, familyId: familyId})
+    const filteredLibs = libs!.apps!
       .filter( (app) => app.excludeReason == undefined || app.excludeReason == 0)
     setLibOverviews(filteredLibs as CFamilyGroups_GetSharedLibraryApps_Response_SharedApp[])
     const libIds:string[][] = _.chunk(filteredLibs.map((it)=>it.appid!.toString()), 30)
@@ -106,7 +103,6 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
     }
     const itemsSteps = libIds.map((idChunk,index)=> new Step(`分块【${getKey(index,idChunk.length)}】库存详情信息`))
     sharedLibsStep.setSubSteps(itemsSteps)
-    // 每个放到 store 中的一个 index
     const res = itemsSteps.map((it,idx) => {
       it.bindFunc(() => handleLibDetails(getKey(idx,libIds[idx].length),libIds[idx]))
       it.bindAfter(async () => syncStep())
@@ -117,16 +113,15 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
   },[syncStep, steamFamilySharedLibsQuery, accessToken, sharedLibsStep, handleLibDetails])
 
   const { toast } = useToast()
-
+  const [loading, setLoading] = useState(false)
   const fetch = async ()=> {
+    setLoading(true)
     // 此处保证持有的最新的steps，在下一次 setState的时候同步
-    // reset()
-    //
     const steps = reset()
     const [familyStep, wrappedStep, finishStep] = steps
     const [playtimeStep, memberStep, ] = wrappedStep.steps
     const sharedLibsStep = wrappedStep.steps[2] as SharedLibraryStep
-    const steamFamily = await familyStep.trigger(() => fetchFamilyInfo())
+    const steamFamily = await familyStep.trigger(() => fetchFamilyInfo(accessToken))
 
     if(!steamFamily) {
       familyStep.failed("获取失败")
@@ -134,6 +129,7 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
         title: '获取失败',
         description: '获取用户家庭信息失败，请检查 Token 是否正确'
       })
+      setLoading(false)
       return
     }
     if(steamFamily?.isNotMemberOfAnyGroup === true) {
@@ -148,13 +144,14 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
         title: '获取失败',
         description: '用户还未处于任何家庭中，无法生成家庭库存图'
       })
+      setLoading(false)
       return
     }
 
     const familyId = steamFamily!.familyGroupid!!.toString()
     const memberIds =steamFamily!.familyGroup!.members!.map((member)=>member.steamid!.toString())
-    playtimeStep.bindFunc(async () => fetchFamilyPlaytime(familyId))
-    memberStep.bindFunc(async () => fetchSteamPlayers(memberIds))
+    playtimeStep.bindFunc(async () => fetchFamilyPlaytime({accessToken, familyId}))
+    memberStep.bindFunc(async () => fetchSteamPlayers({accessToken, steamids: memberIds}))
     sharedLibsStep.bindFunc(async () => handleSteamLibs(familyId))
 
     playtimeStep.bindAfter(async ()=>{syncStep()})
@@ -167,24 +164,17 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
       sharedLibsStep.trigger()
     ]))
     syncStep()
+    setLoading(false)
   }
   const {
     allLibs,
     allMembers,
   } = useComputedLibAndMember(steamFamilyInfo,steamPlayers,libOverviews,libDetailWithIndex)
-
-  // 此处setSteps没有先于steamFamilyInfo更新，Why？
   const dataLoaded = steamFamilyInfo!=null && !steamFamilyInfo.isNotMemberOfAnyGroup && finishStep.ok
   const canDisplay = steamFamilyInfo!=null && !steamFamilyInfo.isNotMemberOfAnyGroup && playtimeStep.ok && memberStep.ok
-  // console.log("execute agagin", steamFamilyInfo)
-  // console.log("familyStep",  familyStep.id)
-  // console.log("wrappedStep",  wrappedStep.id)
-  // console.log("playtimeStep",  playtimeStep.id)
-  // console.log("memberStep", memberStep.id)
-  // console.log("sharedLibsStep", sharedLibsStep.id)
-  // console.log("finishStep",  finishStep.id)
   return {
     dataLoaded,
+    loading,
     canDisplay,
     fetch,
     steps,
@@ -195,13 +185,12 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
     allLibs,
     allMembers
   }
-
 }
 
 
 // 基于已有数据计算家庭成员信息，
 const useComputedLibAndMember = (
-  steamFamilyInfo: CFamilyGroups_GetFamilyGroupForUser_Response | null,
+  steamFamilyInfo: CFamilyGroups_GetFamilyGroupForUser_Response | null | undefined,
   steamPlayers: CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails[],
   libOverviews: CFamilyGroups_GetSharedLibraryApps_Response_SharedApp[],
   libDetailWithIndex: LibDetailsWithRangeIndex,
@@ -211,10 +200,10 @@ const useComputedLibAndMember = (
       return [] as Player[]
     }
 
-    const memberFamilyInfos = _.keyBy(steamFamilyInfo!.familyGroup!.members, 'steamid')
+    const memberFamilyInfos = _.keyBy(steamFamilyInfo.familyGroup!.members, 'steamid')
     return steamPlayers!.map((account)=> {
       const id = account!.publicData!.steamid!.toString()
-      const avatar_hash = shaDigestAvatarBase64ToStrAvatarHash(account!.publicData!.shaDigestAvatar!.toString())
+      const avatar_hash = shaDigestAvatarBase64ToStrAvatarHash(account.publicData!.shaDigestAvatar!.toString())
       return {
         ...account.publicData,
         avatar_hash,
@@ -228,9 +217,7 @@ const useComputedLibAndMember = (
   },[allMembers])
 
   const curLibDetails = useMemo(()=> {
-    // todo
-    // console.log("curLibDetails", libDetailWithIndex)
-    return Object.values(libDetailWithIndex).flatMap(it => it)
+    return Object.values(libDetailWithIndex).flat()
   }, [libDetailWithIndex])
 
   const libDictionary = useMemo(()=>_.keyBy(curLibDetails, 'id'), [curLibDetails])
@@ -240,8 +227,6 @@ const useComputedLibAndMember = (
       // 筛选出不包含 xxx 的时间
       .filter((lib) => {
         const dic = libDictionary[lib.appid!]
-
-        // console.log("lib",lib.appid, dic)
         return !!libDictionary[lib.appid!]
       })
       .map((lib)=> ({

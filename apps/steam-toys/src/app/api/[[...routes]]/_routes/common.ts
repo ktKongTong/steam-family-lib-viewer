@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import {steamCrawlAPI, steamWebStdAPI} from "@repo/steam-proto";
 import {getAccessToken, getAPIKey} from "@/app/api/[[...routes]]/_middlewares/query-extractor";
+import {handleSteamStdResponse} from "@/app/api/[[...routes]]/handle-steam-std-response";
 
 
 const app = new Hono()
@@ -8,6 +9,11 @@ const app = new Hono()
 app.get('/api/steam/wishlist/:ids', async (c)=> {
   const idParam = c.req.param('ids')
   const res = await steamCrawlAPI.common.getWishlistBySteamIds(idParam)
+  return c.json(res)
+})
+app.get('/api/steam/detail/:ids', async(c) => {
+  const idParam = c.req.param('ids')
+  const res = await steamCrawlAPI.common.getSteamItemsDetailsByIds(idParam)
   return c.json(res)
 })
 
@@ -38,14 +44,11 @@ app.get('/api/steam/items/:ids',async (c)=>{
       includeTagCount: 20
     }
   })
-  return c.json(data)
+  // @ts-ignore
+  return handleSteamStdResponse(c, data)
 })
 
-app.get('/api/steam/detail/:ids', async(c) => {
-  const idParam = c.req.param('ids')
-  const res = await steamCrawlAPI.common.getSteamItemsDetailsByIds(idParam)
-  return c.json(res)
-})
+
 
 app.get('/api/steam/player/summaries', async(c) => {
   const idParam = c.req.query('steamids')
@@ -56,7 +59,21 @@ app.get('/api/steam/player/summaries', async(c) => {
 app.get('/api/steam/player/ownedGames', async(c) => {
   const idParam = c.req.query('steamid')
   let apiKey = getAPIKey(c)
-  return fetch(`https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=${apiKey}&steamid=${idParam}&include_appinfo=true&include_extended_appinfo=true`)
+  const res = await steamWebStdAPI.player.getOwnedGames({
+    steamid: BigInt(idParam ?? ""),
+    includeAppinfo: true,
+    includePlayedFreeGames: true,
+    includeFreeSub: true,
+    includeExtendedAppinfo: true,
+    language: 'schinese',
+  }, {
+    apiKey: apiKey,
+    method: 'GET'
+  })
+
+  // @ts-ignore
+  return handleSteamStdResponse(c, res)
+  // return fetch(`https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=${apiKey}&steamid=${idParam}&include_appinfo=true&include_extended_appinfo=true`)
 })
 
 
@@ -72,7 +89,6 @@ app.get('/api/steam/player/:ids',async (c)=>{
   ids = [user].concat(ids)
   let steamids = ids.map(it=> BigInt(it))
   const data = await steamWebStdAPI.player.getPlayerLinkDetails({steamids: steamids}, {accessToken: token.token})
-  const converted = data
   // .accounts
   //   .map((account=>({
   //   ...account,
@@ -81,7 +97,8 @@ app.get('/api/steam/player/:ids',async (c)=>{
   //     shaDigestAvatar: shaDigestAvatarToStrAvatarHash(account.publicData?.shaDigestAvatar!)
   //   }
   // })))
-  return c.json(converted)
+  // @ts-ignore
+  return handleSteamStdResponse(c, data)
 })
 
 

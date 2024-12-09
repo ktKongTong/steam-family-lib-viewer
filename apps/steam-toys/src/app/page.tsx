@@ -22,7 +22,8 @@ export default function Home() {
     steamFamilyInfo,
     sharedPlaytime,
     allLibs,
-    allMembers
+    allMembers,
+    loading,
   } = useSteamFamilyLibInfo(token?.accessToken ?? "", token?.steamId ?? "")
 
   const [ok, setOK] = useState(!!token)
@@ -32,14 +33,7 @@ export default function Home() {
     if (token) {
       setOK(false)
       fetch()
-      .then(() => {
-        setOK(true)
-      }).catch(() => {
-        toast({
-          title: "获取失败",
-          description: "请检查你的Token是否正确"
-        })
-      })
+      .finally(() => setOK(true))
     } else {
       toast({
         title: "获取失败",
@@ -54,7 +48,7 @@ export default function Home() {
       <div className={"flex flex-col w-full min-w-full md:min-w-96 px-4 md:px-20"}>
           <Steps steps={steps}/>
           <Button variant={'ghost'} className={"ml-auto mr-2 w-fit my-4"}
-                  disabled={!ok}
+                  disabled={!ok && loading}
                   onClick={onSubmit}
           >
             开始
@@ -62,8 +56,13 @@ export default function Home() {
       </div>
         {
           canDisplay &&
-            <DataGraph libs={allLibs} players={allMembers} libsPlaytime={sharedPlaytime!} family={steamFamilyInfo!}
-                       allDataLoaded={dataLoaded}/>
+            <DataGraph
+                libs={allLibs}
+                players={allMembers}
+                libsPlaytime={sharedPlaytime}
+                family={steamFamilyInfo!}
+                allDataLoaded={dataLoaded}
+            />
         }
     </section>
   );

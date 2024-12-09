@@ -12,18 +12,3 @@ interface SteamLibDetailAction {
   addAppDetail(apps: any[]): void
 }
 
-export const useSteamLibDetailStore = () => {
-
-
-
-
-}
-
-
-export const useSteamLibDetail = (appid: string) => {
-
-  // if appId exist
-  // el
-  return null
-}
-

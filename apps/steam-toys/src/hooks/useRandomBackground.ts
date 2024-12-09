@@ -9,29 +9,18 @@ async function getRandomBackground(){
 }
 
 export const useRandomBackground = () => {
-  const {mutateAsync, ...rest} = useMutation({
-    mutationKey: ["randomBackground"],
-    mutationFn: ()=> {
-      return getRandomBackground()
-    }
-  })
-  const [background, setBackground] = useState(`https://www.loliapi.com/acg/pe`)
-
   const queryClient = useQueryClient()
+  const {data, isLoading, error, status} = useQuery({
+    queryKey: ["randomBackground"],
+    queryFn: ()=> { return getRandomBackground() },
+    initialData: `https://www.loliapi.com/acg/pe`,
+  })
   const switchOne = ()=> {
-    mutateAsync()
-      .then(result => {
-        result && setBackground(result)
-      }).catch(error => {})
+    queryClient.invalidateQueries({queryKey: ["randomBackground"]})
   }
 
-  useEffect(()=>{
-    switchOne()
-  }, [])
-
   return {
-    // ...rest,
-    background,
+    background: data,
     switchOne
   }
 }

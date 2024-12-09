@@ -1,5 +1,6 @@
 import {useQuery} from "@tanstack/react-query";
 import {
+  InferRespType,
   SteamStdResponseType
 } from "@repo/steam-proto";
 import {AuthBasicInfo} from "@/hooks/auth/interface";
@@ -12,20 +13,15 @@ export const useAuthViaQRQuery = () => {
     // beginAuthViaQR
     queryKey: ['getQR'],
     queryFn: async () => {
-      const qrData = await f.get<SteamStdResponseType<'Authentication', 'BeginAuthSessionViaQR'>>(`/api/steam/auth/qr`)
-      // const qrData = await fetch(`/api/steam/auth/qr`)
-      //   .then(res=>res.json() as Promise<ProxiedAPIResponse<CAuthentication_BeginAuthSessionViaQR_Response>>)
-      // const basicInfo  = await fetch(`/api/steam/auth/basic`)
-      //   .then(res=>res.json())
+      const qrData = await f.get<InferRespType<'Authentication', 'BeginAuthSessionViaQR'>>(`/api/steam/auth/qr`)
       return {
         qrInfo: {
-          clientId: qrData.data?.clientId,
-          requestId: qrData.data?.requestId,
-          challengeUrl: qrData.data?.challengeUrl,
+          clientId: qrData?.clientId,
+          requestId: qrData?.requestId,
+          challengeUrl: qrData?.challengeUrl,
         },
         sessionInfo: {
           sessionId: randomBytes(12).toString('hex'),
-          // ak_bmsc: randomBytes(12).toString('hex'),
         },
       } as unknown as AuthBasicInfo
     }

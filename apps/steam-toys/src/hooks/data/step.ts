@@ -58,13 +58,11 @@ export class Step {
   }
   retryable: boolean = true
   failed(message: string, retryable = true) {
-    // console.log(`setting failed status ${this.title}`)
     this.retryable = retryable
     this.status = StepStatus.Error
     this.message = message
   }
   success(message: string) {
-    // console.log(`setting success status ${this.title}`)
     this.status = StepStatus.OK
     this.message = message
   }
@@ -123,18 +121,4 @@ export class WrappedStep extends Step {
 
 export class SharedLibraryStep extends WrappedStep {
 
-}
-
-
-export const statusToEmoji = (status:StepStatus)=> {
-  if(status === StepStatus.OK) {
-    return `✅`
-  }
-  if(status === StepStatus.Processing) {
-    return `🚧`
-  }
-  if(status === StepStatus.Error) {
-    return `❌`
-  }
-  return `☑️`
 }

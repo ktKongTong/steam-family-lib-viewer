@@ -181,7 +181,7 @@ export default function Game({
           <div className={'mt-auto ml-auto flex flex-col group '}>
             {
               game.owners.map((it, index) =>
-                <Link key={index} href={`https://steamcommunity.com/profile/${it.steamid}`} target={'_blank'}>
+                <Link key={index} href={`https://steamcommunity.com/profiles/${it.steamid}`} target={'_blank'}>
 
                   <Avatar
                           className={cn('h-6 w-6 border-[2px] border-zinc-700', '-mt-[10px] group-hover:mb-[10px]  transition-all ease-in-out')}>

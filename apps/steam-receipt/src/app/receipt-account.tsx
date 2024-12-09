@@ -79,6 +79,7 @@ export const AccountReceipt = ({playerStats, ref}:ReceiptV2Props & {
   const csFriendCode = createCSFriendCodeFromSteamId(id.getSteamID64())
   const friendCode = createFriendCodeFromSteamId(data.id)
   const {t, locale} = useTrans({ prefix: 'receipt' })
+  // @ts-ignore
   return <div ref={ref} className="receipt-content w-full max-w-[144mm] bg-white text-black">
     <div className="p-4 pb-3 sm:p-6 font-mono text-[11px] sm:text-xs leading-relaxed">
       <div className="text-center mb-6">

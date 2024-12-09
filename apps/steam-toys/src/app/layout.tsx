@@ -7,6 +7,7 @@ import {Toaster} from "@/components/ui/toaster";
 import QueryProvider from "@/components/providers/QueryClient";
 import Header from "@/app/header";
 import React from "react";
+import {LocaleProvider} from "@/components/providers/i18n";
 
 
 
@@ -22,6 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <QueryProvider>
+      <LocaleProvider>
       <html lang="en">
       <head>
         <script defer src="https://us.umami.is/script.js" data-website-id="950a9fe2-f18d-48f8-8c6c-1504c0f8aa0a"></script>
@@ -34,6 +36,7 @@ export default function RootLayout({
       </body>
       <Toaster/>
       </html>
+      </LocaleProvider>
     </QueryProvider>
 
   )

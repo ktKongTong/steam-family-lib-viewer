@@ -136,6 +136,9 @@ importers:
       '@dnd-kit/utilities':
         specifier: ^3.2.2
         version: 3.2.2(react@18.2.0)
+      '@ktfun/sts-i18n-react':
+        specifier: 0.2.0
+        version: 0.2.0(@types/react@18.2.73)(react@18.2.0)
       '@radix-ui/react-avatar':
         specifier: ^1.0.4
         version: 1.0.4(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1155,8 +1158,20 @@ packages:
       '@types/react':
         optional: true
 
+  '@ktfun/sts-i18n-react@0.2.0':
+    resolution: {integrity: sha512-t6fCMEsTb5TlTxdp4/S5XfcwVTTVnXoicAevq7IX1lPC2eIfE95kd0U+h6K+R9JNZvf17Tp4fxIXuGOk7bcctQ==}
+    peerDependencies:
+      '@types/react': ^18
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
   '@ktfun/sts-i18n@0.1.2':
     resolution: {integrity: sha512-X2FU52WaFV4Q2nyLvraUJdjGQI0BaQiOELtVpR2jNGIjO28SyqtNsXq2gEH9fqGuv0wnj7EjATpGjTckPeB22w==}
+
+  '@ktfun/sts-i18n@0.2.0':
+    resolution: {integrity: sha512-4OYqeUHQu21i62xyIelleArulfIuxJexbUF4JD/4sCJF2G9+LckmXMFhr1u3Yt65btP3fEL0loqkkN1v+8zoSg==}
 
   '@neondatabase/serverless@0.7.2':
     resolution: {integrity: sha512-wU3WA2uTyNO7wjPs3Mg0G01jztAxUxzd9/mskMmtPwPTjf7JKWi9AW5/puOGXLxmZ9PVgRFeBVRVYq5nBPhsCg==}
@@ -5272,7 +5287,16 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.2.73
 
+  '@ktfun/sts-i18n-react@0.2.0(@types/react@18.2.73)(react@18.2.0)':
+    dependencies:
+      '@ktfun/sts-i18n': 0.2.0
+      react: 18.2.0
+    optionalDependencies:
+      '@types/react': 18.2.73
+
   '@ktfun/sts-i18n@0.1.2': {}
+
+  '@ktfun/sts-i18n@0.2.0': {}
 
   '@neondatabase/serverless@0.7.2':
     dependencies:

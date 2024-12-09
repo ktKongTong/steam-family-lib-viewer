@@ -29,7 +29,7 @@ export function useQRAuth() {
     }
   }, [authBasicInfo]);
 
-  const {mutateAsync, verified} = useGetUserInfoMutation()
+  const { mutateAsync } = useGetUserInfoMutation()
 
   const tokenStore = useTokenStore()
   useEffect(() => {

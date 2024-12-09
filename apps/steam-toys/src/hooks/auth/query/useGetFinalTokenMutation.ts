@@ -3,6 +3,8 @@ import {AuthType, SteamToken} from "@/hooks/auth/interface";
 import {useMutation} from "@tanstack/react-query";
 import {shaDigestAvatarBase64ToStrAvatarHash} from "@repo/shared";
 import {getRandomId} from "@/lib/utils";
+import { f } from "@/lib/omfetch";
+import {InferRespType} from "@repo/steam-proto";
 
 interface FinalTokenParam {
   nonce: string,
@@ -12,41 +14,23 @@ interface FinalTokenParam {
 }
 
 export const useGetUserInfoMutation = () => {
-  const [verified, setVerified] = useState<boolean>(false)
-  const [token, setToken] = useState<SteamToken| null>(null)
-  const [err, setErr] = useState<Error | null>(null)
   const { mutateAsync } = useMutation({
     mutationFn: async (token: Partial<SteamToken>) => {
-      const res = await fetch(`/api/steam/player/${token.steamId}?access_token=${token.accessToken}`)
-        .then(res => res.json())
-      const data = res.data.accounts[0].publicData
-      const hash = shaDigestAvatarBase64ToStrAvatarHash(data.shaDigestAvatar)
+      const res = await f.get<InferRespType<'Player', 'GetPlayerLinkDetails'>>(`/api/steam/player/${token.steamId}?access_token=${token.accessToken}`)
+      const data = res.accounts[0].publicData!
+      const hash = shaDigestAvatarBase64ToStrAvatarHash(data.shaDigestAvatar as any as string)
       return {
         ...token,
         username: data.personaName,
         avatarUrl: `https://avatars.akamai.steamstatic.com/${hash}_full.jpg`,
-        accountName: res.data.accounts[0].privateData!.accountName!,
-        other: {
-
-        }
+        accountName: res.accounts[0].privateData!.accountName!,
+        other: {}
       } as SteamToken
     },
-    onSuccess: res => {
-      setVerified(true)
-      setToken(res)
-    },
-    onError: err => {
-      setVerified(false)
-    }
   })
-
   return {
     mutateAsync,
-    verified,
-    token,
-    err
   }
-
 }
 
 

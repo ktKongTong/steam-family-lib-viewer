@@ -1,6 +1,5 @@
 import type {
-  CFamilyGroups_PlaytimeEntry,
-  SteamStdResponseType
+  CFamilyGroups_PlaytimeEntry, InferRespType,
 } from "@repo/steam-proto";
 import { f } from '@/lib/omfetch'
 import _ from "lodash";
@@ -18,7 +17,7 @@ export const revalidate = 3600
 
 let host = process.env.BASE_URL as string
 async function fetchFamilyInfo(token:string) {
-  return await f.get<SteamStdResponseType<'FamilyGroups', 'GetFamilyGroupForUser'>>(`${host}/api/steam/family?access_token=${token}`)
+  return await f.get<InferRespType<'FamilyGroups', 'GetFamilyGroupForUser'>>(`${host}/api/steam/family?access_token=${token}`)
     .catch(e=> {
       logger.log(e)
       return null
@@ -26,16 +25,16 @@ async function fetchFamilyInfo(token:string) {
 }
 async function fetchFamilyPlayTime(token:string,id:string) {
   let url = `${host}/api/steam/family/playtime/${id}?access_token=${token}`
-  const data = await f.get<SteamStdResponseType<'FamilyGroups', 'GetPlaytimeSummary'>>(url)
+  const data = await f.get<InferRespType<'FamilyGroups', 'GetPlaytimeSummary'>>(url)
     .catch(e=> {
       logger.log(e)
       return null
     })
-  const appids:number[] = data?.data!.entries!.flatMap((it)=>it.appid!)!
-  const appidsByOwner = data?.data!.entriesByOwner!.flatMap((it) => it.appid!)!
+  const appids:number[] = data?.entries!.flatMap((it)=>it.appid!)!
+  const appidsByOwner = data?.entriesByOwner!.flatMap((it) => it.appid!)!
   const allIds = _.uniq(appids.concat(appidsByOwner))
-  const appPlaytimeDict = _.groupBy(data?.data!.entries,'appid')
-  const appPlaytimeByOwnerDict = _.groupBy(data?.data!.entriesByOwner, 'appid')
+  const appPlaytimeDict = _.groupBy(data?.entries,'appid')
+  const appPlaytimeByOwnerDict = _.groupBy(data?.entriesByOwner, 'appid')
   return allIds.map(id=> {
     let res:any[] = []
     let owners = appPlaytimeByOwnerDict[id]
@@ -63,7 +62,7 @@ async function fetchFamilyMembers(token:string,ids:string[]){
 }
 
 async function fetchFamilySharedLibs(token:string,id:string){
-  const data = await f.get<SteamStdResponseType<'FamilyGroups', 'GetSharedLibraryApps'>>(`${host}/api/steam/family/shared/${id}?access_token=${token}`)
+  const data = await f.get<InferRespType<'FamilyGroups', 'GetSharedLibraryApps'>>(`${host}/api/steam/family/shared/${id}?access_token=${token}`)
     .catch(e=> {
       logger.log(e)
       return null
@@ -72,7 +71,7 @@ async function fetchFamilySharedLibs(token:string,id:string){
 }
 
 async function fetchFamilyLibItems(ids:string[]){
-  const data = await f.get<SteamStdResponseType<'StoreBrowse', 'GetItems'>>(`${host}/api/steam/items/${ids.join(',')}`)
+  const data = await f.get<InferRespType<'StoreBrowse', 'GetItems'>>(`${host}/api/steam/items/${ids.join(',')}`)
     .catch(e=> {
       logger.log(e)
       return null
@@ -98,11 +97,11 @@ async function getRandomBackground(){
 async function prepareData(accessToken:string) {
   const bg = getRandomBackground()
   const familyInfo = await fetchFamilyInfo(accessToken)
-  let familyData = familyInfo?.data?.familyGroup!
+  let familyData = familyInfo?.familyGroup!
   const memberIds = familyData.members!.map((member: any)=>member.steamid!.toString())
   const memberFamilyInfos = _.keyBy(familyData.members, 'steamid')
 
-  let familyGroupId = familyInfo?.data?.familyGroupid
+  let familyGroupId = familyInfo?.familyGroupid
 
   const [libsPlaytimeSummary,libOverviewInfos,memberInfos] = await Promise.all([
     fetchFamilyPlayTime(accessToken, familyGroupId!.toString()),
@@ -120,7 +119,7 @@ async function prepareData(accessToken:string) {
     }
   })
   const memberDict = _.keyBy(members, 'steamid')
-  const libs = libOverviewInfos!.data!.apps!
+  const libs = libOverviewInfos!.apps!
     .filter( (app) => app.excludeReason == undefined || app.excludeReason == 0)
 
 
@@ -131,9 +130,9 @@ async function prepareData(accessToken:string) {
   }))
   const items = res
     .filter((it,index) => {
-      return !(!it || it.data!.storeItems!.length == 0);
+      return !(!it || it!.storeItems!.length == 0);
     })
-    .map(resp=>resp!.data!.storeItems).flatMap(it=>it)
+    .map(resp=>resp!.storeItems).flatMap(it=>it)
   const libDictionary = _.keyBy(items, 'id')
   const allLib = libs.map((lib:any)=> ({
     ...lib,

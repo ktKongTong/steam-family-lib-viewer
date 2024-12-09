@@ -7,10 +7,17 @@ export class BizError extends Error {
 }
 
 
-export class TokenInvalidError extends BizError {
+export class InvalidTokenError extends BizError {
   code?: number
   constructor(message: string, code?: number) {
     super(message)
     this.code = code
+  }
+}
+
+
+export class InvalidSteamIDError extends BizError {
+  constructor(message: string) {
+    super(message)
   }
 }

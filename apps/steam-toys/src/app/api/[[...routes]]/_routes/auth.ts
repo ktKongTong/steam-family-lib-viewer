@@ -4,6 +4,7 @@ import {ua} from "@/lib/ua";
 import {f} from "@/lib/omfetch";
 import {getAccessToken} from "@/app/api/[[...routes]]/_middlewares/query-extractor";
 import { handlerAccessToken } from "@repo/shared";
+import {handleSteamStdResponse} from "@/app/api/[[...routes]]/handle-steam-std-response";
 const proxyHost = process.env.STEAM_TOKEN_PROXY_HOST as string;
 
 const app = new Hono()
@@ -20,7 +21,8 @@ app.get('/api/steam/auth/qr', async (c)=>{
       platformType: 2,
     }
   })
-  return c.json(data)
+  // @ts-ignore
+  return handleSteamStdResponse(c, data)
 })
 
 app.get('/api/steam/auth/poll', async (c)=>{
@@ -31,7 +33,8 @@ app.get('/api/steam/auth/poll', async (c)=>{
     clientId: BigInt(client_id!),
     requestId: new Uint8Array(buf)
   })
-  return c.json(data)
+  // @ts-ignore
+  return handleSteamStdResponse(c, data)
 })
 
 const ajaxRefreshRawRequest = () => f.post("https://login.steampowered.com/jwt/ajaxrefresh", {
@@ -207,9 +210,9 @@ app.get('/api/steam/auth/generateAccessToken', async (c)=>{
       steamid: BigInt(id),
       renewalType: renewalType
   })
-  return c.json({
-    ...res
-  })
+
+  // @ts-ignore
+  return handleSteamStdResponse(c, res)
 })
 
 
@@ -217,7 +220,9 @@ app.get('/api/steam/account/private-app', async (c) => {
   const token = getAccessToken(c, true)
   const res = await steamWebStdAPI.accountPrivate
     .getPrivateAppList({}, {accessToken: token.token})
-  return c.json(res)
+
+  // @ts-ignore
+  return handleSteamStdResponse(c, res)
 })
 
 const steamAuthRoute = app

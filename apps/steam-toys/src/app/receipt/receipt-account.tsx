@@ -1,51 +1,48 @@
-import {PlayerStatsData, PlayerCommunityData} from "@/interface/playerStatsData";
-import React, {forwardRef} from "react";
+import React, {forwardRef, useEffect} from "react";
 import {
   createFriendCodeFromSteamId,
   createCSFriendCodeFromSteamId
 } from "@repo/shared";
 import SteamID from "steamid";
 import QRCode from "react-qr-code";
-import {PlayerSummary} from "@/hooks/data/query/useSteamPlayerSummaries";
-import {useTrans} from "@/app/receipt/_i18n";
-import {useLocale} from "@/app/receipt/use-locale-ctx";
+import {PlayerCommunityData, PlayerStats} from "@/app/receipt/interface";
+import {useToast} from "@/components/ui/use-toast";
+import {useTrans} from "@/components/providers/i18n";
 
 interface ReceiptV2Props {
-  playerStats: PlayerStatsData
-  communityStats: PlayerCommunityData
-  playerSummary: PlayerSummary
+  playerStats: PlayerStats
 }
-const useComputedPlayerStats = (playerStats: PlayerStatsData) => {
-  // scores
+const useNewComputedPlayerStats = (playerStats: PlayerStats) => {
+  const now = Math.floor(Date.now()/1000)
+  const isPrivate = playerStats.player.accounts[0].publicData?.visibilityState !== 3
   const res = {
-    id: playerStats.strSteamId,
-    name: playerStats.strProfileName,
-    totalGameCount: playerStats.rgGames.length,
-    playedGameCount: playerStats.rgGames.filter(it => it.playtime_forever > 0).length,
-    unlockedAchievements: playerStats.achievement_progress
-      .reduce((acc,cur) => acc + cur.unlocked, 0),
-    totalAchievements: playerStats.achievement_progress
-      .reduce((acc,cur) => acc + cur.total, 0),
-    fullAchievementGameCount: playerStats.achievement_progress
-      .reduce((acc,cur) => acc + cur.all_unlocked, 0),
-    fullAchievementGameAchievementCount: playerStats.achievement_progress
-      .reduce((acc,cur) => acc + (cur.all_unlocked ? cur.total : 0), 0),
-    totalPlaytimeInMinutes: playerStats.rgGames.reduce((acc, game) => acc + game.playtime_forever, 0),
-    recentPlaytimeInMinutes: playerStats.rgRecentlyPlayedGames
-      .reduce((acc, cur) => acc + cur.playtime_2weeks, 0),
-    recentPlayedGames: playerStats.rgRecentlyPlayedGames
-      .filter(it=>it.playtime_2weeks > 0).length,
-    top10Games: playerStats.rgGames
-      .toSorted((a,b) => b.playtime_forever - a.playtime_forever)
-      .slice(0, 10),
-    reviews: playerStats.nUserReviewCount,
+    isPrivate,
+    age: (now - (playerStats.player.accounts[0].privateData!.timeCreated ?? now)) / 60/60/24/365,
+    id: playerStats.player.accounts[0].publicData!.steamid!.toString(),
+    name: playerStats.player.accounts[0].publicData!.personaName!,
+    totalGameCount: playerStats.games.gameCount ?? 0,
+    playedGameCount: playerStats.games.games.filter(it => it.playtimeForever! > 0).length,
+    unlockedAchievements: playerStats.achievementProgress
+      .reduce((acc,cur) => acc +(cur.unlocked ?? 0), 0),
+    totalAchievements: playerStats.achievementProgress
+      .reduce((acc,cur) => acc + (cur.total ?? 0), 0),
+    fullAchievementGameCount: playerStats.achievementProgress
+      .reduce((acc,cur) => acc + (cur.allUnlocked ? 1 : 0), 0),
+    fullAchievementGameAchievementCount: playerStats.achievementProgress
+      .reduce((acc,cur) => acc + (cur.allUnlocked ? cur.total ?? 0 : 0), 0),
+    totalPlaytimeInMinutes: playerStats.games.games.reduce((acc, game) => acc + game.playtimeForever!, 0),
+    recentPlaytimeInMinutes: playerStats.games.games
+      .reduce((acc, cur) => acc + (cur?.playtime2weeks ?? 0), 0),
+    recentPlayedGames: playerStats.games.games
+      .filter(it=>(it.playtime2weeks ?? 0) > 0).length,
+    top10Games: playerStats.games.games
+      .toSorted((a,b) => b.playtimeForever! - a.playtimeForever!)
+      .slice(0, 10)
   }
-  return  {
-    ...res,
-  }
+  return res
 }
 
-const calculateSteamScore = (data: ReturnType<typeof useComputedPlayerStats>, communityStats: PlayerCommunityData) => {
+const calculateSteamScore = (data: ReturnType<typeof useNewComputedPlayerStats>, communityStats: PlayerCommunityData) => {
   const steamScore =
     (data.recentPlaytimeInMinutes/60) * 2 + (data.totalPlaytimeInMinutes/60) + data.totalGameCount
     // community
@@ -57,22 +54,33 @@ const calculateSteamScore = (data: ReturnType<typeof useComputedPlayerStats>, co
   return steamScore
 }
 
-export const AccountReceipt = forwardRef<HTMLDivElement, ReceiptV2Props>(({playerStats, communityStats, playerSummary}, ref) => {
-  const data = useComputedPlayerStats(playerStats)
+export const AccountReceipt = forwardRef<HTMLDivElement, ReceiptV2Props>(({playerStats}, ref) => {
+  const data = useNewComputedPlayerStats(playerStats)
+  const communityStats = playerStats.community
   const id = new SteamID(data.id)
-  const age = (new Date().getTime()/1000 - (playerSummary?.timecreated ?? 0))/ 60/60/24/365
+  const toast = useToast()
+
+  useEffect(()=> {
+    if(data.isPrivate) {
+      toast.toast({
+        title: 'his/her profile is private 🥲',
+        variant: 'destructive'
+      })
+    }
+  }, [data.isPrivate])
+
+  const age = data.age
   const community = communityStats
   const steamScore = calculateSteamScore(data, community)
   const csFriendCode = createCSFriendCodeFromSteamId(id.getSteamID64())
   const friendCode = createFriendCodeFromSteamId(data.id)
-  const curLocale = useLocale()
-  const {t, locale} = useTrans({locale: curLocale, prefix: 'receipt'})
+  const {t, locale} = useTrans({ prefix: 'receipt' })
 
   return <div ref={ref} className="receipt-content w-full max-w-[144mm] bg-white text-black">
     <div className="p-4 pb-3 sm:p-6 font-mono text-[11px] sm:text-xs leading-relaxed">
       <div className="text-center mb-6">
         <h2 className="text-base sm:text-lg font-bold">STEAM RECEIPT</h2>
-        <p>{new Date().toLocaleDateString(locale, {
+        <p>{new Date().toLocaleDateString(locale(), {
           weekday: 'long',
           month: 'long',
           day: 'numeric',
@@ -126,7 +134,7 @@ export const AccountReceipt = forwardRef<HTMLDivElement, ReceiptV2Props>(({playe
           data.top10Games.map(game => {
             return <div key={game.appid} className={'flex justify-between items-center'}>
               <p>{game.name}</p>
-              <p className={'w-[100px] text-right'}>{(game.playtime_forever / 60).toFixed(1)} H</p>
+              <p className={'w-[100px] text-right'}>{(game.playtimeForever! / 60).toFixed(1)} H</p>
             </div>
           })
         }</div>
@@ -136,7 +144,7 @@ export const AccountReceipt = forwardRef<HTMLDivElement, ReceiptV2Props>(({playe
         <p className={'font-bold text-md'}>{t('community')}</p>
         <div className="flex justify-between">
           <span>{t('community-review')}</span>
-          <span>{data.reviews}</span>
+          <span>{community.reviews}</span>
         </div>
         <div className="flex justify-between">
           <span>{t('community-guide')}</span>

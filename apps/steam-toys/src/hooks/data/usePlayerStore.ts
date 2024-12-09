@@ -1,10 +1,11 @@
-import {PlayerSummary, useSteamPlayerSummaries} from "@/hooks/data/query/useSteamPlayerSummaries";
-import {LibItem, OwnedGameResponse, usePlayerOwnedGames} from "@/hooks/data/query/useSteamPulicLib";
+import { PlayerSummary } from "@/hooks/data/query/interface";
 import {create} from "zustand";
 import {createJSONStorage, persist} from "zustand/middleware";
 import {useAPIKey} from "@/hooks/data/useAPIKeyStore";
 import {useToast} from "@/components/ui/use-toast";
 import SteamID from "steamid";
+import {APIService, LibItem} from "@/hooks/data/query/api";
+import {useMutate} from "@/hooks/data/query/use-mutate";
 
 export interface PlayerInfo {
   steamID: string,
@@ -55,15 +56,10 @@ export const usePlayerStore = create<PlayerStore & PlayerStoreAction>()(
 
 
 export const usePlayer =()=> {
-
-  const { fetchPlayerSummaries } = useSteamPlayerSummaries()
-
-  const { mutateAsync } = usePlayerOwnedGames()
-
+  const {mutateAsync: fetchPlayerSummaryAsync } = useMutate(APIService.getPlayerSummary)
+  const { mutateAsync } = useMutate(APIService.getOwnedGames)
   const {apiKey} = useAPIKey()
-
   const { toast } = useToast()
-
   const addPlayerToStore = usePlayerStore(state => state.addPlayer)
   const removePlayerById = usePlayerStore(state => state.removePlayerById)
   const players = usePlayerStore(state => state.players)
@@ -82,9 +78,9 @@ export const usePlayer =()=> {
       return
     }
     const id = steamId.getSteamID64()
-    const [ playerLibs, playerSummaries]= await Promise.all([
+    const [ playerLibs, playerSummary]= await Promise.all([
       mutateAsync({ apikey:apiKey!!, steamid:id }),
-      fetchPlayerSummaries([id])
+      fetchPlayerSummaryAsync({steamid: id})
     ]).catch(e => {
       toast({
         title: "Error",
@@ -96,10 +92,10 @@ export const usePlayer =()=> {
 
     addPlayerToStore({
       steamID: id,
-      summary: playerSummaries.players![0],
+      summary: playerSummary!,
       summaryRefreshedAt: Date.now(),
       gamesRefreshedAt: Date.now(),
-      ownedGames: playerLibs.games ?? [],
+      ownedGames: (playerLibs.games as any) ?? [],
       openLib: playerLibs.games !== undefined
     })
 }

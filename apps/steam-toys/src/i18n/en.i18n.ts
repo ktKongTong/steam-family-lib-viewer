@@ -1,6 +1,6 @@
-import {i18nRecord} from "./interface";
+import {Tran} from "@ktfun/sts-i18n-react";
 
-const en: i18nRecord = {
+const en = {
   receipt: {
     'order': 'ORDER',
     'customer': 'CUSTOMER',
@@ -36,9 +36,9 @@ const en: i18nRecord = {
     'info': {
       'inspired-by':'inspired by ankit',
       'made-by':'made with ❤️ by ktkongtong',
-      'powered-by':' powered by sflv.ktlab.io'
+      'powered-by': 'powered by sflv.ktlab.io'
     }
-  }
-}
+  },
+} satisfies Tran
 
 export default en

@@ -1,11 +1,11 @@
-import {i18nRecord} from "./interface";
+import { EnTransSchema } from "./index";
 
 const availableThankTips = [
   '感谢游玩，Gaben 爱你呦 😘！',
   '感谢游玩，Ciallo～(∠・ω< )⌒☆！',
 ]
 
-const zh: i18nRecord = {
+const zh:EnTransSchema = {
   receipt: {
     'order': '订单编号',
     'customer': '消费者',

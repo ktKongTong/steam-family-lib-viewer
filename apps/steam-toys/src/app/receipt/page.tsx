@@ -1,33 +1,27 @@
 'use client'
 import React, { useState, useRef } from 'react'
 import { toPng } from 'html-to-image'
-import {useToast} from "@/components/ui/use-toast";
 import {useTokenStore} from "@/hooks/auth/store/useTokenStore";
-
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {usePlayerCommunityStats, usePlayerStats} from "@/hooks/data/query/usePlayerStats";
-import {ReceiptV1} from "@/app/receipt/receipt-v1";
 import {AccountReceipt} from "@/app/receipt/receipt-account";
-import {useSteamPlayerSummaries} from "@/hooks/data/query/useSteamPlayerSummaries";
-import {Ellipsis, Info} from "lucide-react";
+import { Info } from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
-import {AvailableLocales, LocaleProvider} from "@/app/receipt/use-locale-ctx";
 import Link from "next/link";
+import {useMutate} from "@/hooks/data/query/use-mutate";
+import {APIService} from "@/hooks/data/query/api";
+import {I18nSelector} from "@/app/receipt/i18n-selector";
 
 
 
 
 export default function Home() {
   const token = useTokenStore(state => state.currentToken)
-  const [steamid, setSteamid] = useState(token?.steamId ?? '');
-  const [loading, setLoading] = useState(false);
-  const {fetchPlayerStats, playerStats, error, reset} = usePlayerStats(token?.accessToken ?? "")
 
-  const {fetchPlayerCommunityStats, playerCommunityStats, error:communityError, reset:resetCommunity} = usePlayerCommunityStats()
-  const {fetchPlayerSummaries, steamPlayers } = useSteamPlayerSummaries()
+  const [steamid, setSteamid] = useState(token?.steamId ?? '');
+
+  const { mutateAsync:fetchPlayerStatsAsync, mutate: fetchPlayerStats,error, data: playerStats,reset, isPending } = useMutate(APIService.getPlayerStats)
+  const loading = isPending
+
   const receiptRef = useRef<HTMLDivElement>(null);
-  const {toast} = useToast()
-  const playerSummary = steamPlayers?.[0]
   const handleDownload = async () => {
     if (receiptRef.current) {
       const dataUrl = await toPng(receiptRef.current, { quality: 0.95 });
@@ -60,53 +54,12 @@ export default function Home() {
     }
   };
 
-  const [type, setType] = useState('account-v1')
-  const [locale, setLocale] = useState<AvailableLocales>('en-US')
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     reset()
-    setLoading(true)
-    if(type === 'account-v0') {
-      fetchPlayerStats(steamid)
-        .then(()=>{setLoading(false)})
-        .catch(error => {
-          toast({
-            title: 'Error',
-            description: 'Failed to fetch player data',
-            variant: 'destructive'
-          })
-          setLoading(false)
-        })
-    }else {
-      Promise.all([
-        fetchPlayerStats(steamid),
-        fetchPlayerSummaries([steamid]),
-        fetchPlayerCommunityStats(steamid)
-      ])
-    .then(()=>{
-      if(error || communityError) {
-        toast({
-          title: 'Error',
-          description: `Failed to fetch player data ${error ?? communityError}`,
-          variant: 'destructive'
-        })
-      }
-      setLoading(false)
-    })
-      .catch(error => {
-        toast({
-          title: 'Error',
-          description: 'Failed to fetch player data',
-          variant: 'destructive'
-        })
-        setLoading(false)
-      })
-    }
-
+    fetchPlayerStats({accessToken: token?.accessToken ?? "", id: steamid})
   }
   return (
-    <LocaleProvider value={locale}>
       <main className="min-h-[calc(screen-64px)] mx-auto px-4 py-8 sm:py-16">
 
         <div className="text-center mb-8">
@@ -134,24 +87,7 @@ export default function Home() {
         </div>
         <form onSubmit={handleSubmit} className="mb-12 flex items-center flex-col sm:flex-row gap-2">
           <div className={'flex items-center gap-2'}>
-            <Select defaultValue={'account-v1'} onValueChange={setType} value={type}>
-              <SelectTrigger className="w-[110px]">
-                <SelectValue/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="account-v1">overview</SelectItem>
-                <SelectItem value="account-v0">overview(v0)</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select defaultValue={'en-US'} onValueChange={(v) => {setLocale(v as any)}} value={locale}>
-              <SelectTrigger className="w-[110px]">
-                <SelectValue/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="zh-CN">中文</SelectItem>
-                <SelectItem value="en-US">English</SelectItem>
-              </SelectContent>
-            </Select>
+            <I18nSelector/>
           </div>
           <div className="flex gap-2 max-w-md mx-auto">
             <input
@@ -186,23 +122,14 @@ export default function Home() {
           </div>
         )}
         {
-          playerStats && playerCommunityStats && (
+          playerStats && (
             <div className="flex flex-col items-center">
               <div className="receipt-container">
               <div className="coffee-stain"/>
-
-                {
-                  type === 'account-v0' && <ReceiptV1 data={playerStats}  ref={receiptRef}/>
-                }
-                {
-                  type === 'account-v1' &&
-                    <AccountReceipt
-                        ref={receiptRef}
-                        playerStats={playerStats}
-                        communityStats={playerCommunityStats}
-                        playerSummary={playerSummary}/>
-                }
-
+                <AccountReceipt
+                  ref={receiptRef}
+                  playerStats={playerStats}
+                />
               </div>
 
               <div className="mt-6 flex gap-4">
@@ -237,6 +164,5 @@ export default function Home() {
           )
         }
       </main>
-    </LocaleProvider>
   );
 }

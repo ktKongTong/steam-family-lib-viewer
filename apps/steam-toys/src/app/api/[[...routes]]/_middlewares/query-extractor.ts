@@ -1,7 +1,7 @@
 import { createMiddleware } from 'hono/factory'
 import {Context} from "hono";
 import { handlerAccessToken, type ReturnTypeOfHandlerSteamJWTToken } from "@repo/shared";
-import {TokenInvalidError} from "@/app/api/[[...routes]]/errors";
+import { InvalidTokenError } from "@/app/api/[[...routes]]/errors";
 
 
 declare module 'hono' {
@@ -20,14 +20,14 @@ export const getAccessToken = <T extends boolean = false>(c: Context, mustValid?
     return t
   }
   if (t?.expired) {
-    throw new TokenInvalidError('Token Has Expired')
+    throw new InvalidTokenError('Token Has Expired')
   }
 
   if (!t?.steamid) {
-    throw new TokenInvalidError('Not a valid token, can\'t extract userinfo from token')
+    throw new InvalidTokenError('Not a valid token, can\'t extract userinfo from token')
   }
 
-  throw new TokenInvalidError('Invalid token')
+  throw new InvalidTokenError('Invalid token')
 
 }
 

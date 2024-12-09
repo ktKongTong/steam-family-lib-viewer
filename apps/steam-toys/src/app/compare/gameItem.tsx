@@ -1,4 +1,4 @@
-import {LibItem} from "@/hooks/data/query/useSteamPulicLib";
+import {LibItem} from "@/hooks/data/query/api";
 import React, {useMemo} from "react";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {cn} from "@/lib/utils";
@@ -12,7 +12,7 @@ export interface GameProps {
 
 export function GameItem({game, owners}: GameProps) {
   // ?t=${Date.now()}
-  const img = useMemo(() => `https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/${game.capsule_filename}`, [game.appid, game.capsule_filename])
+  const img = useMemo(() => `https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/${game.capsuleFilename}`, [game.appid, game.capsuleFilename])
   return (
     <div className={' max-w-40 relative aspect-[6/9] h-auto'}>
 

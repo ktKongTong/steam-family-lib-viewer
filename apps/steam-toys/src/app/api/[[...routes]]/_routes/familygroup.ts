@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { steamWebStdAPI } from "@repo/steam-proto";
 import {getAccessToken} from "@/app/api/[[...routes]]/_middlewares/query-extractor";
+import {handleSteamStdResponse} from "@/app/api/[[...routes]]/handle-steam-std-response";
 
 const app = new Hono()
 
@@ -14,7 +15,8 @@ app.get('/api/steam/family', async (c)=>{
     includeFamilyGroupResponse: true
   }, { accessToken: token.token })
 
-  return c.json(data)
+  // @ts-ignore
+  return handleSteamStdResponse(c, data)
 
 })
 
@@ -29,7 +31,8 @@ app.get('/api/steam/family/shared/:id', async (c)=> {
       language: 'schinese',
       includeNonGames: undefined
     }, { accessToken: token.token })
-  return c.json(data)
+  // @ts-ignore
+  return handleSteamStdResponse(c, data)
 })
 
 app.get('/api/steam/family/preferred/:familyId', async (c) => {
@@ -37,7 +40,8 @@ app.get('/api/steam/family/preferred/:familyId', async (c) => {
   const token = getAccessToken(c, true)
   const data = await steamWebStdAPI.familyGroup
     .getPreferredLenders({familyGroupid: BigInt(familyId),}, { accessToken: token.token })
-  return c.json(data)
+  // @ts-ignore
+  return handleSteamStdResponse(c, data)
 })
 
 app.get('/api/steam/family/playtime/:familyId', async (c) => {
@@ -45,7 +49,8 @@ app.get('/api/steam/family/playtime/:familyId', async (c) => {
   const token = getAccessToken(c, true)
   const data = await steamWebStdAPI.familyGroup
     .getPlaytimeSummary({ familyGroupid: BigInt(familyId) }, { accessToken: token.token })
-  return c.json(data)
+  // @ts-ignore
+  return handleSteamStdResponse(c, data)
 })
 
 
@@ -55,7 +60,8 @@ app.get('/api/steam/family/clear/:familyId', async (c) => {
   const token = getAccessToken(c, true)
   const data = await steamWebStdAPI.familyGroup
     .clearCooldownSkip({ steamid: BigInt(familyId) }, { accessToken: token.token })
-  return c.json(data)
+  // @ts-ignore
+  return handleSteamStdResponse(c, data)
 })
 
 
@@ -65,7 +71,8 @@ app.get('/api/steam/family/setcooldown/:familyId', async (c) => {
   const token = getAccessToken(c, true)
   const data = await steamWebStdAPI.familyGroup
     .setFamilyCooldownOverrides({ familyGroupid: BigInt(familyId), cooldownCount: 0 }, { accessToken: token.token })
-  return c.json(data)
+  // @ts-ignore
+  return handleSteamStdResponse(c, data)
 })
 
 export default app

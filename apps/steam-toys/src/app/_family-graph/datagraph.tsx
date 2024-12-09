@@ -13,7 +13,7 @@ import {PlaytimeGraph} from "@/app/(chart)/playtimeGraph";
 
 dayjs.extend(duration)
 
-import { toJpeg } from 'html-to-image';
+import { toPng } from 'html-to-image';
 
 import {useComputedData} from "@/hooks/data/useComputedData";
 
@@ -89,14 +89,10 @@ export default function DataGraph(
       return
     }
     setOverlayOpen(true)
-
-    // const canvas =await html2canvas(document.querySelector("#data-graph")!)
-    // const imgURL = canvas.toDataURL()
-    // const ele = document.getElementById("data-graph")!
-    await toJpeg(ref.current)
-    await toJpeg(ref.current)
-    await toJpeg(ref.current)
-    const url = await toJpeg(ref.current)
+    await toPng(ref.current)
+    await toPng(ref.current)
+    await toPng(ref.current)
+    const url = await toPng(ref.current)
     setImgURL(url??"")
   }
 }

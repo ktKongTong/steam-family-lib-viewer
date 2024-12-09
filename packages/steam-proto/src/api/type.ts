@@ -107,6 +107,7 @@ export type SteamStdRequestType<
   // @ts-ignore
   requestData: InferPartialMessage<SteamAPIRequestTypeName<S, M>>,
   accessToken?: string,
+  apiKey?: string,
   headers?: Record<string, string>
 }
 

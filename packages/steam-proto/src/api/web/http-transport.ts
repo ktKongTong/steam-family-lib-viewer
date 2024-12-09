@@ -28,6 +28,7 @@ export const callHttpSteamStdAPI = async <
     serviceMethod,
     requestData,
     accessToken,
+    apiKey,
     headers,
     codec,
     method,
@@ -35,7 +36,10 @@ export const callHttpSteamStdAPI = async <
   method?: 'GET' | 'POST',
   codec?: 'json' | 'proto'
 }
-): Promise<SteamStdResponseType<T, M>> => {
+): Promise<
+  SteamStdResponseType<T, M>
+  & { code: number }
+> => {
   let url = `https://api.steampowered.com/I${serviceName}Service/${serviceMethod}/v${apiVersion ?? 1}`;
   const { reqClazz, respClazz } = getProtoClazzForService(serviceName, serviceMethod)
   // @ts-expect-error
@@ -68,11 +72,17 @@ export const callHttpSteamStdAPI = async <
     if(accessToken) {
       query.append("access_token",accessToken)
     }
+    if(apiKey) {
+      query.append("key", apiKey)
+    }
     url += `?${query.toString()}`
   }else {
     const form = new FormData()
     if(accessToken) {
       form.append("access_token",accessToken)
+    }
+    if(apiKey) {
+      form.append("key", apiKey)
     }
     form.append("input_protobuf_encoded", bufBase64)
     options.body = form
@@ -87,17 +97,18 @@ export const callHttpSteamStdAPI = async <
     const resBin = new Uint8Array(arrBuf)
     resData = respClazz.fromBinary(resBin)
   }
-  let eresultHeader = resp.headers.get('x-eresult');
+  let errResultHeader = resp.headers.get('x-eresult');
   let errorMessageHeader = resp.headers.get('x-error_message');
   let result = EResult.Invalid
-  if (typeof eresultHeader == 'string') {
-    result = parseInt(eresultHeader) as EResult;
+  if (typeof errResultHeader == 'string') {
+    result = parseInt(errResultHeader) as EResult;
   }
   let res =  {
     result: result,
     success: result === EResult.OK,
+    code: resp.status,
     data: resData as any
-  } as SteamStdResponseType<T, M>
+  } as SteamStdResponseType<T, M> & { code: number }
 
   if (typeof errorMessageHeader == 'string') {
     res.errorMessage = errorMessageHeader;
@@ -115,7 +126,8 @@ type SteamHTTPAPI<S extends ServiceDict> = {
 
 export type RequestOpts = {
   accessToken?: string | null
-  apiVersion?: number
+  apiKey?: string,
+  apiVersion?: number,
   headers?: Record<string, string>,
   method?: 'GET' | 'POST',
   codec?: 'json' | 'proto'
@@ -133,6 +145,7 @@ export const createSteamStdAPI = <T extends ServiceDict>(serviceName: T, token?:
         serviceName,
         serviceMethod: s,
         accessToken: requestOpts?.accessToken ?? ak,
+        apiKey: requestOpts?.apiKey,
         requestData: param,
         method: requestOpts?.method,
         codec: requestOpts?.codec,

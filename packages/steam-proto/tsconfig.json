@@ -1,19 +1,17 @@
 {
+
+  "extends": "../../tsconfig.options.json",
   "compilerOptions": {
-    "lib": ["esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "declaration": true,
     "emitDeclarationOnly": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "outDir": "dist/types",
-    "moduleResolution": "bundler",
-    "isolatedModules": true,
-    "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo"
+    "jsx": "preserve",
+    "outDir": "./dist/types",
+    "rootDir": "src"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "proto"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "proto"],
+  "references": [
+    {
+      "path": "../shared"
+    }
+  ]
 }

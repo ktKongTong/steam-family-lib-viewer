@@ -1,1 +1,1 @@
-export const gitlink = 'https://github.com/ktKongTong/steam-family-lib-viewer'
+export const gitlink = 'https://github.com/ktKongTong/steam-toys'

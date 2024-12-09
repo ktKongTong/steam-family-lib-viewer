@@ -5,7 +5,7 @@
   "scripts": {
     "gen:proto": "buf generate proto",
     "gen:steam-type": "node scripts/proto-generate-type.mjs",
-    "build": "tsup && tsc",
+    "build": "tsup",
     "types": "tsc"
   },
   "exports": {

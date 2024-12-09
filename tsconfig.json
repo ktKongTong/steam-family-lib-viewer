@@ -1,0 +1,18 @@
+{
+
+  "files": [],
+  "references": [
+    {
+      "path": "apps/steam-toys"
+    },
+    {
+      "path": "apps/steam-receipt"
+    },
+    {
+      "path": "packages/shared"
+    },
+    {
+      "path": "packages/steam-proto"
+    }
+  ]
+}

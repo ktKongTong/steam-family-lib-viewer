@@ -1,4 +1,5 @@
 import _ from "lodash";
+import {ua} from "../utils/ua";
 
 export class SteamCommonApi {
   private readonly accessToken: string|undefined
@@ -10,7 +11,7 @@ export class SteamCommonApi {
       const url = `https://store.steampowered.com/wishlist/profiles/${id}/wishlistdata/?p=0&v=`
       const res = await fetch(url, {
         headers: {
-          'User-Agent':'SteamFamilyLibViewer/0.0.1 (https://steam-family-lib-viewer.ktlab.io)'
+          'User-Agent': ua.edge,
         }
       }).then((res)=> res.json() as Promise<any>)
       const appIds = Object.keys(res)

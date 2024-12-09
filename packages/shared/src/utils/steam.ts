@@ -1,4 +1,4 @@
-import {base64ToUint8Array} from "@/utils/coder";
+import {base64ToUint8Array} from "./coder";
 import {jwtDecode} from "jwt-decode";
 
 export function shaDigestAvatarBase64ToStrAvatarHash(base64:string) {

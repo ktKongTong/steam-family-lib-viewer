@@ -5,14 +5,12 @@ import {
 } from "@repo/shared";
 import SteamID from "steamid";
 import QRCode from "react-qr-code";
-import {useTrans} from "@/app/_i18n";
-import {useLocale} from "@/app/use-locale-ctx";
 import {PlayerStats, PlayerCommunityData} from "@/interface/playerstats";
 import {useToast} from "@/hooks/use-toast";
+import { useTrans } from "@/components/providers/i18n";
 
 interface ReceiptV2Props {
   playerStats: PlayerStats
-  communityStats: PlayerCommunityData
 }
 
 const useNewComputedPlayerStats = (playerStats: PlayerStats) => {
@@ -58,16 +56,18 @@ const calculateSteamScore = (data: ReturnType<typeof useNewComputedPlayerStats>,
 }
 
 
-export const AccountReceipt = ({playerStats, communityStats, ref}:ReceiptV2Props & {
+export const AccountReceipt = ({playerStats, ref}:ReceiptV2Props & {
   ref: React.RefObject<HTMLDivElement | null>
 }) => {
   const data = useNewComputedPlayerStats(playerStats)
+  const communityStats = playerStats.community
   const id = new SteamID(data.id)
   const toast = useToast()
+
   useEffect(()=> {
     if(data.isPrivate) {
       toast.toast({
-        title: 'Profile Is Private',
+        title: 'his/her profile is private 🥲',
         variant: 'destructive'
       })
     }
@@ -78,9 +78,7 @@ export const AccountReceipt = ({playerStats, communityStats, ref}:ReceiptV2Props
   const steamScore = calculateSteamScore(data, community)
   const csFriendCode = createCSFriendCodeFromSteamId(id.getSteamID64())
   const friendCode = createFriendCodeFromSteamId(data.id)
-  const curLocale = useLocale()
-  const {t, locale} = useTrans({locale: curLocale, prefix: 'receipt'})
-
+  const {t, locale} = useTrans({ prefix: 'receipt' })
   return <div ref={ref} className="receipt-content w-full max-w-[144mm] bg-white text-black">
     <div className="p-4 pb-3 sm:p-6 font-mono text-[11px] sm:text-xs leading-relaxed">
       <div className="text-center mb-6">

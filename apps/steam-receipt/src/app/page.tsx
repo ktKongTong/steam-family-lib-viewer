@@ -1,64 +1,24 @@
 'use client'
 import React, { useState, useRef } from 'react'
-import {useToast} from "@/hooks/use-toast";
-import {useNewPlayerStats, usePlayerCommunityStats} from "@/hooks/usePlayerStats";
+import { useNewPlayerStats } from "@/hooks/usePlayerStats";
 import {AccountReceipt} from "@/app/receipt-account";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {AvailableLocales, LocaleProvider} from "@/app/use-locale-ctx";
-
 import { Button } from "@/components/ui/button"
 import {Input} from "@/components/ui/input";
 import {ShareButtons} from "@/app/ShareButtons";
+import {I18nSelector} from "@/components/i18n-selector";
 
 
 
 export default function Home() {
   const [steamid, setSteamid] = useState('')
-  const [loading, setLoading] = useState(false);
-  const {fetchPlayerStats, playerStats, error, reset} = useNewPlayerStats("")
-  const {fetchPlayerCommunityStats, playerCommunityStats, error:communityError} = usePlayerCommunityStats()
   const receiptRef = useRef<HTMLDivElement>(null);
-  const {toast} = useToast()
-  const [locale, setLocale] = useState<AvailableLocales>('en-US')
-
+  const {fetchPlayerStats, playerStats, loading, reset} = useNewPlayerStats()
   async function handleSubmit(e: React.FormEvent) {
-      e.preventDefault();
+      e.preventDefault()
       reset()
-      setLoading(true)
-      Promise.all([
-        fetchPlayerStats(steamid),
-        fetchPlayerCommunityStats(steamid)
-      ])
-      .then(()=>{
-        if(error || communityError) {
-          console.error(error, communityError)
-          toast({
-            title: 'Error',
-            description: `Failed to fetch player data ${error ?? communityError}`,
-            variant: 'destructive'
-          })
-        }
-        setLoading(false)
-      })
-      // eslint-disable-next-line
-      .catch(error => {
-        toast({
-          title: 'Error',
-          description: 'Failed to fetch player data',
-          variant: 'destructive'
-        })
-        setLoading(false)
-      })
-
+      fetchPlayerStats(steamid)
   }
   return (
-    <LocaleProvider value={locale}>
       <main className="min-h-screen mx-auto max-w-4xl px-4 py-8 sm:py-16">
         <div className="text-center mb-8">
           <h1 className="text-2xl sm:text-4xl font-bold mb-2 text-zinc-900 dark:text-white">
@@ -70,21 +30,12 @@ export default function Home() {
         </div>
         <form onSubmit={handleSubmit} className="mb-12 flex items-center justify-center flex-col sm:flex-row gap-2">
           <div className={'flex items-center gap-2'}>
-            {/* eslint-disable-next-line */}
-            <Select defaultValue={'en-US'} onValueChange={(v) => {setLocale(v as any)}} value={locale}>
-              <SelectTrigger className="w-[100px]">
-                <SelectValue/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="zh-CN">中文</SelectItem>
-                <SelectItem value="en-US">English</SelectItem>
-              </SelectContent>
-            </Select>
+            <I18nSelector/>
           </div>
           <div className="flex gap-1 max-w-md">
             <Input
               type="text"
-              placeholder="Enter Steam ID"
+              placeholder="Enter SteamID or nickname"
               value={steamid}
               onChange={e => setSteamid(e.target.value)}
               autoCapitalize={'none'}
@@ -108,14 +59,13 @@ export default function Home() {
           </div>
         )}
         {
-          playerStats && playerCommunityStats && (
+          playerStats && (
             <div className="flex flex-col items-center">
               <div className="receipt-container">
               <div className="coffee-stain"/>
                 <AccountReceipt
                   ref={receiptRef}
                   playerStats={playerStats}
-                  communityStats={playerCommunityStats}
                 />
               </div>
             </div>
@@ -125,6 +75,5 @@ export default function Home() {
           playerStats && receiptRef.current && <ShareButtons receiptRef={receiptRef} username={steamid}/>
         }
       </main>
-    </LocaleProvider>
   );
 }

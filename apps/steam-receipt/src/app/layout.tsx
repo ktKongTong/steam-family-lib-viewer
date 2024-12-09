@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import {Toaster} from "@/components/ui/toaster";
 import QueryProvider from "@/components/providers/QueryClient";
+import React from "react";
+import { LocaleProvider } from "@/components/providers/i18n";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,14 +29,16 @@ export default function RootLayout({
 }>) {
   return (
     <QueryProvider>
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <LocaleProvider>
+        <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
         {children}
-        <Toaster />
-      </body>
-    </html>
+        <Toaster/>
+        </body>
+        </html>
+      </LocaleProvider>
     </QueryProvider>
   );
 }

@@ -5,7 +5,13 @@ export class BizError extends Error {
 }
 
 
-export class TokenInvalidError extends BizError {
+export class InvalidTokenError extends BizError {
+  constructor(message: string) {
+    super(message)
+  }
+}
+
+export class InvalidSteamIDError extends BizError {
   constructor(message: string) {
     super(message)
   }

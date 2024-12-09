@@ -31,6 +31,9 @@ export const refreshTokenTask = async () => {
     steamid: BigInt(id),
     renewalType: renew ? 1 : 0
   })
+  if(!res.success) {
+    throw new Error(`refresh token task failed: ${res.errorMessage} ${res.result}`)
+  }
   const newRefreshToken = res?.data?.refreshToken ?? refreshToken
   const newAccessToken = res?.data?.accessToken?? accessToken
   await kv.mset({

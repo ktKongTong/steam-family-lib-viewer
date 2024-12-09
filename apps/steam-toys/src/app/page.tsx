@@ -34,6 +34,11 @@ export default function Home() {
       fetch()
       .then(() => {
         setOK(true)
+      }).catch(() => {
+        toast({
+          title: "获取失败",
+          description: "请检查你的Token是否正确"
+        })
       })
     } else {
       toast({

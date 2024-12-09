@@ -1,29 +1,31 @@
 
-import {CFamilyGroups_GetFamilyGroupForUser_Response} from "@repo/steam-proto";
+import { SteamStdResponseType} from "@repo/steam-proto";
 import {useMutation} from "@tanstack/react-query";
 import {useCallback, useState} from "react";
 
+type NotUndefined<T> = T extends undefined ? never : T
 
-async function fetchFamilyInfo(token:string):Promise<null| CFamilyGroups_GetFamilyGroupForUser_Response>{
+type Family = NotUndefined<SteamStdResponseType<'FamilyGroups', 'GetFamilyGroupForUser'>['data']>
+async function fetchFamilyInfo(token:string) {
   const data = await fetch(`/api/steam/family?access_token=${token}`)
-    .then(res=>res.json()).then(res=>res!.data)
-  data.familyGroupid!!
+    .then(res=>res.json()) as SteamStdResponseType<'FamilyGroups', 'GetFamilyGroupForUser'>
   return data
 }
 
 export const useFamilyInfo = (accessToken: string) => {
-  const [steamFamilyInfo, setSteamFamilyInfo] = useState<CFamilyGroups_GetFamilyGroupForUser_Response | null>(null)
+  const [steamFamilyInfo, setSteamFamilyInfo] = useState<Family | null>(null)
 
   const { mutateAsync,error } = useMutation({
     mutationFn: fetchFamilyInfo,
   })
   const fetchFamily = useCallback(async() => {
-    // console.log("request Family")
     const steamFamily = await mutateAsync(accessToken)
-    // console.log("set Family")
-      setSteamFamilyInfo(steamFamily)
 
-    return steamFamily
+    if(steamFamily.success) {
+      setSteamFamilyInfo(steamFamily.data!)
+      return steamFamily.data!
+    }
+    return null
   },[accessToken, mutateAsync])
 
   const reset = () => setSteamFamilyInfo(null)

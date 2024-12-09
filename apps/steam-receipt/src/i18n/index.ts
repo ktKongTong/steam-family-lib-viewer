@@ -17,5 +17,3 @@ export const availableLocales = [
 
 export type EnTransSchema = TransSchema<typeof en>
 export type AvailableLocales = keyof typeof localeMap
-
-export type BaseTrans = typeof en

@@ -126,10 +126,16 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
     const [familyStep, wrappedStep, finishStep] = steps
     const [playtimeStep, memberStep, ] = wrappedStep.steps
     const sharedLibsStep = wrappedStep.steps[2] as SharedLibraryStep
-    // step 1
-    // syncStep 导致 rerender，但是持有还是原来的step，
-    // 但是在rerender 之前，立马就开始下一轮了请求
     const steamFamily = await familyStep.trigger(() => fetchFamilyInfo())
+
+    if(!steamFamily) {
+      familyStep.failed("获取失败")
+      toast({
+        title: '获取失败',
+        description: '获取用户家庭信息失败，请检查 Token 是否正确'
+      })
+      return
+    }
     if(steamFamily?.isNotMemberOfAnyGroup === true) {
       familyStep.failed('用户不处于任何家庭中',false)
       sharedLibsStep.failed('用户不处于任何家庭中',false)

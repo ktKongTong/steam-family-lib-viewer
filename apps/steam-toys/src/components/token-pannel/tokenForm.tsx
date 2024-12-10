@@ -23,9 +23,6 @@ export default function NewTokenForm (
   },[tokenInput])
   const {
     mutateAsync,
-    verified,
-    token,
-    err
   } = useGetUserInfoMutation()
   const verifyToken = ()=> {
     // 1. setLoading

@@ -116,13 +116,13 @@ const getCommunityStats = async (queryId: string)=> {
         },
       ],
     });
-    const regex = /\s(?<total>\d+)\s/;
+    const regex = /\s(\d+)\s/;
     const guideData = $guide.extract({
       count: {
         selector: '.workshopBrowsePagingInfo',
         value: (el, key) => {
           const text = $guide(el).text();
-          const may = regex.exec(text)?.groups?.total
+          const [,may] = regex.exec(text)!
           const v = parseInt(may ?? '0')
           return Number.isNaN(v) ? 0 : v
         },

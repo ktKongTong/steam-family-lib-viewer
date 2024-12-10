@@ -8,7 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@ktfun/sts-i18n-react": "0.1.2",
+    "@ktfun/sts-i18n-react": "0.2.1",
     "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-toast": "^1.1.5",

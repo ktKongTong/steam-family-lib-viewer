@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ktfun/sts-i18n-react": "0.2.1",
+    "@ktfun/sts-i18n-react": "0.2.2",
     "@repo/shared": "workspace:*",
     "@repo/steam-proto": "workspace:*",
     "@dnd-kit/core": "^6.1.0",

@@ -1,6 +1,6 @@
 import {f} from "@/lib/omfetch";
 import {CFamilyGroups_PlaytimeEntry, InferRespType} from "@repo/steam-proto";
-import {PlayerCommunityData, PlayerStatsData} from "@/interface/playerStatsData";
+import {PlayerCommunityData} from "@/interface/playerStatsData";
 import _ from "lodash";
 import {PlayerSummariesResponse} from "@/hooks/data/query/interface";
 import {PlayerStats} from "@/app/receipt/interface";

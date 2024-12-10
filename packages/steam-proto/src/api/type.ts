@@ -131,3 +131,21 @@ export type SteamAPICallFn = <
   T extends ServiceDict,
   M extends ServiceMethodDict<T>
 >(param: SteamStdRequestType<T, M>)=> Promise<SteamStdResponseType<T, M>>
+
+
+// serialized json
+// 1. remove function
+// 2. bigint -> string
+// 3. uint8array -> string
+type JsonType<T> = T extends Function ? never
+  : T extends bigint ? string
+    : T extends Uint8Array ? string
+      : T extends any[] ? T[number][]
+        : T extends object ? { [K in keyof T]: JsonType<T[K]> }
+          : T;
+
+type NotFunction<T> = T extends Function ? never : T;
+export type InferJsonType<
+  S extends ServiceDict,
+  M extends ServiceMethodDict<S>
+> = JsonType<InferRespType<S, M>>

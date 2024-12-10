@@ -9,9 +9,10 @@ import React from "react";
 import { shaDigestAvatarBase64ToStrAvatarHash } from "@repo/shared";
 
 import Graph from "@/app/render/graph";
-
 import {Player} from "@/interface/steamPlaytime";
 
+
+export const dynamic = 'force-dynamic'
 
 export const revalidate = 3600
 
@@ -53,7 +54,7 @@ async function fetchFamilyPlayTime(token:string,id:string) {
   })
 }
 async function fetchFamilyMembers(token:string,ids:string[]){
-  const data = await f.get(`${host}/api/steam/player/${ids.join(',')}?access_token=${token}`)
+  const data = await f.get<InferRespType<'Player', 'GetPlayerLinkDetails'>>(`${host}/api/steam/player/${ids.join(',')}?access_token=${token}`)
     .catch(e=> {
       logger.log(e)
       return null
@@ -98,7 +99,7 @@ async function prepareData(accessToken:string) {
   const bg = getRandomBackground()
   const familyInfo = await fetchFamilyInfo(accessToken)
   let familyData = familyInfo?.familyGroup!
-  const memberIds = familyData.members!.map((member: any)=>member.steamid!.toString())
+  const memberIds = familyData.members!.map((member)=>member.steamid!.toString())
   const memberFamilyInfos = _.keyBy(familyData.members, 'steamid')
 
   let familyGroupId = familyInfo?.familyGroupid
@@ -109,9 +110,9 @@ async function prepareData(accessToken:string) {
     fetchFamilyMembers(accessToken, memberIds)
   ])
 
-  const members:Player[] = memberInfos.data.accounts.map((account:any)=> {
-    const id = account?.publicData?.steamid!
-    const avatar_hash = shaDigestAvatarBase64ToStrAvatarHash(account?.publicData?.shaDigestAvatar?.toString())
+  const members = memberInfos!!.accounts.map((account)=> {
+    const id = account?.publicData?.steamid! as unknown as string
+    const avatar_hash = shaDigestAvatarBase64ToStrAvatarHash(account!.publicData!.shaDigestAvatar!.toString())
     return {
       ...account.publicData,
       avatar_hash,
@@ -134,10 +135,10 @@ async function prepareData(accessToken:string) {
     })
     .map(resp=>resp!.storeItems).flatMap(it=>it)
   const libDictionary = _.keyBy(items, 'id')
-  const allLib = libs.map((lib:any)=> ({
+  const allLib = libs.map((lib)=> ({
     ...lib,
     detail: libDictionary[lib.appid!],
-    owners:lib.ownerSteamids.map((id:any) => {
+    owners:lib.ownerSteamids.map((id) => {
       return memberDict[id.toString()]
     })
   }))
@@ -170,7 +171,7 @@ export default async function Page({
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Graph
         libs={allLib}
-        players={members}
+        players={members as Player[]}
         libsPlaytime={libsPlaytimeSummary}
         family={familyInfo}
         bg={background}

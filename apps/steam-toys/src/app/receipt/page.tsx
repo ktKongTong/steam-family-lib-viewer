@@ -40,8 +40,8 @@ export default function Home() {
       const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], 'steam-receipt.png', { type: 'image/png' });
 
-      if (navigator.share) {
-        await navigator.share({
+      if (navigator?.share) {
+        await navigator?.share({
           title: 'My Steam Receipt',
           text: `Check out my Steam stats for ${steamid}!`,
           files: [file]

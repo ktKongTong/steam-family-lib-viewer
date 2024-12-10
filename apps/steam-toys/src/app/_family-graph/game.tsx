@@ -37,7 +37,7 @@ const HoverContent =({game}:GameProps)=> {
   const medias = m.concat(game
     .detail
     .screenshots
-    ?.allAgesScreenshots.map(screenshot => ({
+    ?.allAgesScreenshots!.map(screenshot => ({
       src: `https://cdn.akamai.steamstatic.com/${screenshot.filename}`,
       type: 'img'
     }))??[])
@@ -100,7 +100,7 @@ const HoverContent =({game}:GameProps)=> {
       </div>
       <div className={'flex gap-1 text-sm w-full flex-wrap'}>
         {
-          game.detail.tagids.slice(0, 7).map(it => (
+          game.detail.tagids!.slice(0, 7).map(it => (
             <span key={it}
                   className={'px-1 text-xs rounded-md font-light text-[6px] py-0.5 w-fit text-zinc-300 bg-zinc-700/30'}>
                     {convertTag(it)}

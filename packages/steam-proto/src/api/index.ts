@@ -1,3 +1,4 @@
 
 export { steamWebStdAPI } from './web'
-export type { InferReqType, InferRespType, SteamStdResponseType, ServiceDict, ServiceMethodDict }  from './type'
+export * from './gen/types'
+export type { InferReqType, InferRespType, InferReqJsonType, InferRespJsonType, SteamStdResponseJsonType,SteamStdRequestJsonType, SteamStdResponseType, ServiceDict, ServiceMethodDict }  from './types'

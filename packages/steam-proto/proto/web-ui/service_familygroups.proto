@@ -10,6 +10,7 @@ message CFamilyGroups_CancelFamilyGroupInvite_Response {
 
 message CFamilyGroups_ClearCooldownSkip_Request {
 	optional fixed64 steamid = 1;
+	optional uint64 invite_id = 2;
 }
 
 message CFamilyGroups_ClearCooldownSkip_Response {
@@ -69,7 +70,7 @@ message CFamilyGroups_GetChangeLog_Response {
 message CFamilyGroups_GetChangeLog_Response_Change {
 	optional fixed64 timestamp = 1;
 	optional fixed64 actor_steamid = 2;
-	optional int32 type = 3 [(google.protobuf.description) = "enum"];
+	optional int32 type = 3 [(.description) = "enum"];
 	optional string body = 4;
 	optional bool by_support = 5;
 }
@@ -114,7 +115,8 @@ message CFamilyGroups_GetInviteCheckResults_Request {
 
 message CFamilyGroups_GetInviteCheckResults_Response {
 	optional bool wallet_country_matches = 1;
-	optional bool has_ip_match = 2;
+	optional bool ip_match = 2;
+	optional uint32 join_restriction = 3;
 }
 
 message CFamilyGroups_GetPlaytimeSummary_Request {
@@ -171,11 +173,12 @@ message CFamilyGroups_GetSharedLibraryApps_Response_SharedApp {
 	optional string sort_as = 7;
 	optional string capsule_filename = 8;
 	optional string img_icon_hash = 9;
-	optional int32 exclude_reason = 10 [default = 0, (google.protobuf.description) = "enum"];
+	optional int32 exclude_reason = 10 [default = 0, (.description) = "enum"];
 	optional uint32 rt_time_acquired = 11;
 	optional uint32 rt_last_played = 12;
 	optional uint32 rt_playtime = 13;
-	optional int32 app_type = 14 [default = 1, (google.protobuf.description) = "enum"];
+	optional int32 app_type = 14 [default = 1, (.description) = "enum"];
+	repeated uint32 content_descriptors = 15;
 }
 
 message CFamilyGroups_GetUsersSharingDevice_Request {
@@ -190,12 +193,12 @@ message CFamilyGroups_GetUsersSharingDevice_Response {
 message CFamilyGroups_InviteToFamilyGroup_Request {
 	optional uint64 family_groupid = 1;
 	optional fixed64 receiver_steamid = 2;
-	optional int32 receiver_role = 3 [(google.protobuf.description) = "enum"];
+	optional int32 receiver_role = 3 [(.description) = "enum"];
 }
 
 message CFamilyGroups_InviteToFamilyGroup_Response {
 	optional uint64 invite_id = 1;
-	optional int32 two_factor_method = 2 [(google.protobuf.description) = "enum"];
+	optional int32 two_factor_method = 2 [(.description) = "enum"];
 }
 
 message CFamilyGroups_JoinFamilyGroup_Request {
@@ -204,7 +207,7 @@ message CFamilyGroups_JoinFamilyGroup_Request {
 }
 
 message CFamilyGroups_JoinFamilyGroup_Response {
-	optional int32 two_factor_method = 2 [(google.protobuf.description) = "enum"];
+	optional int32 two_factor_method = 2 [(.description) = "enum"];
 	optional bool cooldown_skip_granted = 3;
 	optional bool invite_already_accepted = 4;
 }
@@ -255,7 +258,7 @@ message CFamilyGroups_ResendInvitationToFamilyGroup_Response {
 
 message CFamilyGroups_RespondToRequestedPurchase_Request {
 	optional uint64 family_groupid = 1;
-	optional int32 action = 3 [(google.protobuf.description) = "enum"];
+	optional int32 action = 3 [(.description) = "enum"];
 	optional uint64 request_id = 4;
 }
 
@@ -314,20 +317,21 @@ message FamilyGroupFormerMember {
 
 message FamilyGroupMember {
 	optional fixed64 steamid = 1;
-	optional int32 role = 2 [(google.protobuf.description) = "enum"];
+	optional int32 role = 2 [(.description) = "enum"];
 	optional uint32 time_joined = 3;
 	optional uint32 cooldown_seconds_remaining = 4;
 }
 
 message FamilyGroupPendingInvite {
 	optional fixed64 steamid = 1;
-	optional int32 role = 2 [(google.protobuf.description) = "enum"];
+	optional int32 role = 2 [(.description) = "enum"];
 }
 
 message FamilyGroupPendingInviteForUser {
 	optional uint64 family_groupid = 1;
-	optional int32 role = 2 [(google.protobuf.description) = "enum"];
+	optional int32 role = 2 [(.description) = "enum"];
 	optional fixed64 inviter_steamid = 3;
+	optional bool awaiting_2fa = 4;
 }
 
 message PurchaseRequest {
@@ -336,7 +340,7 @@ message PurchaseRequest {
 	optional uint32 time_requested = 3;
 	optional uint32 time_responded = 4;
 	optional fixed64 responder_steamid = 5;
-	optional int32 response_action = 6 [(google.protobuf.description) = "enum"];
+	optional int32 response_action = 6 [(.description) = "enum"];
 	optional bool is_completed = 7;
 	optional uint64 request_id = 8;
 	repeated uint32 requested_packageids = 9;
@@ -375,7 +379,8 @@ service FamilyGroups {
 }
 
 service FamilyGroupsClient {
-	rpc NotifyGroupChanged (.CFamilyGroupsClient_GroupChanged_Notification) returns (google.protobuf.NoResponse);
-	rpc NotifyInviteStatus (.CFamilyGroupsClient_InviteStatus_Notification) returns (google.protobuf.NoResponse);
-	rpc NotifyRunningApps (.CFamilyGroupsClient_NotifyRunningApps_Notification) returns (google.protobuf.NoResponse);
+	rpc NotifyGroupChanged (.CFamilyGroupsClient_GroupChanged_Notification) returns (.NoResponse);
+	rpc NotifyInviteStatus (.CFamilyGroupsClient_InviteStatus_Notification) returns (.NoResponse);
+	rpc NotifyRunningApps (.CFamilyGroupsClient_NotifyRunningApps_Notification) returns (.NoResponse);
 }
+

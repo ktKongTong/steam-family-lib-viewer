@@ -1,10 +1,10 @@
 import {useCallback, useMemo, useState} from "react";
 import {SharedLibraryStep, Step, StepStatus, WrappedStep} from "./step";
 import {
-  CFamilyGroups_GetFamilyGroupForUser_Response,
-  CFamilyGroups_GetSharedLibraryApps_Response_SharedApp,
-  CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails,
-  StoreItem,
+
+  CFamilyGroups_GetSharedLibraryApps_Response_SharedAppJson,
+  InferRespJsonType,
+  StoreItemJson,
 } from "@repo/steam-proto";
 import _ from "lodash";
 
@@ -14,7 +14,7 @@ import {shaDigestAvatarBase64ToStrAvatarHash} from "@repo/shared";
 import {useMutate} from "@/hooks/data/query/use-mutate";
 import {APIService} from "@/hooks/data/query/api";
 
-type LibDetailsWithRangeIndex = Record<string, StoreItem[]>
+type LibDetailsWithRangeIndex = Record<string, StoreItemJson[]>
 
 const getSteps:()=>[Step,WrappedStep,Step] = ()=> [
   new Step( "获取基本信息"),
@@ -45,7 +45,7 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
   //
   const [steps,setSteps] = useState<[Step,WrappedStep,Step]>(getSteps())
 
-  const [libOverviews, setLibOverviews] = useState<CFamilyGroups_GetSharedLibraryApps_Response_SharedApp[]>([])
+  const [libOverviews, setLibOverviews] = useState<CFamilyGroups_GetSharedLibraryApps_Response_SharedAppJson[]>([])
   const [libDetailWithIndex, setLibDetailWithIndex] = useState<LibDetailsWithRangeIndex>({})
 
   const reset = () => {
@@ -85,6 +85,7 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
     const res = await steamItemQuery.mutateAsync(idChunk)
     setLibDetailWithIndex((cur) => {
       let ans: LibDetailsWithRangeIndex = { ...cur }
+      // @ts-ignore
       ans[key] = res.storeItems!
       return ans
     })
@@ -95,7 +96,7 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
     const libs = await steamFamilySharedLibsQuery.mutateAsync({accessToken, familyId: familyId})
     const filteredLibs = libs!.apps!
       .filter( (app) => app.excludeReason == undefined || app.excludeReason == 0)
-    setLibOverviews(filteredLibs as CFamilyGroups_GetSharedLibraryApps_Response_SharedApp[])
+    setLibOverviews(filteredLibs as CFamilyGroups_GetSharedLibraryApps_Response_SharedAppJson[])
     const libIds:string[][] = _.chunk(filteredLibs.map((it)=>it.appid!.toString()), 30)
 
     const getKey = (index: number, size: number)=> {
@@ -190,9 +191,9 @@ export const useSteamFamilyLibInfo = (accessToken: string, steamid: string) => {
 
 // 基于已有数据计算家庭成员信息，
 const useComputedLibAndMember = (
-  steamFamilyInfo: CFamilyGroups_GetFamilyGroupForUser_Response | null | undefined,
-  steamPlayers: CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails[],
-  libOverviews: CFamilyGroups_GetSharedLibraryApps_Response_SharedApp[],
+  steamFamilyInfo: InferRespJsonType<'FamilyGroups', 'GetFamilyGroupForUser'> | null | undefined,
+  steamPlayers: InferRespJsonType<'Player', 'GetPlayerLinkDetails'>['accounts'],
+  libOverviews: CFamilyGroups_GetSharedLibraryApps_Response_SharedAppJson[],
   libDetailWithIndex: LibDetailsWithRangeIndex,
 ) => {
   const allMembers = useMemo(()=>{
@@ -232,7 +233,7 @@ const useComputedLibAndMember = (
       .map((lib)=> ({
         ...lib,
         detail: libDictionary[lib.appid!],
-        owners:lib.ownerSteamids.map((id) => {return memberDict[id.toString()]})
+        owners:lib.ownerSteamids!.map((id) => {return memberDict[id.toString()]})
       }))
     return filtered
   }, [libOverviews, libDictionary, memberDict])

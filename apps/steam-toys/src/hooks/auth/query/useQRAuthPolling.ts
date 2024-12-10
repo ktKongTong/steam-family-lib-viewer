@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import {PollStatus} from "@/hooks/auth/interface";
-import { SteamStdResponseType } from "@repo/steam-proto"
+import {InferRespJsonType, SteamStdResponseType} from "@repo/steam-proto"
 import { f } from '@/lib/omfetch'
 
 export default function useQRAuthPolling(
@@ -9,8 +9,8 @@ export default function useQRAuthPolling(
   requestId?: string,
 ) {
   const [challengeURL, setChallengeURL] = useState("")
-  const [clientId, setClientId] = useState<bigint| undefined>()
-  const clientIdRef  = useRef<bigint| undefined>()
+  const [clientId, setClientId] = useState<string| undefined>()
+  const clientIdRef  = useRef<string| undefined>()
   const [pollTime, setPollTime] = useState(0)
   const [status, setStatus] = useState(PollStatus.notScan)
   const {data, isLoading, error } = useQuery({
@@ -21,8 +21,8 @@ export default function useQRAuthPolling(
         return
       }
       setPollTime((it)=> it + 1)
-      const res = await f.get<SteamStdResponseType<'Authentication', 'PollAuthSessionStatus'>>(`/api/steam/auth/poll?client_id=${clientId}&request_id=${requestId}`)
-      return res.data
+      const res = await f.get<InferRespJsonType<'Authentication', 'PollAuthSessionStatus'>>(`/api/steam/auth/poll?client_id=${clientId}&request_id=${requestId}`)
+      return res
     },
     refetchInterval: (query) => {
       if(pollTime >= 20) {
@@ -59,7 +59,7 @@ export default function useQRAuthPolling(
     }
   }, [pollTime, data, challengeURL, clientId])
 
-  const setC = (id: bigint)=> {
+  const setC = (id: string)=> {
     clientIdRef.current = id
     setClientId(id)
   }
@@ -74,7 +74,7 @@ export default function useQRAuthPolling(
 }
 
 
-export const useAuthPollQuery = (clientId: bigint, requestId: string) => {
+export const useAuthPollQuery = (clientId: string, requestId: string) => {
   return useQuery({
     // 在第一次获取 QR 的时候，携带上 sessionId，akmc 等字段
     // beginAuthViaQR

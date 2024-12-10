@@ -61,7 +61,7 @@ export default function GamesGrid({
         //   }
         // }
         // return  true
-        return tagFilter.length == 0 || !tagFilter.find(filter=>!x.detail.tagids.includes(filter))
+        return tagFilter.length == 0 || !tagFilter.find(filter=>!x.detail.tagids!.includes(filter))
       })
       .sort(sortFunc(order, ruleKey))
   },[apps, keyword, order, ruleKey, tagFilter])

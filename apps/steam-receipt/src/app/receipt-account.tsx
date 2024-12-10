@@ -15,28 +15,28 @@ interface ReceiptV2Props {
 
 const useNewComputedPlayerStats = (playerStats: PlayerStats) => {
   const now = Math.floor(Date.now()/1000)
-  const isPrivate = playerStats.player.accounts[0].publicData?.visibilityState !== 3
+  const isPrivate = playerStats.player.accounts![0].publicData?.visibilityState !== 3
   const res = {
     isPrivate,
-    age: (now - (playerStats.player.accounts[0].privateData!.timeCreated ?? now)) / 60/60/24/365,
-    id: playerStats.player.accounts[0].publicData!.steamid!.toString(),
-    name: playerStats.player.accounts[0].publicData!.personaName!,
+    age: (now - (playerStats.player.accounts![0].privateData!.timeCreated ?? now)) / 60/60/24/365,
+    id: playerStats.player.accounts![0].publicData!.steamid!.toString(),
+    name: playerStats.player.accounts![0].publicData!.personaName!,
     totalGameCount: playerStats.games.gameCount ?? 0,
-    playedGameCount: playerStats.games.games.filter(it => it.playtimeForever! > 0).length,
-    unlockedAchievements: playerStats.achievementProgress
+    playedGameCount: playerStats.games.games!.filter(it => it.playtimeForever! > 0).length,
+    unlockedAchievements: playerStats.achievementProgress!
       .reduce((acc,cur) => acc +(cur.unlocked ?? 0), 0),
-    totalAchievements: playerStats.achievementProgress
+    totalAchievements: playerStats.achievementProgress!
       .reduce((acc,cur) => acc + (cur.total ?? 0), 0),
-    fullAchievementGameCount: playerStats.achievementProgress
+    fullAchievementGameCount: playerStats.achievementProgress!
       .reduce((acc,cur) => acc + (cur.allUnlocked ? 1 : 0), 0),
-    fullAchievementGameAchievementCount: playerStats.achievementProgress
+    fullAchievementGameAchievementCount: playerStats.achievementProgress!
       .reduce((acc,cur) => acc + (cur.allUnlocked ? cur.total ?? 0 : 0), 0),
-    totalPlaytimeInMinutes: playerStats.games.games.reduce((acc, game) => acc + game.playtimeForever!, 0),
-    recentPlaytimeInMinutes: playerStats.games.games
+    totalPlaytimeInMinutes: playerStats.games.games!.reduce((acc, game) => acc + game.playtimeForever!, 0),
+    recentPlaytimeInMinutes: playerStats.games.games!
       .reduce((acc, cur) => acc + (cur?.playtime2weeks ?? 0), 0),
-    recentPlayedGames: playerStats.games.games
+    recentPlayedGames: playerStats.games.games!
       .filter(it=>(it.playtime2weeks ?? 0) > 0).length,
-    top10Games: playerStats.games.games
+    top10Games: playerStats.games.games!
       .toSorted((a,b) => b.playtimeForever! - a.playtimeForever!)
       .slice(0, 10)
   }
@@ -84,7 +84,7 @@ export const AccountReceipt = ({playerStats, ref}:ReceiptV2Props & {
     <div className="p-4 pb-3 sm:p-6 font-mono text-[11px] sm:text-xs leading-relaxed">
       <div className="text-center mb-6">
         <h2 className="text-base sm:text-lg font-bold">STEAM RECEIPT</h2>
-        <p>{new Date().toLocaleDateString(locale, {
+        <p>{new Date().toLocaleDateString(locale as any, {
           weekday: 'long',
           month: 'long',
           day: 'numeric',

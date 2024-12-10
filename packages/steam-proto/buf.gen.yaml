@@ -1,5 +1,5 @@
 version: v1
 plugins:
    - plugin: es
-     opt: target=ts
+     opt: target=ts,json_types=true
      out: src/proto-gen

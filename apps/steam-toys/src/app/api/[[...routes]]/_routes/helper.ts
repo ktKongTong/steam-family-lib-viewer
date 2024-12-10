@@ -52,7 +52,7 @@ app.get('/api/steam/player-stats/:id',async (c)=>{
   const siteOwnerToken = handlerAccessToken(await getAccessTokenFromKV())
 
 
-  const tokenValidRes = await steamWebStdAPI.player.getPlayerLinkDetails({steamids: [BigInt(siteOwnerToken.steamid ?? 0)]}, { accessToken: siteOwnerToken.token })
+  const tokenValidRes = await steamWebStdAPI.player.getPlayerLinkDetails({steamids: [siteOwnerToken.steamid!]}, { accessToken: siteOwnerToken.token })
   if(!tokenValidRes.success) {
     throw new InvalidTokenError('Not Found Any Valid Token')
   }
@@ -60,9 +60,9 @@ app.get('/api/steam/player-stats/:id',async (c)=>{
   const token = siteOwnerToken.token
 
   const [player, games, community] = await Promise.all([
-    steamWebStdAPI.player.getPlayerLinkDetails({ steamids: [BigInt(id)] }, { accessToken: siteOwnerToken.token }),
+    steamWebStdAPI.player.getPlayerLinkDetails({ steamids: [id!] }, { accessToken: siteOwnerToken.token }),
     steamWebStdAPI.player.getOwnedGames({
-      steamid: BigInt(id),
+      steamid: id!,
       includeAppinfo: true,
       includePlayedFreeGames: true,
       includeFreeSub: true,
@@ -73,9 +73,9 @@ app.get('/api/steam/player-stats/:id',async (c)=>{
   if(!player.success) {
     throw new InvalidSteamIDError(`Can't found PlayerInfo By 64-bit SteamID: ${id}`)
   }
-  const appids = games.data!.games.map(game => game.appid!)
+  const appids = games.data!.games!.map(game => game.appid!)
 
-  const gameAchievementProgress = await steamWebStdAPI.player.getAchievementsProgress({ steamid: BigInt(id), appids: appids }, {
+  const gameAchievementProgress = await steamWebStdAPI.player.getAchievementsProgress({ steamid: id!, appids: appids }, {
     accessToken: token
   })
 

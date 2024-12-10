@@ -60,7 +60,7 @@ app.get('/api/steam/player/ownedGames', async(c) => {
   const idParam = c.req.query('steamid')
   let apiKey = getAPIKey(c)
   const res = await steamWebStdAPI.player.getOwnedGames({
-    steamid: BigInt(idParam ?? ""),
+    steamid: idParam,
     includeAppinfo: true,
     includePlayedFreeGames: true,
     includeFreeSub: true,
@@ -87,8 +87,7 @@ app.get('/api/steam/player/:ids',async (c)=>{
 
   if(ids.includes(user)){ids = ids.filter(id=>id!=user)}
   ids = [user].concat(ids)
-  let steamids = ids.map(it=> BigInt(it))
-  const data = await steamWebStdAPI.player.getPlayerLinkDetails({steamids: steamids}, {accessToken: token.token})
+  const data = await steamWebStdAPI.player.getPlayerLinkDetails({steamids: ids}, {accessToken: token.token})
   // .accounts
   //   .map((account=>({
   //   ...account,

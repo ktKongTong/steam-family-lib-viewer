@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build:deps": "turbo build --filter=./packages/*",
+    "build:all": "turbo build",
     "build:toys": "turbo build --filter @repo/steam-toys",
     "start:toys": "pnpm run --filter @repo/steam-toys  start",
     "dev:toys": "pnpm run --filter @repo/steam-toys  dev",

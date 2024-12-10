@@ -1,16 +1,16 @@
-import {APICallClazzType, ServiceDict, ServiceMethodDict} from "./type";
-import {steamStdServiceClazzMap as clazzMap} from "./gen/service-dict";
+import {APICallClazzType, ServiceDict, ServiceMethodDict} from "./types";
+import {steamStdServiceClazzMap as schemaMap} from "./gen/service-map";
 
 
 
-export const getProtoClazzForService = <
+export const getProtoSchemaForService = <
   T extends ServiceDict,
   M extends ServiceMethodDict<T>
 >(serviceName: T, serviceMethod: M): APICallClazzType<T,M> => {
-  const serviceMap = clazzMap[serviceName as keyof typeof clazzMap]
-  const clazz = serviceMap[serviceMethod as keyof typeof serviceMap] as any
+  const serviceMap = schemaMap[serviceName as keyof typeof schemaMap]
+  const schema = serviceMap[serviceMethod as keyof typeof serviceMap] as any
   return {
-    reqClazz: clazz.req,
-    respClazz: clazz.resp
+    reqSchema: schema.req,
+    respSchema: schema.resp
   } as any
 }

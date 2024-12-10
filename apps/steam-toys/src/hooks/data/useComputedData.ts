@@ -2,7 +2,7 @@
 import {Player, SteamAppPlaytime} from "@/interface/steamPlaytime";
 import {useMemo} from "react";
 import _ from "lodash";
-import {StoreItem} from "@repo/steam-proto";
+import {StoreItemJson} from "@repo/steam-proto";
 import {convertTag} from "@/lib/tagdict";
 
 
@@ -52,7 +52,7 @@ export const useComputedData = (
 
   const tags = useMemo(()=>appsForUse
       .map(app=> app.detail)
-      .flatMap((item:StoreItem)=>item.tagids.slice(0,10)),
+      .flatMap((item:StoreItemJson)=>item.tagids?.slice(0,10) ?? []),
     [appsForUse])
 
   const dict = useMemo(()=>_.countBy(tags, it=>it),[tags])

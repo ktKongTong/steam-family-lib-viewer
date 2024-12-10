@@ -95,7 +95,7 @@ export const getGameTrailer = (game:App) => {
     const prefix = "https://cdn.akamai.steamstatic.com/"
     //
     // https://cdn.akamai.steamstatic.com/steam/apps/256689996/microtrailer.webm
-    const filename = game.detail.trailers?.highlights?.[0]!.microtrailer[0].filename!
+    const filename = game.detail.trailers?.highlights?.[0]!.microtrailer![0].filename!
     const url = format.replace("${FILENAME}", filename)
     return prefix + url
   }catch (e) {

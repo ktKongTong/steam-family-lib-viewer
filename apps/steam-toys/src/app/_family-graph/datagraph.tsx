@@ -22,9 +22,9 @@ import {cooldownDurationTostring} from "@/lib/utils";
 import EchartWordCloud from "@/app/(chart)/echart-worldcloud";
 import {useRandomBackground} from "@/hooks/useRandomBackground";
 
-import { InferRespType } from "@repo/steam-proto";
+import { InferRespJsonType } from "@repo/steam-proto";
 import {useMediaQuery} from "@/hooks/useMediaQuery";
-type FamilyGroups = InferRespType<'FamilyGroups','GetFamilyGroupForUser'>
+type FamilyGroups = InferRespJsonType<'FamilyGroups','GetFamilyGroupForUser'>
 export default function DataGraph(
 {
   libs,

@@ -1,12 +1,12 @@
 import {
-  CFamilyGroups_GetSharedLibraryApps_Response_SharedApp,
-  CFamilyGroups_PlaytimeEntry,
-  CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails_AccountPublicData,
-  FamilyGroupMember,
-  StoreItem
+  CFamilyGroups_GetSharedLibraryApps_Response_SharedAppJson,
+  CFamilyGroups_PlaytimeEntryJson,
+  CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails_AccountPublicDataJson,
+  FamilyGroupMemberJson,
+  StoreItemJson
 } from "@repo/steam-proto";
 
-export interface ExtendedSteamPlaytimeItem extends CFamilyGroups_PlaytimeEntry {
+export interface ExtendedSteamPlaytimeItem extends CFamilyGroups_PlaytimeEntryJson {
   isOwner: boolean
 }
 export interface SteamAppPlaytime {
@@ -15,10 +15,10 @@ export interface SteamAppPlaytime {
 }
 
 
-export type Player = FamilyGroupMember & CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails_AccountPublicData & {
+export type Player = FamilyGroupMemberJson & CPlayer_GetPlayerLinkDetails_Response_PlayerLinkDetails_AccountPublicDataJson & {
   avatar_hash: string
 }
-export type App = CFamilyGroups_GetSharedLibraryApps_Response_SharedApp
-  & { detail: StoreItem }
+export type App = CFamilyGroups_GetSharedLibraryApps_Response_SharedAppJson
+  & { detail: StoreItemJson }
   & { owners: Player[] }
   & { playtime?: any }

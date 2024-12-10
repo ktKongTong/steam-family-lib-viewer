@@ -1,5 +1,5 @@
 import type {
-  CFamilyGroups_PlaytimeEntry, InferRespType,
+  CFamilyGroups_PlaytimeEntryJson, InferRespJsonType,
 } from "@repo/steam-proto";
 import { f } from '@/lib/omfetch'
 import _ from "lodash";
@@ -18,7 +18,7 @@ export const revalidate = 3600
 
 let host = process.env.BASE_URL as string
 async function fetchFamilyInfo(token:string) {
-  return await f.get<InferRespType<'FamilyGroups', 'GetFamilyGroupForUser'>>(`${host}/api/steam/family?access_token=${token}`)
+  return await f.get<InferRespJsonType<'FamilyGroups', 'GetFamilyGroupForUser'>>(`${host}/api/steam/family?access_token=${token}`)
     .catch(e=> {
       logger.log(e)
       return null
@@ -26,7 +26,7 @@ async function fetchFamilyInfo(token:string) {
 }
 async function fetchFamilyPlayTime(token:string,id:string) {
   let url = `${host}/api/steam/family/playtime/${id}?access_token=${token}`
-  const data = await f.get<InferRespType<'FamilyGroups', 'GetPlaytimeSummary'>>(url)
+  const data = await f.get<InferRespJsonType<'FamilyGroups', 'GetPlaytimeSummary'>>(url)
     .catch(e=> {
       logger.log(e)
       return null
@@ -49,12 +49,12 @@ async function fetchFamilyPlayTime(token:string,id:string) {
     }
     return {
       appid: id,
-      players: res as (CFamilyGroups_PlaytimeEntry & {isOwner:boolean})[],
+      players: res as (CFamilyGroups_PlaytimeEntryJson & {isOwner:boolean})[],
     }
   })
 }
 async function fetchFamilyMembers(token:string,ids:string[]){
-  const data = await f.get<InferRespType<'Player', 'GetPlayerLinkDetails'>>(`${host}/api/steam/player/${ids.join(',')}?access_token=${token}`)
+  const data = await f.get<InferRespJsonType<'Player', 'GetPlayerLinkDetails'>>(`${host}/api/steam/player/${ids.join(',')}?access_token=${token}`)
     .catch(e=> {
       logger.log(e)
       return null
@@ -63,7 +63,7 @@ async function fetchFamilyMembers(token:string,ids:string[]){
 }
 
 async function fetchFamilySharedLibs(token:string,id:string){
-  const data = await f.get<InferRespType<'FamilyGroups', 'GetSharedLibraryApps'>>(`${host}/api/steam/family/shared/${id}?access_token=${token}`)
+  const data = await f.get<InferRespJsonType<'FamilyGroups', 'GetSharedLibraryApps'>>(`${host}/api/steam/family/shared/${id}?access_token=${token}`)
     .catch(e=> {
       logger.log(e)
       return null
@@ -72,7 +72,7 @@ async function fetchFamilySharedLibs(token:string,id:string){
 }
 
 async function fetchFamilyLibItems(ids:string[]){
-  const data = await f.get<InferRespType<'StoreBrowse', 'GetItems'>>(`${host}/api/steam/items/${ids.join(',')}`)
+  const data = await f.get<InferRespJsonType<'StoreBrowse', 'GetItems'>>(`${host}/api/steam/items/${ids.join(',')}`)
     .catch(e=> {
       logger.log(e)
       return null
@@ -110,7 +110,7 @@ async function prepareData(accessToken:string) {
     fetchFamilyMembers(accessToken, memberIds)
   ])
 
-  const members = memberInfos!!.accounts.map((account)=> {
+  const members = memberInfos!!.accounts!.map((account)=> {
     const id = account?.publicData?.steamid! as unknown as string
     const avatar_hash = shaDigestAvatarBase64ToStrAvatarHash(account!.publicData!.shaDigestAvatar!.toString())
     return {
@@ -138,7 +138,7 @@ async function prepareData(accessToken:string) {
   const allLib = libs.map((lib)=> ({
     ...lib,
     detail: libDictionary[lib.appid!],
-    owners:lib.ownerSteamids.map((id) => {
+    owners:lib.ownerSteamids!.map((id) => {
       return memberDict[id.toString()]
     })
   }))

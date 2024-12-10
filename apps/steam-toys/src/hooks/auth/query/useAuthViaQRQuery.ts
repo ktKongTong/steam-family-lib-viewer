@@ -1,7 +1,6 @@
 import {useQuery} from "@tanstack/react-query";
 import {
-  InferRespType,
-  SteamStdResponseType
+  InferRespJsonType
 } from "@repo/steam-proto";
 import {AuthBasicInfo} from "@/hooks/auth/interface";
 import {randomBytes} from "crypto";
@@ -13,7 +12,7 @@ export const useAuthViaQRQuery = () => {
     // beginAuthViaQR
     queryKey: ['getQR'],
     queryFn: async () => {
-      const qrData = await f.get<InferRespType<'Authentication', 'BeginAuthSessionViaQR'>>(`/api/steam/auth/qr`)
+      const qrData = await f.get<InferRespJsonType<'Authentication', 'BeginAuthSessionViaQR'>>(`/api/steam/auth/qr`)
       return {
         qrInfo: {
           clientId: qrData?.clientId,

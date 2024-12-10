@@ -1,8 +1,16 @@
 import {EResult} from "../../enums/std-err-result";
-import {InferReqType, ServiceDict, ServiceMethodDict, SteamStdRequestType, SteamStdResponseType} from "../type";
-import {getProtoClazzForService} from "../util";
+import {
+  InferReqJsonType,
+  InferReqType,
+  ServiceDict,
+  ServiceMethodDict, SteamStdRequestJsonType,
+  SteamStdRequestType,
+  SteamStdResponseJsonType,
+  SteamStdResponseType
+} from "../types";
+import {getProtoSchemaForService} from "../util";
 import {uint8ArrayToBase64} from "../../utils";
-
+import {create, toBinary, toJson, fromJson, fromBinary} from "@bufbuild/protobuf";
 
 interface SteamClientOpts {
 
@@ -32,19 +40,18 @@ export const callHttpSteamStdAPI = async <
     headers,
     codec,
     method,
-}: SteamStdRequestType<T, M> & {
+}: SteamStdRequestJsonType<T, M> & {
   method?: 'GET' | 'POST',
   codec?: 'json' | 'proto'
 }
 ): Promise<
-  SteamStdResponseType<T, M>
+  SteamStdResponseJsonType<T, M>
   & { code: number }
 > => {
   let url = `https://api.steampowered.com/I${serviceName}Service/${serviceMethod}/v${apiVersion ?? 1}`;
-  const { reqClazz, respClazz } = getProtoClazzForService(serviceName, serviceMethod)
-  // @ts-expect-error
-  const reqData = new reqClazz(requestData)
-  const reqBin = reqData.toBinary()
+  const { reqSchema, respSchema } = getProtoSchemaForService(serviceName, serviceMethod)
+  const reqData = fromJson(reqSchema, requestData as any)
+  const reqBin = toBinary(reqSchema, reqData)
 
   const bufBase64 = uint8ArrayToBase64(reqBin)
   if(!method) {
@@ -61,7 +68,7 @@ export const callHttpSteamStdAPI = async <
   if(method === 'GET') {
     const query = new URLSearchParams()
     if(codec && codec === 'json') {
-      const obj = reqData.toJson({useProtoFieldName: true}) as Object
+      const obj = toJson(reqSchema, reqData) as any
       let keys = Object.keys(obj)
       for(const key of keys) {
         query.set(key,obj[key as keyof object])
@@ -91,11 +98,12 @@ export const callHttpSteamStdAPI = async <
   const resp = await fetch(url, options)
   if(codec && codec === 'json') {
     let data = await resp.json().then((it: any) => it.response)
-    resData = respClazz.fromJson(data as any)
+
+    resData = fromJson(respSchema, data)
   }else {
     const arrBuf = await resp.arrayBuffer()
     const resBin = new Uint8Array(arrBuf)
-    resData = respClazz.fromBinary(resBin)
+    resData = fromBinary(respSchema, resBin)
   }
   let errResultHeader = resp.headers.get('x-eresult');
   let errorMessageHeader = resp.headers.get('x-error_message');
@@ -107,8 +115,8 @@ export const callHttpSteamStdAPI = async <
     result: result,
     success: result === EResult.OK,
     code: resp.status,
-    data: resData as any
-  } as SteamStdResponseType<T, M> & { code: number }
+    data: toJson(respSchema,resData)
+  } as SteamStdResponseJsonType<T, M> & { code: number }
 
   if (typeof errorMessageHeader == 'string') {
     res.errorMessage = errorMessageHeader;
@@ -121,7 +129,11 @@ export const callHttpSteamStdAPI = async <
 type FirstLetterLowerCase<T extends string> = T extends `${infer First}${infer Rest}` ? `${Lowercase<First>}${Rest}` : T
 
 type SteamHTTPAPI<S extends ServiceDict> = {
-  [K in ServiceMethodDict<S> as FirstLetterLowerCase<K>]: (requestParam: InferReqType<S, K>, opts?: RequestOpts) => Promise<SteamStdResponseType<S, K>>
+  [K in ServiceMethodDict<S> as FirstLetterLowerCase<K>]: (requestParam: InferReqJsonType<S, K>, opts?: RequestOpts) => Promise<SteamStdResponseJsonType<S, K>>
+}
+
+export type SteamHTTPServiceAPI = {
+  [K in ServiceDict as FirstLetterLowerCase<K>]: SteamHTTPAPI<K>
 }
 
 export type RequestOpts = {
@@ -139,7 +151,7 @@ export const createSteamStdAPI = <T extends ServiceDict>(serviceName: T, token?:
     get: <M extends ServiceMethodDict<T>>(target: any, serviceMethod: M) => {
       // make serviceMethod First Letter to UpperCase
       let s = serviceMethod.charAt(0).toUpperCase() + serviceMethod.slice(1) as M
-      return (param:InferReqType<T, M>, requestOpts?: RequestOpts) => callHttpSteamStdAPI({
+      return (param:InferReqJsonType<T, M>, requestOpts?: RequestOpts) => callHttpSteamStdAPI({
         apiVersion: requestOpts?.apiVersion,
         headers: requestOpts?.headers,
         serviceName,

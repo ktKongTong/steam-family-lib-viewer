@@ -11,7 +11,7 @@ const app = new Hono()
 
 // steam qr login
 app.get('/api/steam/auth/qr', async (c)=>{
-  const data = await steamWebStdAPI.auth.beginAuthSessionViaQR({
+  const data = await steamWebStdAPI.authentication.beginAuthSessionViaQR({
     websiteId: 'Store',
     platformType: 2,
     deviceFriendlyName: "ChromeSteam",
@@ -28,10 +28,10 @@ app.get('/api/steam/auth/qr', async (c)=>{
 app.get('/api/steam/auth/poll', async (c)=>{
   const client_id= c.req.query('client_id')
   const request_id= c.req.query('request_id')
-  const buf = Buffer.from(request_id!, 'base64')
-  const data = await steamWebStdAPI.auth.pollAuthSessionStatus({
-    clientId: BigInt(client_id!),
-    requestId: new Uint8Array(buf)
+  // const buf = Buffer.from(request_id!, 'base64')
+  const data = await steamWebStdAPI.authentication.pollAuthSessionStatus({
+    clientId: client_id,
+    requestId: request_id
   })
   // @ts-ignore
   return handleSteamStdResponse(c, data)
@@ -205,9 +205,9 @@ app.get('/api/steam/auth/generateAccessToken', async (c)=>{
   }
 
   const id = token.steamid!
-  const res =  await steamWebStdAPI.auth.accessToken_GenerateForApp({
+  const res =  await steamWebStdAPI.authentication.generateAccessTokenForApp({
       refreshToken: refreshToken,
-      steamid: BigInt(id),
+      steamid: id,
       renewalType: renewalType
   })
 
@@ -218,7 +218,7 @@ app.get('/api/steam/auth/generateAccessToken', async (c)=>{
 
 app.get('/api/steam/account/private-app', async (c) => {
   const token = getAccessToken(c, true)
-  const res = await steamWebStdAPI.accountPrivate
+  const res = await steamWebStdAPI.accountPrivateApps
     .getPrivateAppList({}, {accessToken: token.token})
 
   // @ts-ignore

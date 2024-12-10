@@ -1,0 +1,1498 @@
+
+import {ServiceDict, ServiceMethodDict} from '../types'
+import {
+        CWishlist_AddToWishlist_Request,
+CWishlist_GetWishlist_Request,
+CWishlist_GetWishlistItemCount_Request,
+CWishlist_GetWishlistItemsOnSale_Request,
+CWishlist_GetWishlistSortedFiltered_Request,
+CWishlist_RemoveFromWishlist_Request,
+CUserNews_GetAppDetailsSpotlight_Request,
+CUserNews_GetUserNews_Request,
+CUserGameNotes_DeleteNote_Request,
+CUserGameNotes_GetGamesWithNotes_Request,
+CUserGameNotes_GetNotesForGame_Request,
+CUserGameNotes_SaveNote_Request,
+CUserGameActivity_GetActivity_Request,
+CUserAccount_CancelLicenseForApp_Request,
+CUserAccount_CreateFriendInviteToken_Request,
+CUserAccount_GetAccountLinkStatus_Request,
+CUserAccount_GetAvailableValveDiscountPromotions_Request,
+CUserAccount_GetClientWalletDetails_Request,
+CUserAccount_GetFriendInviteTokens_Request,
+CUserAccount_GetUserCountry_Request,
+CUserAccount_RedeemFriendInviteToken_Request,
+CUserAccount_RegisterCompatTool_Request,
+CUserAccount_RevokeFriendInviteToken_Request,
+CUserAccount_ViewFriendInviteToken_Request,
+CStore_GetUserVotes_Request,
+CStore_GetVoteDefinitions_Request,
+NotImplemented,
+CStore_SetVote_Request,
+CStoreQuery_GetItemByUserCombinedTagsPriority_Request,
+CStoreQuery_GetItemsByUserRecommendedTags_Request,
+CStoreQuery_Query_Request,
+CStoreQuery_SearchSuggestions_Request,
+CStoreMarketing_GetFrontPageConfig_Request,
+CStoreMarketing_GetItemsToFeature_Request,
+CStoreCatalog_GetDevPageAllAppsLinked_Request,
+CStoreBrowse_GetDLCForApps_Request,
+CStoreBrowse_GetDLCForAppsSolr_Request,
+CStoreBrowse_GetHardwareItems_Request,
+CStoreBrowse_GetItems_Request,
+CStoreBrowse_GetPriceStops_Request,
+CStoreBrowse_GetStoreCategories_Request,
+CStoreAppSimilarity_IdentifyClustersFromPlaytime_Request,
+CStoreAppSimilarity_PrioritizeAppsForUser_Request,
+CStore_DeleteReservationPositionMessage_Request,
+CStore_GetAllReservationPositionMessages_Request,
+CStore_GetDiscoveryQueue_Request,
+CStore_GetDiscoveryQueueSettings_Request,
+CStore_GetDiscoveryQueueSkippedApps_Request,
+CStore_GetLocalizedNameForTags_Request,
+CStore_GetMostPopularTags_Request,
+CStore_GetStorePreferences_Request,
+CStore_GetTagList_Request,
+CStore_GetTrendingAppsAmongFriends_Request,
+CStore_GetUserGameInterestState_Request,
+CStore_GetWishlistDemoEmailStatus_Request,
+CStore_QueueWishlistDemoEmailToFire_Request,
+CStore_RegisterCDKey_Request,
+CStore_ReportApp_Request,
+CSteamDeckCompatibility_SetFeedback_Request,
+CStore_SetReservationPositionMessage_Request,
+CSteamDeckCompatibility_ShouldPrompt_Request,
+CStore_SkipDiscoveryQueueItem_Request,
+CStore_UpdatePackageReservations_Request,
+CStore_StorePreferencesChanged_Notification,
+CSteamNotification_GetPreferences_Request,
+CSteamNotification_GetSteamNotifications_Request,
+CSteamNotification_SetPreferences_Request,
+CSteamNotification_NotificationsReceived_Notification,
+CSteamNotification_PreferencesUpdated_Notification,
+CSteamCharts_GetBestOfYearPages_Request,
+CSteamCharts_GetGamesByConcurrentPlayers_Request,
+CSteamCharts_GetMostPlayedGames_Request,
+CSteamCharts_GetMostPlayedSteamDeckGames_Request,
+CSteamCharts_GetTopReleasesPages_Request,
+CSteamAwards_GetNominationRecommendations_Request,
+CSteamAwards_GetNominationShareLink_Request,
+CSteamAwards_GetOtherUserNominations_Request,
+CSteamAwards_GetUserNominations_Request,
+CSteamAwards_Nominate_Request,
+CPublishing_CreatePartnerAppOptInEmail_Request,
+CPublishing_GetEstimatePartnerAppOptInEmail_Request,
+CPublishing_GetOptInAppealsSummaryStats_Request,
+CPublishing_GetOptInEmailTracking_Request,
+CPublishing_GetPartnerAppOptInEmailDefAndStats_Request,
+CPublishing_GetPartnerAppOptInsIDs_Request,
+CPublishing_GetPartnerPaidGivenPackageList_Request,
+CPublishing_GetSinglePartnerAppOptIns_Request,
+CPublishing_SendPartnerAppOptInEmailAndWait_Request,
+CPublishing_SetFeaturingOnPartnerAppOptIn_Request,
+CPublishing_TestFirePartnerAppOptInEmail_Request,
+CPublishing_UpdatePartnerAppOptInEmail_Request,
+CPublishedFile_AddAppRelationship_Request,
+CPublishedFile_AddChild_Request,
+CPublishedFile_AreFilesInSubscriptionList_Request,
+CPublishedFile_CanSubscribe_Request,
+CPublishedFile_Delete_Request,
+CPublishedFile_GetAppRelationships_Request,
+CPublishedFile_GetAppRelationshipsBatched_Request,
+CPublishedFile_GetChangeHistory_Request,
+CPublishedFile_GetChangeHistoryEntry_Request,
+CPublishedFile_GetContentDescriptors_Request,
+CPublishedFile_GetDetails_Request,
+CPublishedFile_GetItemChanges_Request,
+CPublishedFile_GetItemInfo_Request,
+CPublishedFile_GetSubSectionData_Request,
+CPublishedFile_GetUserFiles_Request,
+CPublishedFile_GetUserVoteSummary_Request,
+CPublishedFile_Publish_Request,
+CPublishedFile_QueryFiles_Request,
+CPublishedFile_RefreshVotingQueue_Request,
+CPublishedFile_RemoveAppRelationship_Request,
+CPublishedFile_RemoveChild_Request,
+CPublishedFile_SetCollectionChildren_Request,
+CPublishedFile_SetPlaytimeForControllerConfigs_Request,
+CPublishedFile_SetSubscriptionListFromCollection_Request,
+CPublishedFile_StartPlaytimeTracking_Request,
+CPublishedFile_StopPlaytimeTracking_Request,
+CPublishedFile_StopPlaytimeTrackingForAllAppItems_Request,
+CPublishedFile_Subscribe_Request,
+CPublishedFile_Unsubscribe_Request,
+CPublishedFile_Update_Request,
+CPublishedFile_UpdateContentDescriptors_Request,
+CPublishedFile_Vote_Request,
+CPublishedFile_FileDeleted_Client_Notification,
+CPublishedFile_FileSubscribed_Notification,
+CPublishedFile_FileUnsubscribed_Notification,
+CPlaytest_GetInvites_Request,
+CPlaytest_GetUserStatus_Request,
+CPlaytest_RequestInvite_Request,
+CPlaytest_UpdateInvites_Request,
+CPlayer_AcceptSSA_Request,
+CPlayer_AddFriend_Request,
+CPlayer_GetLastPlayedTimes_Request,
+CPlayer_DeletePostedStatus_Request,
+CPlayer_GetAchievementsProgress_Request,
+CPlayer_GetAnimatedAvatar_Request,
+CPlayer_GetAvatarFrame_Request,
+CPlayer_GetCommunityBadgeProgress_Request,
+CPlayer_GetCommunityPreferences_Request,
+CPlayer_GetDurationControl_Request,
+CPlayer_GetEmoticonList_Request,
+CPlayer_GetFavoriteBadge_Request,
+CPlayer_GetFriendsAppsActivity_Request,
+CPlayer_GetFriendsGameplayInfo_Request,
+CPlayer_GetGameAchievements_Request,
+CPlayer_GetGameBadgeLevels_Request,
+CPlayer_GetMiniProfileBackground_Request,
+CPlayer_GetMutualFriendsForIncomingInvites_Request,
+CPlayer_GetNewSteamAnnouncementState_Request,
+CPlayer_GetNicknameList_Request,
+CPlayer_GetOwnedGames_Request,
+CPlayer_GetPerFriendPreferences_Request,
+CPlayer_GetPlayerLinkDetails_Request,
+CPlayer_GetPlayNext_Request,
+CPlayer_GetPostedStatus_Request,
+CPlayer_GetPrivacySettings_Request,
+CPlayer_GetProfileBackground_Request,
+CPlayer_GetProfileCustomization_Request,
+CPlayer_GetProfileItemsEquipped_Request,
+CPlayer_GetProfileItemsOwned_Request,
+CPlayer_GetProfileThemesAvailable_Request,
+CPlayer_GetPurchasedAndUpgradedProfileCustomizations_Request,
+CPlayer_GetPurchasedProfileCustomizations_Request,
+CPlayer_GetRecentPlaytimeSessionsForChild_Request,
+CPlayer_GetSteamDeckKeyboardSkin_Request,
+CPlayer_GetTextFilterWords_Request,
+CPlayer_GetTimeSSAAccepted_Request,
+CPlayer_GetTopAchievementsForGames_Request,
+CPlayer_IgnoreFriend_Request,
+CPlayer_PostStatusToFriends_Request,
+CPlayer_RecordDisconnectedPlaytime_Request,
+CPlayer_RemoveFriend_Request,
+CPlayer_SetAnimatedAvatar_Request,
+CPlayer_SetAvatarFrame_Request,
+CPlayer_SetCommunityPreferences_Request,
+CPlayer_SetEquippedProfileItemFlags_Request,
+CPlayer_SetFavoriteBadge_Request,
+CPlayer_SetMiniProfileBackground_Request,
+CPlayer_SetPerFriendPreferences_Request,
+CPlayer_SetProfileBackground_Request,
+CPlayer_SetProfilePreferences_Request,
+CPlayer_SetProfileTheme_Request,
+CPlayer_SetSteamDeckKeyboardSkin_Request,
+CPlayer_UpdateSteamAnnouncementLastRead_Request,
+CPlayer_CommunityPreferencesChanged_Notification,
+CPlayer_FriendEquippedProfileItemsChanged_Notification,
+CPlayer_FriendNicknameChanged_Notification,
+CPlayer_LastPlayedTimes_Notification,
+CPlayer_NewSteamAnnouncementState_Notification,
+CPlayer_PerFriendPreferencesChanged_Notification,
+CPlayer_PrivacySettingsChanged_Notification,
+CPlayer_TextFilterWordsChanged_Notification,
+CNews_ConvertHTMLToBBCode_Request,
+CNews_GetBatchPublishedPartnerEvent_Request,
+CNews_GetNewsFeedByRepublishClan_Request,
+CNews_PreviewPartnerEvents_Request,
+CNews_PublishPartnerEvent_Request,
+CLoyaltyRewards_AddReaction_Request,
+CLoyaltyRewards_BatchedQueryRewardItems_Request,
+CLoyaltyRewards_GetActivePurchaseBonuses_Request,
+CLoyaltyRewards_GetEligibleApps_Request,
+CLoyaltyRewards_GetEquippedProfileItems_Request,
+CLoyaltyRewards_GetPointsForSpend_Request,
+CLoyaltyRewards_GetProfileCustomizationsConfig_Request,
+CLoyaltyRewards_GetReactionConfig_Request,
+CLoyaltyRewards_GetReactions_Request,
+CLoyaltyRewards_GetReactionsSummaryForUser_Request,
+CLoyaltyRewards_GetSummary_Request,
+CLoyaltyRewards_QueryRewardItems_Request,
+CLoyaltyRewards_RedeemPoints_Request,
+CLoyaltyRewards_RedeemPointsForBadgeLevel_Request,
+CLoyaltyRewards_RedeemPointsForProfileCustomization_Request,
+CLoyaltyRewards_RedeemPointsForProfileCustomizationUpgrade_Request,
+CLoyaltyRewards_RedeemPointsToUpgradeItem_Request,
+CLoyaltyRewards_RegisterForSteamDeckRewards_Request,
+CFriendsList_GetCategories_Request,
+CFriendsList_GetFavorites_Request,
+CFriendsList_GetFriendsList_Request,
+CFriendsList_SetFavorites_Request,
+CFriendsList_FavoritesChanged_Notification,
+CFriendMessages_AckMessage_Notification,
+CFriendsMessages_GetActiveMessageSessions_Request,
+CFriendMessages_GetRecentMessages_Request,
+CFriendMessages_IsInFriendsUIBeta_Request,
+CFriendMessages_SendMessage_Request,
+CFriendMessages_UpdateMessageReaction_Request,
+CFriendMessages_IncomingMessage_Notification,
+CFriendMessages_MessageReaction_Notification,
+CFamilyGroups_CancelFamilyGroupInvite_Request,
+CFamilyGroups_ClearCooldownSkip_Request,
+CFamilyGroups_ConfirmInviteToFamilyGroup_Request,
+CFamilyGroups_ConfirmJoinFamilyGroup_Request,
+CFamilyGroups_CreateFamilyGroup_Request,
+CFamilyGroups_DeleteFamilyGroup_Request,
+CFamilyGroups_ForceAcceptInvite_Request,
+CFamilyGroups_GetChangeLog_Request,
+CFamilyGroups_GetFamilyGroup_Request,
+CFamilyGroups_GetFamilyGroupForUser_Request,
+CFamilyGroups_GetInviteCheckResults_Request,
+CFamilyGroups_GetPlaytimeSummary_Request,
+CFamilyGroups_GetPreferredLenders_Request,
+CFamilyGroups_GetPurchaseRequests_Request,
+CFamilyGroups_GetSharedLibraryApps_Request,
+CFamilyGroups_GetUsersSharingDevice_Request,
+CFamilyGroups_InviteToFamilyGroup_Request,
+CFamilyGroups_JoinFamilyGroup_Request,
+CFamilyGroups_ModifyFamilyGroupDetails_Request,
+CFamilyGroups_RemoveFromFamilyGroup_Request,
+CFamilyGroups_RequestPurchase_Request,
+CFamilyGroups_ResendInvitationToFamilyGroup_Request,
+CFamilyGroups_RespondToRequestedPurchase_Request,
+CFamilyGroups_SetFamilyCooldownOverrides_Request,
+CFamilyGroups_SetPreferredLender_Request,
+CFamilyGroups_UndeleteFamilyGroup_Request,
+CFamilyGroupsClient_GroupChanged_Notification,
+CFamilyGroupsClient_InviteStatus_Notification,
+CFamilyGroupsClient_NotifyRunningApps_Notification,
+CEcon_ClientGetItemShopOverlayAuthURL_Request,
+CEcon_GetAssetClassInfo_Request,
+CEcon_GetInventoryItemsWithDescriptions_Request,
+CEcon_GetTradeOfferAccessToken_Request,
+CCommunity_ClearSinglePartnerEventsAppPriority_Request,
+CCommunity_ClearUserPartnerEventsAppPriorities_Request,
+CCommunity_DeleteCommentFromThread_Request,
+CCommunity_FetchTranslationFromCrowdIn_Request,
+CCommunity_GetAppRichPresenceLocalization_Request,
+CCommunity_GetApps_Request,
+CCommunity_GetAvatarHistory_Request,
+CCommunity_GetBestEventsForUser_Request,
+CCommunity_GetClanAnnouncementVoteForUser_Request,
+CCommunity_GetClanCrowdInMetadata_Request,
+CCommunity_GetClanEventCrowdInMetadata_Request,
+CCommunity_GetCommentThread_Request,
+CCommunity_GetCommentThreadRatings_Request,
+CCommunity_GetUserPartnerEventNews_Request,
+CCommunity_GetUserPartnerEventsAppPriorities_Request,
+CCommunity_GetUserPartnerEventViewStatus_Request,
+CCommunity_MarkPartnerEventsForUser_Request,
+CCommunity_PartnerEventsShowLessForApp_Request,
+CCommunity_PartnerEventsShowMoreForApp_Request,
+CCommunity_PostCommentToThread_Request,
+CCommunity_RateClanAnnouncement_Request,
+CCommunity_RateCommentThread_Request,
+CCloudConfigStore_Download_Request,
+CCloudConfigStore_Upload_Request,
+CCloudConfigStore_Change_Notification,
+CCloud_ClientLogUploadRequest_Notification,
+CCloud_AppCloudStateChange_Notification,
+CClientComm_EnableOrDisableDownloads_Request,
+CClientComm_GetAllClientLogonInfo_Request,
+CClientComm_GetClientAppList_Request,
+CClientComm_GetClientInfo_Request,
+CClientComm_GetClientLogonInfo_Request,
+CClientComm_InstallClientApp_Request,
+CClientComm_LaunchClientApp_Request,
+CClientComm_SetClientAppUpdateState_Request,
+CClientComm_UninstallClientApp_Request,
+CAuthenticationSupport_GetTokenHistory_Request,
+CAuthenticationSupport_MarkTokenCompromised_Request,
+CAuthenticationSupport_QueryRefreshTokenByID_Request,
+CAuthenticationSupport_QueryRefreshTokensByAccount_Request,
+CAuthenticationSupport_RevokeToken_Request,
+CAuthentication_BeginAuthSessionViaCredentials_Request,
+CAuthentication_BeginAuthSessionViaQR_Request,
+CAuthentication_RefreshToken_Enumerate_Request,
+CAuthentication_AccessToken_GenerateForApp_Request,
+CAuthentication_GetAuthSessionInfo_Request,
+CAuthentication_GetAuthSessionRiskInfo_Request,
+CAuthentication_GetAuthSessionsForAccount_Request,
+CAuthentication_GetPasswordRSAPublicKey_Request,
+CAuthentication_MigrateMobileSession_Request,
+CAuthentication_PollAuthSessionStatus_Request,
+CAuthentication_RefreshToken_Revoke_Request,
+CAuthentication_Token_Revoke_Request,
+CAuthentication_UpdateAuthSessionWithMobileConfirmation_Request,
+CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request,
+CAchievements_GetInfo_Request,
+CAccountPrivateApps_GetPrivateAppList_Request,
+CAccountPrivateApps_ToggleAppPrivacy_Request,
+CAccountPrivateApsClient_NotifyPrivateAppListChanged_Notification,
+CAccountPrivacy_GetCookiePreferences_Request,
+CWishlist_AddToWishlist_Response,
+CWishlist_GetWishlist_Response,
+CWishlist_GetWishlistItemCount_Response,
+CWishlist_GetWishlistItemsOnSale_Response,
+CWishlist_GetWishlistSortedFiltered_Response,
+CWishlist_RemoveFromWishlist_Response,
+CUserNews_GetAppDetailsSpotlight_Response,
+CUserNews_GetUserNews_Response,
+CUserGameNotes_DeleteNote_Response,
+CUserGameNotes_GetGamesWithNotes_Response,
+CUserGameNotes_GetNotesForGame_Response,
+CUserGameNotes_SaveNote_Response,
+CUserGameActivity_GetActivity_Response,
+CUserAccount_CancelLicenseForApp_Response,
+CUserAccount_CreateFriendInviteToken_Response,
+CUserAccount_GetAccountLinkStatus_Response,
+CUserAccount_GetAvailableValveDiscountPromotions_Response,
+CUserAccount_GetWalletDetails_Response,
+CUserAccount_GetFriendInviteTokens_Response,
+CUserAccount_GetUserCountry_Response,
+CUserAccount_RedeemFriendInviteToken_Response,
+CUserAccount_RegisterCompatTool_Response,
+CUserAccount_RevokeFriendInviteToken_Response,
+CUserAccount_ViewFriendInviteToken_Response,
+CStore_GetUserVotes_Response,
+CStore_GetVoteDefinitions_Response,
+CStore_GetVoteDefinitionsForEvents_Response,
+CStore_SetVote_Response,
+CStoreQuery_GetItemByUserCombinedTagsPriority_Response,
+CStoreQuery_GetItemsByUserRecommendedTags_Response,
+CStoreQuery_Query_Response,
+CStoreQuery_SearchSuggestions_Response,
+CStoreMarketing_GetFrontPageConfig_Response,
+CStoreMarketing_GetItemsToFeature_Response,
+CStoreCatalog_GetDevPageAllAppsLinked_Response,
+CStoreBrowse_GetDLCForApps_Response,
+CStoreBrowse_GetDLCForAppsSolr_Response,
+CStoreBrowse_GetHardwareItems_Response,
+CStoreBrowse_GetItems_Response,
+CStoreBrowse_GetPriceStops_Response,
+CStoreBrowse_GetStoreCategories_Response,
+CStoreAppSimilarity_IdentifyClustersFromPlaytime_Response,
+CStoreAppSimilarity_PrioritizeAppsForUser_Response,
+CStore_DeleteReservationPositionMessage_Response,
+CStore_GetAllReservationPositionMessages_Response,
+CStore_GetDiscoveryQueue_Response,
+CStore_GetDiscoveryQueueSettings_Response,
+CStore_GetDiscoveryQueueSkippedApps_Response,
+CStore_GetLocalizedNameForTags_Response,
+CStore_GetMostPopularTags_Response,
+CStore_GetStorePreferences_Response,
+CStore_GetTagList_Response,
+CStore_GetTrendingAppsAmongFriends_Response,
+CStore_GetUserGameInterestState_Response,
+CStore_GetWishlistDemoEmailStatus_Response,
+CStore_QueueWishlistDemoEmailToFire_Response,
+CStore_RegisterCDKey_Response,
+CStore_ReportApp_Response,
+CSteamDeckCompatibility_SetFeedback_Response,
+CStore_SetReservationPositionMessage_Response,
+CSteamDeckCompatibility_ShouldPrompt_Response,
+CStore_SkipDiscoveryQueueItem_Response,
+CStore_UpdatePackageReservations_Response,
+NoResponse,
+CSteamNotification_GetPreferences_Response,
+CSteamNotification_GetSteamNotifications_Response,
+CSteamNotification_SetPreferences_Response,
+CSteamCharts_GetBestOfYearPages_Response,
+CSteamCharts_GetGamesByConcurrentPlayers_Response,
+CSteamCharts_GetMostPlayedGames_Response,
+CSteamCharts_GetMostPlayedSteamDeckGames_Response,
+CSteamCharts_GetTopReleasesPages_Response,
+CSteamAwards_GetNominationRecommendations_Response,
+CSteamAwards_GetNominationShareLink_Response,
+CSteamAwards_GetUserNominations_Response,
+CSteamAwards_Nominate_Response,
+CPublishing_CreatePartnerAppOptInEmail_Response,
+CPublishing_GetEstimatePartnerAppOptInEmail_Response,
+CPublishing_GetOptInAppealsSummaryStats_Response,
+CPublishing_GetOptInEmailTracking_Response,
+CPublishing_GetPartnerAppOptInEmailDefAndStats_Response,
+CPublishing_GetPartnerAppOptInsIDs_Response,
+CPublishing_GetPartnerOptInInvites_Response,
+CPublishing_GetPartnerPaidGivenPackageList_Response,
+CPublishing_GetSinglePartnerAppOptIns_Response,
+CPublishing_SendPartnerAppOptInEmailAndWait_Response,
+CPublishing_SetFeaturingOnPartnerAppOptIn_Response,
+CPublishing_TestFirePartnerAppOptInEmail_Response,
+CPublishing_UpdatePartnerAppOptInEmail_Response,
+CPublishedFile_AddAppRelationship_Response,
+CPublishedFile_AddChild_Response,
+CPublishedFile_AreFilesInSubscriptionList_Response,
+CPublishedFile_CanSubscribe_Response,
+CPublishedFile_Delete_Response,
+CPublishedFile_GetAppRelationships_Response,
+CPublishedFile_GetAppRelationshipsBatched_Response,
+CPublishedFile_GetChangeHistory_Response,
+CPublishedFile_GetChangeHistoryEntry_Response,
+CPublishedFile_GetContentDescriptors_Response,
+CPublishedFile_GetDetails_Response,
+CPublishedFile_GetItemChanges_Response,
+CPublishedFile_GetItemInfo_Response,
+CPublishedFile_GetSubSectionData_Response,
+CPublishedFile_GetUserFiles_Response,
+CPublishedFile_GetUserVoteSummary_Response,
+CPublishedFile_Publish_Response,
+CPublishedFile_QueryFiles_Response,
+CPublishedFile_RefreshVotingQueue_Response,
+CPublishedFile_RemoveAppRelationship_Response,
+CPublishedFile_RemoveChild_Response,
+CPublishedFile_SetCollectionChildren_Response,
+CPublishedFile_SetPlaytimeForControllerConfigs_Response,
+CPublishedFile_SetSubscriptionListFromCollection_Response,
+CPublishedFile_StartPlaytimeTracking_Response,
+CPublishedFile_StopPlaytimeTracking_Response,
+CPublishedFile_StopPlaytimeTrackingForAllAppItems_Response,
+CPublishedFile_Subscribe_Response,
+CPublishedFile_Unsubscribe_Response,
+CPublishedFile_Update_Response,
+CPublishedFile_UpdateContentDescriptors_Response,
+CPublishedFile_Vote_Response,
+CPlaytest_GetInvites_Response,
+CPlaytest_GetUserStatus_Response,
+CPlaytest_RequestInvite_Response,
+CPlaytest_UpdateInvites_Response,
+CPlayer_AcceptSSA_Response,
+CPlayer_AddFriend_Response,
+CPlayer_GetLastPlayedTimes_Response,
+CPlayer_DeletePostedStatus_Response,
+CPlayer_GetAchievementsProgress_Response,
+CPlayer_GetAnimatedAvatar_Response,
+CPlayer_GetAvatarFrame_Response,
+CPlayer_GetCommunityBadgeProgress_Response,
+CPlayer_GetCommunityPreferences_Response,
+CPlayer_GetDurationControl_Response,
+CPlayer_GetEmoticonList_Response,
+CPlayer_GetFavoriteBadge_Response,
+CPlayer_GetFriendsAppsActivity_Response,
+CPlayer_GetFriendsGameplayInfo_Response,
+CPlayer_GetGameAchievements_Response,
+CPlayer_GetGameBadgeLevels_Response,
+CPlayer_GetMiniProfileBackground_Response,
+CPlayer_GetMutualFriendsForIncomingInvites_Response,
+CPlayer_GetNewSteamAnnouncementState_Response,
+CPlayer_GetNicknameList_Response,
+CPlayer_GetOwnedGames_Response,
+CPlayer_GetPerFriendPreferences_Response,
+CPlayer_GetPlayerLinkDetails_Response,
+CPlayer_GetPlayNext_Response,
+CPlayer_GetPostedStatus_Response,
+CPlayer_GetPrivacySettings_Response,
+CPlayer_GetProfileBackground_Response,
+CPlayer_GetProfileCustomization_Response,
+CPlayer_GetProfileItemsEquipped_Response,
+CPlayer_GetProfileItemsOwned_Response,
+CPlayer_GetProfileThemesAvailable_Response,
+CPlayer_GetPurchasedAndUpgradedProfileCustomizations_Response,
+CPlayer_GetPurchasedProfileCustomizations_Response,
+CPlayer_GetRecentPlaytimeSessionsForChild_Response,
+CPlayer_GetSteamDeckKeyboardSkin_Response,
+CPlayer_GetTextFilterWords_Response,
+CPlayer_GetTimeSSAAccepted_Response,
+CPlayer_GetTopAchievementsForGames_Response,
+CPlayer_IgnoreFriend_Response,
+CPlayer_PostStatusToFriends_Response,
+CPlayer_RecordDisconnectedPlaytime_Response,
+CPlayer_RemoveFriend_Response,
+CPlayer_SetAnimatedAvatar_Response,
+CPlayer_SetAvatarFrame_Response,
+CPlayer_SetCommunityPreferences_Response,
+CPlayer_SetEquippedProfileItemFlags_Response,
+CPlayer_SetFavoriteBadge_Response,
+CPlayer_SetMiniProfileBackground_Response,
+CPlayer_SetPerFriendPreferences_Response,
+CPlayer_SetProfileBackground_Response,
+CPlayer_SetProfilePreferences_Response,
+CPlayer_SetProfileTheme_Response,
+CPlayer_SetSteamDeckKeyboardSkin_Response,
+CPlayer_UpdateSteamAnnouncementLastRead_Response,
+CNews_ConvertHTMLToBBCode_Response,
+CNews_GetBatchPublishedPartnerEvent_Response,
+CNews_GetNewsFeedByRepublishClan_Response,
+CNews_PreviewPartnerEvents_Response,
+CNews_PublishPartnerEvent_Response,
+CLoyaltyRewards_AddReaction_Response,
+CLoyaltyRewards_BatchedQueryRewardItems_Response,
+CLoyaltyRewards_GetActivePurchaseBonuses_Response,
+CLoyaltyRewards_GetEligibleApps_Response,
+CLoyaltyRewards_GetEquippedProfileItems_Response,
+CLoyaltyRewards_GetPointsForSpend_Response,
+CLoyaltyRewards_GetProfileCustomizationsConfig_Response,
+CLoyaltyRewards_GetReactionConfig_Response,
+CLoyaltyRewards_GetReactions_Response,
+CLoyaltyRewards_GetReactionsSummaryForUser_Response,
+CLoyaltyRewards_GetSummary_Response,
+CLoyaltyRewards_QueryRewardItems_Response,
+CLoyaltyRewards_RedeemPoints_Response,
+CLoyaltyRewards_RedeemPointsForProfileCustomization_Response,
+CLoyaltyRewards_RedeemPointsForProfileCustomizationUpgrade_Response,
+CLoyaltyRewards_RegisterForSteamDeckRewards_Response,
+CFriendsList_GetCategories_Response,
+CFriendsList_GetFavorites_Response,
+CFriendsList_GetFriendsList_Response,
+CFriendsList_SetFavorites_Response,
+CFriendsMessages_GetActiveMessageSessions_Response,
+CFriendMessages_GetRecentMessages_Response,
+CFriendMessages_IsInFriendsUIBeta_Response,
+CFriendMessages_SendMessage_Response,
+CFriendMessages_UpdateMessageReaction_Response,
+CFamilyGroups_CancelFamilyGroupInvite_Response,
+CFamilyGroups_ClearCooldownSkip_Response,
+CFamilyGroups_ConfirmInviteToFamilyGroup_Response,
+CFamilyGroups_ConfirmJoinFamilyGroup_Response,
+CFamilyGroups_CreateFamilyGroup_Response,
+CFamilyGroups_DeleteFamilyGroup_Response,
+CFamilyGroups_ForceAcceptInvite_Response,
+CFamilyGroups_GetChangeLog_Response,
+CFamilyGroups_GetFamilyGroup_Response,
+CFamilyGroups_GetFamilyGroupForUser_Response,
+CFamilyGroups_GetInviteCheckResults_Response,
+CFamilyGroups_GetPlaytimeSummary_Response,
+CFamilyGroups_GetPreferredLenders_Response,
+CFamilyGroups_GetPurchaseRequests_Response,
+CFamilyGroups_GetSharedLibraryApps_Response,
+CFamilyGroups_GetUsersSharingDevice_Response,
+CFamilyGroups_InviteToFamilyGroup_Response,
+CFamilyGroups_JoinFamilyGroup_Response,
+CFamilyGroups_ModifyFamilyGroupDetails_Response,
+CFamilyGroups_RemoveFromFamilyGroup_Response,
+CFamilyGroups_RequestPurchase_Response,
+CFamilyGroups_ResendInvitationToFamilyGroup_Response,
+CFamilyGroups_RespondToRequestedPurchase_Response,
+CFamilyGroups_SetFamilyCooldownOverrides_Response,
+CFamilyGroups_SetPreferredLender_Response,
+CFamilyGroups_UndeleteFamilyGroup_Response,
+CEcon_ClientGetItemShopOverlayAuthURL_Response,
+CEcon_GetAssetClassInfo_Response,
+CEcon_GetInventoryItemsWithDescriptions_Response,
+CEcon_GetTradeOfferAccessToken_Response,
+CCommunity_ClearSinglePartnerEventsAppPriority_Response,
+CCommunity_ClearUserPartnerEventsAppPriorities_Response,
+CCommunity_DeleteCommentFromThread_Response,
+CCommunity_FetchTranslationFromCrowdIn_Response,
+CCommunity_GetAppRichPresenceLocalization_Response,
+CCommunity_GetApps_Response,
+CCommunity_GetAvatarHistory_Response,
+CCommunity_GetBestEventsForUser_Response,
+CCommunity_GetClanAnnouncementVoteForUser_Response,
+CCommunity_GetClanCrowdInMetadata_Response,
+CCommunity_GetClanEventCrowdInMetadata_Response,
+CCommunity_GetCommentThread_Response,
+CCommunity_GetCommentThreadRatings_Response,
+CCommunity_GetUserPartnerEventNews_Response,
+CCommunity_GetUserPartnerEventsAppPriorities_Response,
+CCommunity_GetUserPartnerEventViewStatus_Response,
+CCommunity_MarkPartnerEventsForUser_Response,
+CCommunity_PartnerEventsShowLessForApp_Response,
+CCommunity_PartnerEventsShowMoreForApp_Response,
+CCommunity_PostCommentToThread_Response,
+CCommunity_RateClanAnnouncement_Response,
+CCommunity_RateCommentThread_Response,
+CCloudConfigStore_Download_Response,
+CCloudConfigStore_Upload_Response,
+CCloud_BeginAppUploadBatch_Response,
+CCloud_BeginHTTPUpload_Response,
+CCloud_BeginUGCUpload_Response,
+CCloud_ClientBeginFileUpload_Response,
+CCloud_ClientCommitFileUpload_Response,
+CCloud_ClientDeleteFile_Response,
+CCloud_ClientFileDownload_Response,
+CCloud_ClientGetAppQuotaUsage_Response,
+CCloud_CommitHTTPUpload_Response,
+CCloud_CommitUGCUpload_Response,
+CCloud_CompleteAppUploadBatch_Response,
+CCloud_Delete_Response,
+CCloud_EnumerateUserApps_Response,
+CCloud_EnumerateUserFiles_Response,
+CCloud_GetAppFileChangelist_Response,
+CCloud_GetClientEncryptionKey_Response,
+CCloud_GetFileDetails_Response,
+CCloud_GetUploadServerInfo_Response,
+CCloud_AppSessionResume_Response,
+CCloud_AppLaunchIntent_Response,
+CCloud_AppSessionSuspend_Response,
+CClientComm_EnableOrDisableDownloads_Response,
+CClientComm_GetAllClientLogonInfo_Response,
+CClientComm_GetClientAppList_Response,
+CClientComm_GetClientInfo_Response,
+CClientComm_GetClientLogonInfo_Response,
+CClientComm_InstallClientApp_Response,
+CClientComm_LaunchClientApp_Response,
+CClientComm_SetClientAppUpdateState_Response,
+CClientComm_UninstallClientApp_Response,
+CAuthenticationSupport_GetTokenHistory_Response,
+CAuthenticationSupport_MarkTokenCompromised_Response,
+CAuthenticationSupport_QueryRefreshTokenByID_Response,
+CAuthenticationSupport_QueryRefreshTokensByAccount_Response,
+CAuthenticationSupport_RevokeToken_Response,
+CAuthentication_BeginAuthSessionViaCredentials_Response,
+CAuthentication_BeginAuthSessionViaQR_Response,
+CAuthentication_RefreshToken_Enumerate_Response,
+CAuthentication_AccessToken_GenerateForApp_Response,
+CAuthentication_GetAuthSessionInfo_Response,
+CAuthentication_GetAuthSessionRiskInfo_Response,
+CAuthentication_GetAuthSessionsForAccount_Response,
+CAuthentication_GetPasswordRSAPublicKey_Response,
+CAuthentication_MigrateMobileSession_Response,
+CAuthentication_PollAuthSessionStatus_Response,
+CAuthentication_RefreshToken_Revoke_Response,
+CAuthentication_Token_Revoke_Response,
+CAuthentication_UpdateAuthSessionWithMobileConfirmation_Response,
+CAuthentication_UpdateAuthSessionWithSteamGuardCode_Response,
+CAchievements_GetInfo_Response,
+CAccountPrivateApps_GetPrivateAppList_Response,
+CAccountPrivateApps_ToggleAppPrivacy_Response,
+CAccountPrivacy_GetCookiePreferences_Response
+    } from "./types"
+    
+
+
+type InferSteamStdReqOrRespWishlistType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'Wishlist' = 'Wishlist',
+> = T extends never ? never
+  : M extends 'AddToWishlist' ? (T extends 'Response' ? CWishlist_AddToWishlist_Response : CWishlist_AddToWishlist_Request)
+  : M extends 'GetWishlist' ? (T extends 'Response' ? CWishlist_GetWishlist_Response : CWishlist_GetWishlist_Request)
+  : M extends 'GetWishlistItemCount' ? (T extends 'Response' ? CWishlist_GetWishlistItemCount_Response : CWishlist_GetWishlistItemCount_Request)
+  : M extends 'GetWishlistItemsOnSale' ? (T extends 'Response' ? CWishlist_GetWishlistItemsOnSale_Response : CWishlist_GetWishlistItemsOnSale_Request)
+  : M extends 'GetWishlistSortedFiltered' ? (T extends 'Response' ? CWishlist_GetWishlistSortedFiltered_Response : CWishlist_GetWishlistSortedFiltered_Request)
+  : M extends 'RemoveFromWishlist' ? (T extends 'Response' ? CWishlist_RemoveFromWishlist_Response : CWishlist_RemoveFromWishlist_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespUserNewsType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'UserNews' = 'UserNews',
+> = T extends never ? never
+  : M extends 'GetAppDetailsSpotlight' ? (T extends 'Response' ? CUserNews_GetAppDetailsSpotlight_Response : CUserNews_GetAppDetailsSpotlight_Request)
+  : M extends 'GetUserNews' ? (T extends 'Response' ? CUserNews_GetUserNews_Response : CUserNews_GetUserNews_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespUserGameNotesType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'UserGameNotes' = 'UserGameNotes',
+> = T extends never ? never
+  : M extends 'DeleteNote' ? (T extends 'Response' ? CUserGameNotes_DeleteNote_Response : CUserGameNotes_DeleteNote_Request)
+  : M extends 'GetGamesWithNotes' ? (T extends 'Response' ? CUserGameNotes_GetGamesWithNotes_Response : CUserGameNotes_GetGamesWithNotes_Request)
+  : M extends 'GetNotesForGame' ? (T extends 'Response' ? CUserGameNotes_GetNotesForGame_Response : CUserGameNotes_GetNotesForGame_Request)
+  : M extends 'SaveNote' ? (T extends 'Response' ? CUserGameNotes_SaveNote_Response : CUserGameNotes_SaveNote_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespUserGameActivityType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'UserGameActivity' = 'UserGameActivity',
+> = T extends never ? never
+  : M extends 'GetActivity' ? (T extends 'Response' ? CUserGameActivity_GetActivity_Response : CUserGameActivity_GetActivity_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespUserAccountType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'UserAccount' = 'UserAccount',
+> = T extends never ? never
+  : M extends 'CancelLicenseForApp' ? (T extends 'Response' ? CUserAccount_CancelLicenseForApp_Response : CUserAccount_CancelLicenseForApp_Request)
+  : M extends 'CreateFriendInviteToken' ? (T extends 'Response' ? CUserAccount_CreateFriendInviteToken_Response : CUserAccount_CreateFriendInviteToken_Request)
+  : M extends 'GetAccountLinkStatus' ? (T extends 'Response' ? CUserAccount_GetAccountLinkStatus_Response : CUserAccount_GetAccountLinkStatus_Request)
+  : M extends 'GetAvailableValveDiscountPromotions' ? (T extends 'Response' ? CUserAccount_GetAvailableValveDiscountPromotions_Response : CUserAccount_GetAvailableValveDiscountPromotions_Request)
+  : M extends 'GetClientWalletDetails' ? (T extends 'Response' ? CUserAccount_GetWalletDetails_Response : CUserAccount_GetClientWalletDetails_Request)
+  : M extends 'GetFriendInviteTokens' ? (T extends 'Response' ? CUserAccount_GetFriendInviteTokens_Response : CUserAccount_GetFriendInviteTokens_Request)
+  : M extends 'GetUserCountry' ? (T extends 'Response' ? CUserAccount_GetUserCountry_Response : CUserAccount_GetUserCountry_Request)
+  : M extends 'RedeemFriendInviteToken' ? (T extends 'Response' ? CUserAccount_RedeemFriendInviteToken_Response : CUserAccount_RedeemFriendInviteToken_Request)
+  : M extends 'RegisterCompatTool' ? (T extends 'Response' ? CUserAccount_RegisterCompatTool_Response : CUserAccount_RegisterCompatTool_Request)
+  : M extends 'RevokeFriendInviteToken' ? (T extends 'Response' ? CUserAccount_RevokeFriendInviteToken_Response : CUserAccount_RevokeFriendInviteToken_Request)
+  : M extends 'ViewFriendInviteToken' ? (T extends 'Response' ? CUserAccount_ViewFriendInviteToken_Response : CUserAccount_ViewFriendInviteToken_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespStoreSalesType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'StoreSales' = 'StoreSales',
+> = T extends never ? never
+  : M extends 'GetUserVotes' ? (T extends 'Response' ? CStore_GetUserVotes_Response : CStore_GetUserVotes_Request)
+  : M extends 'GetVoteDefinitions' ? (T extends 'Response' ? CStore_GetVoteDefinitions_Response : CStore_GetVoteDefinitions_Request)
+  : M extends 'GetVoteDefinitionsForEvents' ? (T extends 'Response' ? CStore_GetVoteDefinitionsForEvents_Response : NotImplemented)
+  : M extends 'SetVote' ? (T extends 'Response' ? CStore_SetVote_Response : CStore_SetVote_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespStoreQueryType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'StoreQuery' = 'StoreQuery',
+> = T extends never ? never
+  : M extends 'GetItemByUserCombinedTagsPriority' ? (T extends 'Response' ? CStoreQuery_GetItemByUserCombinedTagsPriority_Response : CStoreQuery_GetItemByUserCombinedTagsPriority_Request)
+  : M extends 'GetItemsByUserRecommendedTags' ? (T extends 'Response' ? CStoreQuery_GetItemsByUserRecommendedTags_Response : CStoreQuery_GetItemsByUserRecommendedTags_Request)
+  : M extends 'Query' ? (T extends 'Response' ? CStoreQuery_Query_Response : CStoreQuery_Query_Request)
+  : M extends 'SearchSuggestions' ? (T extends 'Response' ? CStoreQuery_SearchSuggestions_Response : CStoreQuery_SearchSuggestions_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespStoreMarketingType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'StoreMarketing' = 'StoreMarketing',
+> = T extends never ? never
+  : M extends 'GetFrontPageConfig' ? (T extends 'Response' ? CStoreMarketing_GetFrontPageConfig_Response : CStoreMarketing_GetFrontPageConfig_Request)
+  : M extends 'GetItemsToFeature' ? (T extends 'Response' ? CStoreMarketing_GetItemsToFeature_Response : CStoreMarketing_GetItemsToFeature_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespStoreCatalogType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'StoreCatalog' = 'StoreCatalog',
+> = T extends never ? never
+  : M extends 'GetDevPageAllAppsLinked' ? (T extends 'Response' ? CStoreCatalog_GetDevPageAllAppsLinked_Response : CStoreCatalog_GetDevPageAllAppsLinked_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespStoreBrowseType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'StoreBrowse' = 'StoreBrowse',
+> = T extends never ? never
+  : M extends 'GetDLCForApps' ? (T extends 'Response' ? CStoreBrowse_GetDLCForApps_Response : CStoreBrowse_GetDLCForApps_Request)
+  : M extends 'GetDLCForAppsSolr' ? (T extends 'Response' ? CStoreBrowse_GetDLCForAppsSolr_Response : CStoreBrowse_GetDLCForAppsSolr_Request)
+  : M extends 'GetHardwareItems' ? (T extends 'Response' ? CStoreBrowse_GetHardwareItems_Response : CStoreBrowse_GetHardwareItems_Request)
+  : M extends 'GetItems' ? (T extends 'Response' ? CStoreBrowse_GetItems_Response : CStoreBrowse_GetItems_Request)
+  : M extends 'GetPriceStops' ? (T extends 'Response' ? CStoreBrowse_GetPriceStops_Response : CStoreBrowse_GetPriceStops_Request)
+  : M extends 'GetStoreCategories' ? (T extends 'Response' ? CStoreBrowse_GetStoreCategories_Response : CStoreBrowse_GetStoreCategories_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespStoreAppSimilarityType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'StoreAppSimilarity' = 'StoreAppSimilarity',
+> = T extends never ? never
+  : M extends 'IdentifyClustersFromPlaytime' ? (T extends 'Response' ? CStoreAppSimilarity_IdentifyClustersFromPlaytime_Response : CStoreAppSimilarity_IdentifyClustersFromPlaytime_Request)
+  : M extends 'PrioritizeAppsForUser' ? (T extends 'Response' ? CStoreAppSimilarity_PrioritizeAppsForUser_Response : CStoreAppSimilarity_PrioritizeAppsForUser_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespStoreType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'Store' = 'Store',
+> = T extends never ? never
+  : M extends 'DeleteReservationPositionMessage' ? (T extends 'Response' ? CStore_DeleteReservationPositionMessage_Response : CStore_DeleteReservationPositionMessage_Request)
+  : M extends 'GetAllReservationPositionMessages' ? (T extends 'Response' ? CStore_GetAllReservationPositionMessages_Response : CStore_GetAllReservationPositionMessages_Request)
+  : M extends 'GetDiscoveryQueue' ? (T extends 'Response' ? CStore_GetDiscoveryQueue_Response : CStore_GetDiscoveryQueue_Request)
+  : M extends 'GetDiscoveryQueueSettings' ? (T extends 'Response' ? CStore_GetDiscoveryQueueSettings_Response : CStore_GetDiscoveryQueueSettings_Request)
+  : M extends 'GetDiscoveryQueueSkippedApps' ? (T extends 'Response' ? CStore_GetDiscoveryQueueSkippedApps_Response : CStore_GetDiscoveryQueueSkippedApps_Request)
+  : M extends 'GetLocalizedNameForTags' ? (T extends 'Response' ? CStore_GetLocalizedNameForTags_Response : CStore_GetLocalizedNameForTags_Request)
+  : M extends 'GetMostPopularTags' ? (T extends 'Response' ? CStore_GetMostPopularTags_Response : CStore_GetMostPopularTags_Request)
+  : M extends 'GetStorePreferences' ? (T extends 'Response' ? CStore_GetStorePreferences_Response : CStore_GetStorePreferences_Request)
+  : M extends 'GetTagList' ? (T extends 'Response' ? CStore_GetTagList_Response : CStore_GetTagList_Request)
+  : M extends 'GetTrendingAppsAmongFriends' ? (T extends 'Response' ? CStore_GetTrendingAppsAmongFriends_Response : CStore_GetTrendingAppsAmongFriends_Request)
+  : M extends 'GetUserGameInterestState' ? (T extends 'Response' ? CStore_GetUserGameInterestState_Response : CStore_GetUserGameInterestState_Request)
+  : M extends 'GetWishlistDemoEmailStatus' ? (T extends 'Response' ? CStore_GetWishlistDemoEmailStatus_Response : CStore_GetWishlistDemoEmailStatus_Request)
+  : M extends 'QueueWishlistDemoEmailToFire' ? (T extends 'Response' ? CStore_QueueWishlistDemoEmailToFire_Response : CStore_QueueWishlistDemoEmailToFire_Request)
+  : M extends 'RegisterCDKey' ? (T extends 'Response' ? CStore_RegisterCDKey_Response : CStore_RegisterCDKey_Request)
+  : M extends 'ReportApp' ? (T extends 'Response' ? CStore_ReportApp_Response : CStore_ReportApp_Request)
+  : M extends 'SetCompatibilityFeedback' ? (T extends 'Response' ? CSteamDeckCompatibility_SetFeedback_Response : CSteamDeckCompatibility_SetFeedback_Request)
+  : M extends 'SetReservationPositionMessage' ? (T extends 'Response' ? CStore_SetReservationPositionMessage_Response : CStore_SetReservationPositionMessage_Request)
+  : M extends 'ShouldPromptForCompatibilityFeedback' ? (T extends 'Response' ? CSteamDeckCompatibility_ShouldPrompt_Response : CSteamDeckCompatibility_ShouldPrompt_Request)
+  : M extends 'SkipDiscoveryQueueItem' ? (T extends 'Response' ? CStore_SkipDiscoveryQueueItem_Response : CStore_SkipDiscoveryQueueItem_Request)
+  : M extends 'UpdatePackageReservations' ? (T extends 'Response' ? CStore_UpdatePackageReservations_Response : CStore_UpdatePackageReservations_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespStoreClientType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'StoreClient' = 'StoreClient',
+> = T extends never ? never
+  : M extends 'NotifyStorePreferencesChanged' ? (T extends 'Response' ? NoResponse : CStore_StorePreferencesChanged_Notification)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespSteamNotificationType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'SteamNotification' = 'SteamNotification',
+> = T extends never ? never
+  : M extends 'GetPreferences' ? (T extends 'Response' ? CSteamNotification_GetPreferences_Response : CSteamNotification_GetPreferences_Request)
+  : M extends 'GetSteamNotifications' ? (T extends 'Response' ? CSteamNotification_GetSteamNotifications_Response : CSteamNotification_GetSteamNotifications_Request)
+  : M extends 'SetPreferences' ? (T extends 'Response' ? CSteamNotification_SetPreferences_Response : CSteamNotification_SetPreferences_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespSteamNotificationClientType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'SteamNotificationClient' = 'SteamNotificationClient',
+> = T extends never ? never
+  : M extends 'NotificationsReceived' ? (T extends 'Response' ? NoResponse : CSteamNotification_NotificationsReceived_Notification)
+  : M extends 'PreferencesUpdated' ? (T extends 'Response' ? NoResponse : CSteamNotification_PreferencesUpdated_Notification)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespSteamChartsType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'SteamCharts' = 'SteamCharts',
+> = T extends never ? never
+  : M extends 'GetBestOfYearPages' ? (T extends 'Response' ? CSteamCharts_GetBestOfYearPages_Response : CSteamCharts_GetBestOfYearPages_Request)
+  : M extends 'GetGamesByConcurrentPlayers' ? (T extends 'Response' ? CSteamCharts_GetGamesByConcurrentPlayers_Response : CSteamCharts_GetGamesByConcurrentPlayers_Request)
+  : M extends 'GetMostPlayedGames' ? (T extends 'Response' ? CSteamCharts_GetMostPlayedGames_Response : CSteamCharts_GetMostPlayedGames_Request)
+  : M extends 'GetMostPlayedSteamDeckGames' ? (T extends 'Response' ? CSteamCharts_GetMostPlayedSteamDeckGames_Response : CSteamCharts_GetMostPlayedSteamDeckGames_Request)
+  : M extends 'GetTopReleasesPages' ? (T extends 'Response' ? CSteamCharts_GetTopReleasesPages_Response : CSteamCharts_GetTopReleasesPages_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespSteamAwardsType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'SteamAwards' = 'SteamAwards',
+> = T extends never ? never
+  : M extends 'GetNominationRecommendations' ? (T extends 'Response' ? CSteamAwards_GetNominationRecommendations_Response : CSteamAwards_GetNominationRecommendations_Request)
+  : M extends 'GetNominationShareLink' ? (T extends 'Response' ? CSteamAwards_GetNominationShareLink_Response : CSteamAwards_GetNominationShareLink_Request)
+  : M extends 'GetOtherUserNominations' ? (T extends 'Response' ? CSteamAwards_GetUserNominations_Response : CSteamAwards_GetOtherUserNominations_Request)
+  : M extends 'GetUserNominations' ? (T extends 'Response' ? CSteamAwards_GetUserNominations_Response : CSteamAwards_GetUserNominations_Request)
+  : M extends 'Nominate' ? (T extends 'Response' ? CSteamAwards_Nominate_Response : CSteamAwards_Nominate_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespPublishingType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'Publishing' = 'Publishing',
+> = T extends never ? never
+  : M extends 'CreatePartnerAppOptInEmails' ? (T extends 'Response' ? CPublishing_CreatePartnerAppOptInEmail_Response : CPublishing_CreatePartnerAppOptInEmail_Request)
+  : M extends 'GetEstimatePartnerAppOptInEmail' ? (T extends 'Response' ? CPublishing_GetEstimatePartnerAppOptInEmail_Response : CPublishing_GetEstimatePartnerAppOptInEmail_Request)
+  : M extends 'GetOptInAppealsSummaryStats' ? (T extends 'Response' ? CPublishing_GetOptInAppealsSummaryStats_Response : CPublishing_GetOptInAppealsSummaryStats_Request)
+  : M extends 'GetOptInEmailTracking' ? (T extends 'Response' ? CPublishing_GetOptInEmailTracking_Response : CPublishing_GetOptInEmailTracking_Request)
+  : M extends 'GetPartnerAppOptInEmailDefAndStats' ? (T extends 'Response' ? CPublishing_GetPartnerAppOptInEmailDefAndStats_Response : CPublishing_GetPartnerAppOptInEmailDefAndStats_Request)
+  : M extends 'GetPartnerAppOptInsIDs' ? (T extends 'Response' ? CPublishing_GetPartnerAppOptInsIDs_Response : CPublishing_GetPartnerAppOptInsIDs_Request)
+  : M extends 'GetPartnerOptInInvites' ? (T extends 'Response' ? CPublishing_GetPartnerOptInInvites_Response : NotImplemented)
+  : M extends 'GetPartnerPaidGivenPackageList' ? (T extends 'Response' ? CPublishing_GetPartnerPaidGivenPackageList_Response : CPublishing_GetPartnerPaidGivenPackageList_Request)
+  : M extends 'GetSinglePartnerAppOptIn' ? (T extends 'Response' ? CPublishing_GetSinglePartnerAppOptIns_Response : CPublishing_GetSinglePartnerAppOptIns_Request)
+  : M extends 'SendPartnerOptInEmailAndWait' ? (T extends 'Response' ? CPublishing_SendPartnerAppOptInEmailAndWait_Response : CPublishing_SendPartnerAppOptInEmailAndWait_Request)
+  : M extends 'SetFeaturingOnPartnerAppOptIn' ? (T extends 'Response' ? CPublishing_SetFeaturingOnPartnerAppOptIn_Response : CPublishing_SetFeaturingOnPartnerAppOptIn_Request)
+  : M extends 'TestFirePartnerAppOptInEmail' ? (T extends 'Response' ? CPublishing_TestFirePartnerAppOptInEmail_Response : CPublishing_TestFirePartnerAppOptInEmail_Request)
+  : M extends 'UpdatePartnerAppOptInEmails' ? (T extends 'Response' ? CPublishing_UpdatePartnerAppOptInEmail_Response : CPublishing_UpdatePartnerAppOptInEmail_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespPublishedFileType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'PublishedFile' = 'PublishedFile',
+> = T extends never ? never
+  : M extends 'AddAppRelationship' ? (T extends 'Response' ? CPublishedFile_AddAppRelationship_Response : CPublishedFile_AddAppRelationship_Request)
+  : M extends 'AddChild' ? (T extends 'Response' ? CPublishedFile_AddChild_Response : CPublishedFile_AddChild_Request)
+  : M extends 'AreFilesInSubscriptionList' ? (T extends 'Response' ? CPublishedFile_AreFilesInSubscriptionList_Response : CPublishedFile_AreFilesInSubscriptionList_Request)
+  : M extends 'CanSubscribe' ? (T extends 'Response' ? CPublishedFile_CanSubscribe_Response : CPublishedFile_CanSubscribe_Request)
+  : M extends 'Delete' ? (T extends 'Response' ? CPublishedFile_Delete_Response : CPublishedFile_Delete_Request)
+  : M extends 'GetAppRelationships' ? (T extends 'Response' ? CPublishedFile_GetAppRelationships_Response : CPublishedFile_GetAppRelationships_Request)
+  : M extends 'GetAppRelationshipsBatched' ? (T extends 'Response' ? CPublishedFile_GetAppRelationshipsBatched_Response : CPublishedFile_GetAppRelationshipsBatched_Request)
+  : M extends 'GetChangeHistory' ? (T extends 'Response' ? CPublishedFile_GetChangeHistory_Response : CPublishedFile_GetChangeHistory_Request)
+  : M extends 'GetChangeHistoryEntry' ? (T extends 'Response' ? CPublishedFile_GetChangeHistoryEntry_Response : CPublishedFile_GetChangeHistoryEntry_Request)
+  : M extends 'GetContentDescriptors' ? (T extends 'Response' ? CPublishedFile_GetContentDescriptors_Response : CPublishedFile_GetContentDescriptors_Request)
+  : M extends 'GetDetails' ? (T extends 'Response' ? CPublishedFile_GetDetails_Response : CPublishedFile_GetDetails_Request)
+  : M extends 'GetItemChanges' ? (T extends 'Response' ? CPublishedFile_GetItemChanges_Response : CPublishedFile_GetItemChanges_Request)
+  : M extends 'GetItemInfo' ? (T extends 'Response' ? CPublishedFile_GetItemInfo_Response : CPublishedFile_GetItemInfo_Request)
+  : M extends 'GetSubSectionData' ? (T extends 'Response' ? CPublishedFile_GetSubSectionData_Response : CPublishedFile_GetSubSectionData_Request)
+  : M extends 'GetUserFileCount' ? (T extends 'Response' ? CPublishedFile_GetUserFiles_Response : CPublishedFile_GetUserFiles_Request)
+  : M extends 'GetUserFiles' ? (T extends 'Response' ? CPublishedFile_GetUserFiles_Response : CPublishedFile_GetUserFiles_Request)
+  : M extends 'GetUserVoteSummary' ? (T extends 'Response' ? CPublishedFile_GetUserVoteSummary_Response : CPublishedFile_GetUserVoteSummary_Request)
+  : M extends 'Publish' ? (T extends 'Response' ? CPublishedFile_Publish_Response : CPublishedFile_Publish_Request)
+  : M extends 'QueryFiles' ? (T extends 'Response' ? CPublishedFile_QueryFiles_Response : CPublishedFile_QueryFiles_Request)
+  : M extends 'RefreshVotingQueue' ? (T extends 'Response' ? CPublishedFile_RefreshVotingQueue_Response : CPublishedFile_RefreshVotingQueue_Request)
+  : M extends 'RemoveAppRelationship' ? (T extends 'Response' ? CPublishedFile_RemoveAppRelationship_Response : CPublishedFile_RemoveAppRelationship_Request)
+  : M extends 'RemoveChild' ? (T extends 'Response' ? CPublishedFile_RemoveChild_Response : CPublishedFile_RemoveChild_Request)
+  : M extends 'SetCollectionChildren' ? (T extends 'Response' ? CPublishedFile_SetCollectionChildren_Response : CPublishedFile_SetCollectionChildren_Request)
+  : M extends 'SetPlaytimeForControllerConfigs' ? (T extends 'Response' ? CPublishedFile_SetPlaytimeForControllerConfigs_Response : CPublishedFile_SetPlaytimeForControllerConfigs_Request)
+  : M extends 'SetSubscriptionListFromCollection' ? (T extends 'Response' ? CPublishedFile_SetSubscriptionListFromCollection_Response : CPublishedFile_SetSubscriptionListFromCollection_Request)
+  : M extends 'StartPlaytimeTracking' ? (T extends 'Response' ? CPublishedFile_StartPlaytimeTracking_Response : CPublishedFile_StartPlaytimeTracking_Request)
+  : M extends 'StopPlaytimeTracking' ? (T extends 'Response' ? CPublishedFile_StopPlaytimeTracking_Response : CPublishedFile_StopPlaytimeTracking_Request)
+  : M extends 'StopPlaytimeTrackingForAllAppItems' ? (T extends 'Response' ? CPublishedFile_StopPlaytimeTrackingForAllAppItems_Response : CPublishedFile_StopPlaytimeTrackingForAllAppItems_Request)
+  : M extends 'Subscribe' ? (T extends 'Response' ? CPublishedFile_Subscribe_Response : CPublishedFile_Subscribe_Request)
+  : M extends 'Unsubscribe' ? (T extends 'Response' ? CPublishedFile_Unsubscribe_Response : CPublishedFile_Unsubscribe_Request)
+  : M extends 'Update' ? (T extends 'Response' ? CPublishedFile_Update_Response : CPublishedFile_Update_Request)
+  : M extends 'UpdateContentDescriptors' ? (T extends 'Response' ? CPublishedFile_UpdateContentDescriptors_Response : CPublishedFile_UpdateContentDescriptors_Request)
+  : M extends 'Vote' ? (T extends 'Response' ? CPublishedFile_Vote_Response : CPublishedFile_Vote_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespPublishedFileClientType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'PublishedFileClient' = 'PublishedFileClient',
+> = T extends never ? never
+  : M extends 'NotifyFileDeleted' ? (T extends 'Response' ? NoResponse : CPublishedFile_FileDeleted_Client_Notification)
+  : M extends 'NotifyFileSubscribed' ? (T extends 'Response' ? NoResponse : CPublishedFile_FileSubscribed_Notification)
+  : M extends 'NotifyFileUnsubscribed' ? (T extends 'Response' ? NoResponse : CPublishedFile_FileUnsubscribed_Notification)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespPlaytestType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'Playtest' = 'Playtest',
+> = T extends never ? never
+  : M extends 'GetInvites' ? (T extends 'Response' ? CPlaytest_GetInvites_Response : CPlaytest_GetInvites_Request)
+  : M extends 'GetUserStatus' ? (T extends 'Response' ? CPlaytest_GetUserStatus_Response : CPlaytest_GetUserStatus_Request)
+  : M extends 'RequestInvite' ? (T extends 'Response' ? CPlaytest_RequestInvite_Response : CPlaytest_RequestInvite_Request)
+  : M extends 'UpdateInvites' ? (T extends 'Response' ? CPlaytest_UpdateInvites_Response : CPlaytest_UpdateInvites_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespPlayerType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'Player' = 'Player',
+> = T extends never ? never
+  : M extends 'AcceptSSA' ? (T extends 'Response' ? CPlayer_AcceptSSA_Response : CPlayer_AcceptSSA_Request)
+  : M extends 'AddFriend' ? (T extends 'Response' ? CPlayer_AddFriend_Response : CPlayer_AddFriend_Request)
+  : M extends 'ClientGetLastPlayedTimes' ? (T extends 'Response' ? CPlayer_GetLastPlayedTimes_Response : CPlayer_GetLastPlayedTimes_Request)
+  : M extends 'DeletePostedStatus' ? (T extends 'Response' ? CPlayer_DeletePostedStatus_Response : CPlayer_DeletePostedStatus_Request)
+  : M extends 'GetAchievementsProgress' ? (T extends 'Response' ? CPlayer_GetAchievementsProgress_Response : CPlayer_GetAchievementsProgress_Request)
+  : M extends 'GetAnimatedAvatar' ? (T extends 'Response' ? CPlayer_GetAnimatedAvatar_Response : CPlayer_GetAnimatedAvatar_Request)
+  : M extends 'GetAvatarFrame' ? (T extends 'Response' ? CPlayer_GetAvatarFrame_Response : CPlayer_GetAvatarFrame_Request)
+  : M extends 'GetCommunityBadgeProgress' ? (T extends 'Response' ? CPlayer_GetCommunityBadgeProgress_Response : CPlayer_GetCommunityBadgeProgress_Request)
+  : M extends 'GetCommunityPreferences' ? (T extends 'Response' ? CPlayer_GetCommunityPreferences_Response : CPlayer_GetCommunityPreferences_Request)
+  : M extends 'GetDurationControl' ? (T extends 'Response' ? CPlayer_GetDurationControl_Response : CPlayer_GetDurationControl_Request)
+  : M extends 'GetEmoticonList' ? (T extends 'Response' ? CPlayer_GetEmoticonList_Response : CPlayer_GetEmoticonList_Request)
+  : M extends 'GetFavoriteBadge' ? (T extends 'Response' ? CPlayer_GetFavoriteBadge_Response : CPlayer_GetFavoriteBadge_Request)
+  : M extends 'GetFriendsAppsActivity' ? (T extends 'Response' ? CPlayer_GetFriendsAppsActivity_Response : CPlayer_GetFriendsAppsActivity_Request)
+  : M extends 'GetFriendsGameplayInfo' ? (T extends 'Response' ? CPlayer_GetFriendsGameplayInfo_Response : CPlayer_GetFriendsGameplayInfo_Request)
+  : M extends 'GetGameAchievements' ? (T extends 'Response' ? CPlayer_GetGameAchievements_Response : CPlayer_GetGameAchievements_Request)
+  : M extends 'GetGameBadgeLevels' ? (T extends 'Response' ? CPlayer_GetGameBadgeLevels_Response : CPlayer_GetGameBadgeLevels_Request)
+  : M extends 'GetMiniProfileBackground' ? (T extends 'Response' ? CPlayer_GetMiniProfileBackground_Response : CPlayer_GetMiniProfileBackground_Request)
+  : M extends 'GetMutualFriendsForIncomingInvites' ? (T extends 'Response' ? CPlayer_GetMutualFriendsForIncomingInvites_Response : CPlayer_GetMutualFriendsForIncomingInvites_Request)
+  : M extends 'GetNewSteamAnnouncementState' ? (T extends 'Response' ? CPlayer_GetNewSteamAnnouncementState_Response : CPlayer_GetNewSteamAnnouncementState_Request)
+  : M extends 'GetNicknameList' ? (T extends 'Response' ? CPlayer_GetNicknameList_Response : CPlayer_GetNicknameList_Request)
+  : M extends 'GetOwnedGames' ? (T extends 'Response' ? CPlayer_GetOwnedGames_Response : CPlayer_GetOwnedGames_Request)
+  : M extends 'GetPerFriendPreferences' ? (T extends 'Response' ? CPlayer_GetPerFriendPreferences_Response : CPlayer_GetPerFriendPreferences_Request)
+  : M extends 'GetPlayerLinkDetails' ? (T extends 'Response' ? CPlayer_GetPlayerLinkDetails_Response : CPlayer_GetPlayerLinkDetails_Request)
+  : M extends 'GetPlayNext' ? (T extends 'Response' ? CPlayer_GetPlayNext_Response : CPlayer_GetPlayNext_Request)
+  : M extends 'GetPostedStatus' ? (T extends 'Response' ? CPlayer_GetPostedStatus_Response : CPlayer_GetPostedStatus_Request)
+  : M extends 'GetPrivacySettings' ? (T extends 'Response' ? CPlayer_GetPrivacySettings_Response : CPlayer_GetPrivacySettings_Request)
+  : M extends 'GetProfileBackground' ? (T extends 'Response' ? CPlayer_GetProfileBackground_Response : CPlayer_GetProfileBackground_Request)
+  : M extends 'GetProfileCustomization' ? (T extends 'Response' ? CPlayer_GetProfileCustomization_Response : CPlayer_GetProfileCustomization_Request)
+  : M extends 'GetProfileItemsEquipped' ? (T extends 'Response' ? CPlayer_GetProfileItemsEquipped_Response : CPlayer_GetProfileItemsEquipped_Request)
+  : M extends 'GetProfileItemsOwned' ? (T extends 'Response' ? CPlayer_GetProfileItemsOwned_Response : CPlayer_GetProfileItemsOwned_Request)
+  : M extends 'GetProfileThemesAvailable' ? (T extends 'Response' ? CPlayer_GetProfileThemesAvailable_Response : CPlayer_GetProfileThemesAvailable_Request)
+  : M extends 'GetPurchasedAndUpgradedProfileCustomizations' ? (T extends 'Response' ? CPlayer_GetPurchasedAndUpgradedProfileCustomizations_Response : CPlayer_GetPurchasedAndUpgradedProfileCustomizations_Request)
+  : M extends 'GetPurchasedProfileCustomizations' ? (T extends 'Response' ? CPlayer_GetPurchasedProfileCustomizations_Response : CPlayer_GetPurchasedProfileCustomizations_Request)
+  : M extends 'GetRecentPlaytimeSessionsForChild' ? (T extends 'Response' ? CPlayer_GetRecentPlaytimeSessionsForChild_Response : CPlayer_GetRecentPlaytimeSessionsForChild_Request)
+  : M extends 'GetSteamDeckKeyboardSkin' ? (T extends 'Response' ? CPlayer_GetSteamDeckKeyboardSkin_Response : CPlayer_GetSteamDeckKeyboardSkin_Request)
+  : M extends 'GetTextFilterWords' ? (T extends 'Response' ? CPlayer_GetTextFilterWords_Response : CPlayer_GetTextFilterWords_Request)
+  : M extends 'GetTimeSSAAccepted' ? (T extends 'Response' ? CPlayer_GetTimeSSAAccepted_Response : CPlayer_GetTimeSSAAccepted_Request)
+  : M extends 'GetTopAchievementsForGames' ? (T extends 'Response' ? CPlayer_GetTopAchievementsForGames_Response : CPlayer_GetTopAchievementsForGames_Request)
+  : M extends 'IgnoreFriend' ? (T extends 'Response' ? CPlayer_IgnoreFriend_Response : CPlayer_IgnoreFriend_Request)
+  : M extends 'PostStatusToFriends' ? (T extends 'Response' ? CPlayer_PostStatusToFriends_Response : CPlayer_PostStatusToFriends_Request)
+  : M extends 'RecordDisconnectedPlaytime' ? (T extends 'Response' ? CPlayer_RecordDisconnectedPlaytime_Response : CPlayer_RecordDisconnectedPlaytime_Request)
+  : M extends 'RemoveFriend' ? (T extends 'Response' ? CPlayer_RemoveFriend_Response : CPlayer_RemoveFriend_Request)
+  : M extends 'SetAnimatedAvatar' ? (T extends 'Response' ? CPlayer_SetAnimatedAvatar_Response : CPlayer_SetAnimatedAvatar_Request)
+  : M extends 'SetAvatarFrame' ? (T extends 'Response' ? CPlayer_SetAvatarFrame_Response : CPlayer_SetAvatarFrame_Request)
+  : M extends 'SetCommunityPreferences' ? (T extends 'Response' ? CPlayer_SetCommunityPreferences_Response : CPlayer_SetCommunityPreferences_Request)
+  : M extends 'SetEquippedProfileItemFlags' ? (T extends 'Response' ? CPlayer_SetEquippedProfileItemFlags_Response : CPlayer_SetEquippedProfileItemFlags_Request)
+  : M extends 'SetFavoriteBadge' ? (T extends 'Response' ? CPlayer_SetFavoriteBadge_Response : CPlayer_SetFavoriteBadge_Request)
+  : M extends 'SetMiniProfileBackground' ? (T extends 'Response' ? CPlayer_SetMiniProfileBackground_Response : CPlayer_SetMiniProfileBackground_Request)
+  : M extends 'SetPerFriendPreferences' ? (T extends 'Response' ? CPlayer_SetPerFriendPreferences_Response : CPlayer_SetPerFriendPreferences_Request)
+  : M extends 'SetProfileBackground' ? (T extends 'Response' ? CPlayer_SetProfileBackground_Response : CPlayer_SetProfileBackground_Request)
+  : M extends 'SetProfilePreferences' ? (T extends 'Response' ? CPlayer_SetProfilePreferences_Response : CPlayer_SetProfilePreferences_Request)
+  : M extends 'SetProfileTheme' ? (T extends 'Response' ? CPlayer_SetProfileTheme_Response : CPlayer_SetProfileTheme_Request)
+  : M extends 'SetSteamDeckKeyboardSkin' ? (T extends 'Response' ? CPlayer_SetSteamDeckKeyboardSkin_Response : CPlayer_SetSteamDeckKeyboardSkin_Request)
+  : M extends 'UpdateSteamAnnouncementLastRead' ? (T extends 'Response' ? CPlayer_UpdateSteamAnnouncementLastRead_Response : CPlayer_UpdateSteamAnnouncementLastRead_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespPlayerClientType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'PlayerClient' = 'PlayerClient',
+> = T extends never ? never
+  : M extends 'NotifyCommunityPreferencesChanged' ? (T extends 'Response' ? NoResponse : CPlayer_CommunityPreferencesChanged_Notification)
+  : M extends 'NotifyFriendEquippedProfileItemsChanged' ? (T extends 'Response' ? NoResponse : CPlayer_FriendEquippedProfileItemsChanged_Notification)
+  : M extends 'NotifyFriendNicknameChanged' ? (T extends 'Response' ? NoResponse : CPlayer_FriendNicknameChanged_Notification)
+  : M extends 'NotifyLastPlayedTimes' ? (T extends 'Response' ? NoResponse : CPlayer_LastPlayedTimes_Notification)
+  : M extends 'NotifyNewSteamAnnouncementState' ? (T extends 'Response' ? NoResponse : CPlayer_NewSteamAnnouncementState_Notification)
+  : M extends 'NotifyPerFriendPreferencesChanged' ? (T extends 'Response' ? NoResponse : CPlayer_PerFriendPreferencesChanged_Notification)
+  : M extends 'NotifyPrivacyPrivacySettingsChanged' ? (T extends 'Response' ? NoResponse : CPlayer_PrivacySettingsChanged_Notification)
+  : M extends 'NotifyTextFilterWordsChanged' ? (T extends 'Response' ? NoResponse : CPlayer_TextFilterWordsChanged_Notification)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespNewsType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'News' = 'News',
+> = T extends never ? never
+  : M extends 'ConvertHTMLToBBCode' ? (T extends 'Response' ? CNews_ConvertHTMLToBBCode_Response : CNews_ConvertHTMLToBBCode_Request)
+  : M extends 'GetBatchPublishedPartnerEvent' ? (T extends 'Response' ? CNews_GetBatchPublishedPartnerEvent_Response : CNews_GetBatchPublishedPartnerEvent_Request)
+  : M extends 'GetNewsFeedByRepublishClan' ? (T extends 'Response' ? CNews_GetNewsFeedByRepublishClan_Response : CNews_GetNewsFeedByRepublishClan_Request)
+  : M extends 'PreviewPartnerEvents' ? (T extends 'Response' ? CNews_PreviewPartnerEvents_Response : CNews_PreviewPartnerEvents_Request)
+  : M extends 'PublishPartnerEvent' ? (T extends 'Response' ? CNews_PublishPartnerEvent_Response : CNews_PublishPartnerEvent_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespLoyaltyRewardsType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'LoyaltyRewards' = 'LoyaltyRewards',
+> = T extends never ? never
+  : M extends 'AddReaction' ? (T extends 'Response' ? CLoyaltyRewards_AddReaction_Response : CLoyaltyRewards_AddReaction_Request)
+  : M extends 'BatchedQueryRewardItems' ? (T extends 'Response' ? CLoyaltyRewards_BatchedQueryRewardItems_Response : CLoyaltyRewards_BatchedQueryRewardItems_Request)
+  : M extends 'GetActivePurchaseBonuses' ? (T extends 'Response' ? CLoyaltyRewards_GetActivePurchaseBonuses_Response : CLoyaltyRewards_GetActivePurchaseBonuses_Request)
+  : M extends 'GetEligibleApps' ? (T extends 'Response' ? CLoyaltyRewards_GetEligibleApps_Response : CLoyaltyRewards_GetEligibleApps_Request)
+  : M extends 'GetEquippedProfileItems' ? (T extends 'Response' ? CLoyaltyRewards_GetEquippedProfileItems_Response : CLoyaltyRewards_GetEquippedProfileItems_Request)
+  : M extends 'GetPointsForSpend' ? (T extends 'Response' ? CLoyaltyRewards_GetPointsForSpend_Response : CLoyaltyRewards_GetPointsForSpend_Request)
+  : M extends 'GetProfileCustomizationsConfig' ? (T extends 'Response' ? CLoyaltyRewards_GetProfileCustomizationsConfig_Response : CLoyaltyRewards_GetProfileCustomizationsConfig_Request)
+  : M extends 'GetReactionConfig' ? (T extends 'Response' ? CLoyaltyRewards_GetReactionConfig_Response : CLoyaltyRewards_GetReactionConfig_Request)
+  : M extends 'GetReactions' ? (T extends 'Response' ? CLoyaltyRewards_GetReactions_Response : CLoyaltyRewards_GetReactions_Request)
+  : M extends 'GetReactionsSummaryForUser' ? (T extends 'Response' ? CLoyaltyRewards_GetReactionsSummaryForUser_Response : CLoyaltyRewards_GetReactionsSummaryForUser_Request)
+  : M extends 'GetSummary' ? (T extends 'Response' ? CLoyaltyRewards_GetSummary_Response : CLoyaltyRewards_GetSummary_Request)
+  : M extends 'QueryRewardItems' ? (T extends 'Response' ? CLoyaltyRewards_QueryRewardItems_Response : CLoyaltyRewards_QueryRewardItems_Request)
+  : M extends 'RedeemPoints' ? (T extends 'Response' ? CLoyaltyRewards_RedeemPoints_Response : CLoyaltyRewards_RedeemPoints_Request)
+  : M extends 'RedeemPointsForBadgeLevel' ? (T extends 'Response' ? CLoyaltyRewards_RedeemPoints_Response : CLoyaltyRewards_RedeemPointsForBadgeLevel_Request)
+  : M extends 'RedeemPointsForProfileCustomization' ? (T extends 'Response' ? CLoyaltyRewards_RedeemPointsForProfileCustomization_Response : CLoyaltyRewards_RedeemPointsForProfileCustomization_Request)
+  : M extends 'RedeemPointsForProfileCustomizationUpgrade' ? (T extends 'Response' ? CLoyaltyRewards_RedeemPointsForProfileCustomizationUpgrade_Response : CLoyaltyRewards_RedeemPointsForProfileCustomizationUpgrade_Request)
+  : M extends 'RedeemPointsToUpgradeItem' ? (T extends 'Response' ? CLoyaltyRewards_RedeemPoints_Response : CLoyaltyRewards_RedeemPointsToUpgradeItem_Request)
+  : M extends 'RegisterForSteamDeckRewards' ? (T extends 'Response' ? CLoyaltyRewards_RegisterForSteamDeckRewards_Response : CLoyaltyRewards_RegisterForSteamDeckRewards_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespFriendsListType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'FriendsList' = 'FriendsList',
+> = T extends never ? never
+  : M extends 'GetCategories' ? (T extends 'Response' ? CFriendsList_GetCategories_Response : CFriendsList_GetCategories_Request)
+  : M extends 'GetFavorites' ? (T extends 'Response' ? CFriendsList_GetFavorites_Response : CFriendsList_GetFavorites_Request)
+  : M extends 'GetFriendsList' ? (T extends 'Response' ? CFriendsList_GetFriendsList_Response : CFriendsList_GetFriendsList_Request)
+  : M extends 'SetFavorites' ? (T extends 'Response' ? CFriendsList_SetFavorites_Response : CFriendsList_SetFavorites_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespFriendsListClientType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'FriendsListClient' = 'FriendsListClient',
+> = T extends never ? never
+  : M extends 'FavoritesChanged' ? (T extends 'Response' ? NoResponse : CFriendsList_FavoritesChanged_Notification)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespFriendMessagesType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'FriendMessages' = 'FriendMessages',
+> = T extends never ? never
+  : M extends 'AckMessage' ? (T extends 'Response' ? NoResponse : CFriendMessages_AckMessage_Notification)
+  : M extends 'GetActiveMessageSessions' ? (T extends 'Response' ? CFriendsMessages_GetActiveMessageSessions_Response : CFriendsMessages_GetActiveMessageSessions_Request)
+  : M extends 'GetRecentMessages' ? (T extends 'Response' ? CFriendMessages_GetRecentMessages_Response : CFriendMessages_GetRecentMessages_Request)
+  : M extends 'IsInFriendsUIBeta' ? (T extends 'Response' ? CFriendMessages_IsInFriendsUIBeta_Response : CFriendMessages_IsInFriendsUIBeta_Request)
+  : M extends 'SendMessage' ? (T extends 'Response' ? CFriendMessages_SendMessage_Response : CFriendMessages_SendMessage_Request)
+  : M extends 'UpdateMessageReaction' ? (T extends 'Response' ? CFriendMessages_UpdateMessageReaction_Response : CFriendMessages_UpdateMessageReaction_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespFriendMessagesClientType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'FriendMessagesClient' = 'FriendMessagesClient',
+> = T extends never ? never
+  : M extends 'IncomingMessage' ? (T extends 'Response' ? NoResponse : CFriendMessages_IncomingMessage_Notification)
+  : M extends 'MessageReaction' ? (T extends 'Response' ? NoResponse : CFriendMessages_MessageReaction_Notification)
+  : M extends 'NotifyAckMessageEcho' ? (T extends 'Response' ? NoResponse : CFriendMessages_AckMessage_Notification)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespFamilyGroupsType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'FamilyGroups' = 'FamilyGroups',
+> = T extends never ? never
+  : M extends 'CancelFamilyGroupInvite' ? (T extends 'Response' ? CFamilyGroups_CancelFamilyGroupInvite_Response : CFamilyGroups_CancelFamilyGroupInvite_Request)
+  : M extends 'ClearCooldownSkip' ? (T extends 'Response' ? CFamilyGroups_ClearCooldownSkip_Response : CFamilyGroups_ClearCooldownSkip_Request)
+  : M extends 'ConfirmInviteToFamilyGroup' ? (T extends 'Response' ? CFamilyGroups_ConfirmInviteToFamilyGroup_Response : CFamilyGroups_ConfirmInviteToFamilyGroup_Request)
+  : M extends 'ConfirmJoinFamilyGroup' ? (T extends 'Response' ? CFamilyGroups_ConfirmJoinFamilyGroup_Response : CFamilyGroups_ConfirmJoinFamilyGroup_Request)
+  : M extends 'CreateFamilyGroup' ? (T extends 'Response' ? CFamilyGroups_CreateFamilyGroup_Response : CFamilyGroups_CreateFamilyGroup_Request)
+  : M extends 'DeleteFamilyGroup' ? (T extends 'Response' ? CFamilyGroups_DeleteFamilyGroup_Response : CFamilyGroups_DeleteFamilyGroup_Request)
+  : M extends 'ForceAcceptInvite' ? (T extends 'Response' ? CFamilyGroups_ForceAcceptInvite_Response : CFamilyGroups_ForceAcceptInvite_Request)
+  : M extends 'GetChangeLog' ? (T extends 'Response' ? CFamilyGroups_GetChangeLog_Response : CFamilyGroups_GetChangeLog_Request)
+  : M extends 'GetFamilyGroup' ? (T extends 'Response' ? CFamilyGroups_GetFamilyGroup_Response : CFamilyGroups_GetFamilyGroup_Request)
+  : M extends 'GetFamilyGroupForUser' ? (T extends 'Response' ? CFamilyGroups_GetFamilyGroupForUser_Response : CFamilyGroups_GetFamilyGroupForUser_Request)
+  : M extends 'GetInviteCheckResults' ? (T extends 'Response' ? CFamilyGroups_GetInviteCheckResults_Response : CFamilyGroups_GetInviteCheckResults_Request)
+  : M extends 'GetPlaytimeSummary' ? (T extends 'Response' ? CFamilyGroups_GetPlaytimeSummary_Response : CFamilyGroups_GetPlaytimeSummary_Request)
+  : M extends 'GetPreferredLenders' ? (T extends 'Response' ? CFamilyGroups_GetPreferredLenders_Response : CFamilyGroups_GetPreferredLenders_Request)
+  : M extends 'GetPurchaseRequests' ? (T extends 'Response' ? CFamilyGroups_GetPurchaseRequests_Response : CFamilyGroups_GetPurchaseRequests_Request)
+  : M extends 'GetSharedLibraryApps' ? (T extends 'Response' ? CFamilyGroups_GetSharedLibraryApps_Response : CFamilyGroups_GetSharedLibraryApps_Request)
+  : M extends 'GetUsersSharingDevice' ? (T extends 'Response' ? CFamilyGroups_GetUsersSharingDevice_Response : CFamilyGroups_GetUsersSharingDevice_Request)
+  : M extends 'InviteToFamilyGroup' ? (T extends 'Response' ? CFamilyGroups_InviteToFamilyGroup_Response : CFamilyGroups_InviteToFamilyGroup_Request)
+  : M extends 'JoinFamilyGroup' ? (T extends 'Response' ? CFamilyGroups_JoinFamilyGroup_Response : CFamilyGroups_JoinFamilyGroup_Request)
+  : M extends 'ModifyFamilyGroupDetails' ? (T extends 'Response' ? CFamilyGroups_ModifyFamilyGroupDetails_Response : CFamilyGroups_ModifyFamilyGroupDetails_Request)
+  : M extends 'RemoveFromFamilyGroup' ? (T extends 'Response' ? CFamilyGroups_RemoveFromFamilyGroup_Response : CFamilyGroups_RemoveFromFamilyGroup_Request)
+  : M extends 'RequestPurchase' ? (T extends 'Response' ? CFamilyGroups_RequestPurchase_Response : CFamilyGroups_RequestPurchase_Request)
+  : M extends 'ResendInvitationToFamilyGroup' ? (T extends 'Response' ? CFamilyGroups_ResendInvitationToFamilyGroup_Response : CFamilyGroups_ResendInvitationToFamilyGroup_Request)
+  : M extends 'RespondToRequestedPurchase' ? (T extends 'Response' ? CFamilyGroups_RespondToRequestedPurchase_Response : CFamilyGroups_RespondToRequestedPurchase_Request)
+  : M extends 'SetFamilyCooldownOverrides' ? (T extends 'Response' ? CFamilyGroups_SetFamilyCooldownOverrides_Response : CFamilyGroups_SetFamilyCooldownOverrides_Request)
+  : M extends 'SetPreferredLender' ? (T extends 'Response' ? CFamilyGroups_SetPreferredLender_Response : CFamilyGroups_SetPreferredLender_Request)
+  : M extends 'UndeleteFamilyGroup' ? (T extends 'Response' ? CFamilyGroups_UndeleteFamilyGroup_Response : CFamilyGroups_UndeleteFamilyGroup_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespFamilyGroupsClientType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'FamilyGroupsClient' = 'FamilyGroupsClient',
+> = T extends never ? never
+  : M extends 'NotifyGroupChanged' ? (T extends 'Response' ? NoResponse : CFamilyGroupsClient_GroupChanged_Notification)
+  : M extends 'NotifyInviteStatus' ? (T extends 'Response' ? NoResponse : CFamilyGroupsClient_InviteStatus_Notification)
+  : M extends 'NotifyRunningApps' ? (T extends 'Response' ? NoResponse : CFamilyGroupsClient_NotifyRunningApps_Notification)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespExperimentServiceType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'ExperimentService' = 'ExperimentService',
+> = T extends never ? never
+  : M extends 'ReportProductImpressionsFromClient' ? (T extends 'Response' ? NoResponse : NotImplemented)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespEconType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'Econ' = 'Econ',
+> = T extends never ? never
+  : M extends 'ClientGetItemShopOverlayAuthURL' ? (T extends 'Response' ? CEcon_ClientGetItemShopOverlayAuthURL_Response : CEcon_ClientGetItemShopOverlayAuthURL_Request)
+  : M extends 'GetAssetClassInfo' ? (T extends 'Response' ? CEcon_GetAssetClassInfo_Response : CEcon_GetAssetClassInfo_Request)
+  : M extends 'GetInventoryItemsWithDescriptions' ? (T extends 'Response' ? CEcon_GetInventoryItemsWithDescriptions_Response : CEcon_GetInventoryItemsWithDescriptions_Request)
+  : M extends 'GetTradeOfferAccessToken' ? (T extends 'Response' ? CEcon_GetTradeOfferAccessToken_Response : CEcon_GetTradeOfferAccessToken_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespCommunityType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'Community' = 'Community',
+> = T extends never ? never
+  : M extends 'ClearSinglePartnerEventsAppPriority' ? (T extends 'Response' ? CCommunity_ClearSinglePartnerEventsAppPriority_Response : CCommunity_ClearSinglePartnerEventsAppPriority_Request)
+  : M extends 'ClearUserPartnerEventsAppPriorities' ? (T extends 'Response' ? CCommunity_ClearUserPartnerEventsAppPriorities_Response : CCommunity_ClearUserPartnerEventsAppPriorities_Request)
+  : M extends 'DeleteCommentFromThread' ? (T extends 'Response' ? CCommunity_DeleteCommentFromThread_Response : CCommunity_DeleteCommentFromThread_Request)
+  : M extends 'FetchTranslationFromCrowdIn' ? (T extends 'Response' ? CCommunity_FetchTranslationFromCrowdIn_Response : CCommunity_FetchTranslationFromCrowdIn_Request)
+  : M extends 'GetAppRichPresenceLocalization' ? (T extends 'Response' ? CCommunity_GetAppRichPresenceLocalization_Response : CCommunity_GetAppRichPresenceLocalization_Request)
+  : M extends 'GetApps' ? (T extends 'Response' ? CCommunity_GetApps_Response : CCommunity_GetApps_Request)
+  : M extends 'GetAvatarHistory' ? (T extends 'Response' ? CCommunity_GetAvatarHistory_Response : CCommunity_GetAvatarHistory_Request)
+  : M extends 'GetBestEventsForUser' ? (T extends 'Response' ? CCommunity_GetBestEventsForUser_Response : CCommunity_GetBestEventsForUser_Request)
+  : M extends 'GetClanAnnouncementVoteForUser' ? (T extends 'Response' ? CCommunity_GetClanAnnouncementVoteForUser_Response : CCommunity_GetClanAnnouncementVoteForUser_Request)
+  : M extends 'GetClanCrowdInMetadata' ? (T extends 'Response' ? CCommunity_GetClanCrowdInMetadata_Response : CCommunity_GetClanCrowdInMetadata_Request)
+  : M extends 'GetClanEventCrowdInMetadata' ? (T extends 'Response' ? CCommunity_GetClanEventCrowdInMetadata_Response : CCommunity_GetClanEventCrowdInMetadata_Request)
+  : M extends 'GetCommentThread' ? (T extends 'Response' ? CCommunity_GetCommentThread_Response : CCommunity_GetCommentThread_Request)
+  : M extends 'GetCommentThreadRatings' ? (T extends 'Response' ? CCommunity_GetCommentThreadRatings_Response : CCommunity_GetCommentThreadRatings_Request)
+  : M extends 'GetUserPartnerEventNews' ? (T extends 'Response' ? CCommunity_GetUserPartnerEventNews_Response : CCommunity_GetUserPartnerEventNews_Request)
+  : M extends 'GetUserPartnerEventsAppPriorities' ? (T extends 'Response' ? CCommunity_GetUserPartnerEventsAppPriorities_Response : CCommunity_GetUserPartnerEventsAppPriorities_Request)
+  : M extends 'GetUserPartnerEventViewStatus' ? (T extends 'Response' ? CCommunity_GetUserPartnerEventViewStatus_Response : CCommunity_GetUserPartnerEventViewStatus_Request)
+  : M extends 'MarkPartnerEventsForUser' ? (T extends 'Response' ? CCommunity_MarkPartnerEventsForUser_Response : CCommunity_MarkPartnerEventsForUser_Request)
+  : M extends 'PartnerEventsShowLessForApp' ? (T extends 'Response' ? CCommunity_PartnerEventsShowLessForApp_Response : CCommunity_PartnerEventsShowLessForApp_Request)
+  : M extends 'PartnerEventsShowMoreForApp' ? (T extends 'Response' ? CCommunity_PartnerEventsShowMoreForApp_Response : CCommunity_PartnerEventsShowMoreForApp_Request)
+  : M extends 'PostCommentToThread' ? (T extends 'Response' ? CCommunity_PostCommentToThread_Response : CCommunity_PostCommentToThread_Request)
+  : M extends 'RateClanAnnouncement' ? (T extends 'Response' ? CCommunity_RateClanAnnouncement_Response : CCommunity_RateClanAnnouncement_Request)
+  : M extends 'RateCommentThread' ? (T extends 'Response' ? CCommunity_RateCommentThread_Response : CCommunity_RateCommentThread_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespCloudConfigStoreType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'CloudConfigStore' = 'CloudConfigStore',
+> = T extends never ? never
+  : M extends 'Download' ? (T extends 'Response' ? CCloudConfigStore_Download_Response : CCloudConfigStore_Download_Request)
+  : M extends 'Upload' ? (T extends 'Response' ? CCloudConfigStore_Upload_Response : CCloudConfigStore_Upload_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespCloudConfigStoreClientType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'CloudConfigStoreClient' = 'CloudConfigStoreClient',
+> = T extends never ? never
+  : M extends 'NotifyChange' ? (T extends 'Response' ? NoResponse : CCloudConfigStore_Change_Notification)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespCloudType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'Cloud' = 'Cloud',
+> = T extends never ? never
+  : M extends 'BeginAppUploadBatch' ? (T extends 'Response' ? CCloud_BeginAppUploadBatch_Response : NotImplemented)
+  : M extends 'BeginHTTPUpload' ? (T extends 'Response' ? CCloud_BeginHTTPUpload_Response : NotImplemented)
+  : M extends 'BeginUGCUpload' ? (T extends 'Response' ? CCloud_BeginUGCUpload_Response : NotImplemented)
+  : M extends 'CDNReport' ? (T extends 'Response' ? NoResponse : NotImplemented)
+  : M extends 'ClientBeginFileUpload' ? (T extends 'Response' ? CCloud_ClientBeginFileUpload_Response : NotImplemented)
+  : M extends 'ClientCommitFileUpload' ? (T extends 'Response' ? CCloud_ClientCommitFileUpload_Response : NotImplemented)
+  : M extends 'ClientConflictResolution' ? (T extends 'Response' ? NoResponse : NotImplemented)
+  : M extends 'ClientDeleteFile' ? (T extends 'Response' ? CCloud_ClientDeleteFile_Response : NotImplemented)
+  : M extends 'ClientFileDownload' ? (T extends 'Response' ? CCloud_ClientFileDownload_Response : NotImplemented)
+  : M extends 'ClientGetAppQuotaUsage' ? (T extends 'Response' ? CCloud_ClientGetAppQuotaUsage_Response : NotImplemented)
+  : M extends 'ClientLogUploadCheck' ? (T extends 'Response' ? NoResponse : NotImplemented)
+  : M extends 'ClientLogUploadComplete' ? (T extends 'Response' ? NoResponse : NotImplemented)
+  : M extends 'CommitHTTPUpload' ? (T extends 'Response' ? CCloud_CommitHTTPUpload_Response : NotImplemented)
+  : M extends 'CommitUGCUpload' ? (T extends 'Response' ? CCloud_CommitUGCUpload_Response : NotImplemented)
+  : M extends 'CompleteAppUploadBatch' ? (T extends 'Response' ? NoResponse : NotImplemented)
+  : M extends 'CompleteAppUploadBatchBlocking' ? (T extends 'Response' ? CCloud_CompleteAppUploadBatch_Response : NotImplemented)
+  : M extends 'Delete' ? (T extends 'Response' ? CCloud_Delete_Response : NotImplemented)
+  : M extends 'EnumerateUserApps' ? (T extends 'Response' ? CCloud_EnumerateUserApps_Response : NotImplemented)
+  : M extends 'EnumerateUserFiles' ? (T extends 'Response' ? CCloud_EnumerateUserFiles_Response : NotImplemented)
+  : M extends 'ExternalStorageTransferReport' ? (T extends 'Response' ? NoResponse : NotImplemented)
+  : M extends 'GetAppFileChangelist' ? (T extends 'Response' ? CCloud_GetAppFileChangelist_Response : NotImplemented)
+  : M extends 'GetClientEncryptionKey' ? (T extends 'Response' ? CCloud_GetClientEncryptionKey_Response : NotImplemented)
+  : M extends 'GetFileDetails' ? (T extends 'Response' ? CCloud_GetFileDetails_Response : NotImplemented)
+  : M extends 'GetUploadServerInfo' ? (T extends 'Response' ? CCloud_GetUploadServerInfo_Response : NotImplemented)
+  : M extends 'ResumeAppSession' ? (T extends 'Response' ? CCloud_AppSessionResume_Response : NotImplemented)
+  : M extends 'SignalAppExitSyncDone' ? (T extends 'Response' ? NoResponse : NotImplemented)
+  : M extends 'SignalAppLaunchIntent' ? (T extends 'Response' ? CCloud_AppLaunchIntent_Response : NotImplemented)
+  : M extends 'SuspendAppSession' ? (T extends 'Response' ? CCloud_AppSessionSuspend_Response : NotImplemented)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespCloudClientType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'CloudClient' = 'CloudClient',
+> = T extends never ? never
+  : M extends 'ClientLogUploadRequest' ? (T extends 'Response' ? NoResponse : CCloud_ClientLogUploadRequest_Notification)
+  : M extends 'NotifyAppStateChange' ? (T extends 'Response' ? NoResponse : CCloud_AppCloudStateChange_Notification)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespClientCommType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'ClientComm' = 'ClientComm',
+> = T extends never ? never
+  : M extends 'EnableOrDisableDownloads' ? (T extends 'Response' ? CClientComm_EnableOrDisableDownloads_Response : CClientComm_EnableOrDisableDownloads_Request)
+  : M extends 'GetAllClientLogonInfo' ? (T extends 'Response' ? CClientComm_GetAllClientLogonInfo_Response : CClientComm_GetAllClientLogonInfo_Request)
+  : M extends 'GetClientAppList' ? (T extends 'Response' ? CClientComm_GetClientAppList_Response : CClientComm_GetClientAppList_Request)
+  : M extends 'GetClientInfo' ? (T extends 'Response' ? CClientComm_GetClientInfo_Response : CClientComm_GetClientInfo_Request)
+  : M extends 'GetClientLogonInfo' ? (T extends 'Response' ? CClientComm_GetClientLogonInfo_Response : CClientComm_GetClientLogonInfo_Request)
+  : M extends 'InstallClientApp' ? (T extends 'Response' ? CClientComm_InstallClientApp_Response : CClientComm_InstallClientApp_Request)
+  : M extends 'LaunchClientApp' ? (T extends 'Response' ? CClientComm_LaunchClientApp_Response : CClientComm_LaunchClientApp_Request)
+  : M extends 'SetClientAppUpdateState' ? (T extends 'Response' ? CClientComm_SetClientAppUpdateState_Response : CClientComm_SetClientAppUpdateState_Request)
+  : M extends 'UninstallClientApp' ? (T extends 'Response' ? CClientComm_UninstallClientApp_Response : CClientComm_UninstallClientApp_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespAuthenticationSupportType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'AuthenticationSupport' = 'AuthenticationSupport',
+> = T extends never ? never
+  : M extends 'GetTokenHistory' ? (T extends 'Response' ? CAuthenticationSupport_GetTokenHistory_Response : CAuthenticationSupport_GetTokenHistory_Request)
+  : M extends 'MarkTokenCompromised' ? (T extends 'Response' ? CAuthenticationSupport_MarkTokenCompromised_Response : CAuthenticationSupport_MarkTokenCompromised_Request)
+  : M extends 'QueryRefreshTokenByID' ? (T extends 'Response' ? CAuthenticationSupport_QueryRefreshTokenByID_Response : CAuthenticationSupport_QueryRefreshTokenByID_Request)
+  : M extends 'QueryRefreshTokensByAccount' ? (T extends 'Response' ? CAuthenticationSupport_QueryRefreshTokensByAccount_Response : CAuthenticationSupport_QueryRefreshTokensByAccount_Request)
+  : M extends 'RevokeToken' ? (T extends 'Response' ? CAuthenticationSupport_RevokeToken_Response : CAuthenticationSupport_RevokeToken_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespAuthenticationType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'Authentication' = 'Authentication',
+> = T extends never ? never
+  : M extends 'BeginAuthSessionViaCredentials' ? (T extends 'Response' ? CAuthentication_BeginAuthSessionViaCredentials_Response : CAuthentication_BeginAuthSessionViaCredentials_Request)
+  : M extends 'BeginAuthSessionViaQR' ? (T extends 'Response' ? CAuthentication_BeginAuthSessionViaQR_Response : CAuthentication_BeginAuthSessionViaQR_Request)
+  : M extends 'EnumerateTokens' ? (T extends 'Response' ? CAuthentication_RefreshToken_Enumerate_Response : CAuthentication_RefreshToken_Enumerate_Request)
+  : M extends 'GenerateAccessTokenForApp' ? (T extends 'Response' ? CAuthentication_AccessToken_GenerateForApp_Response : CAuthentication_AccessToken_GenerateForApp_Request)
+  : M extends 'GetAuthSessionInfo' ? (T extends 'Response' ? CAuthentication_GetAuthSessionInfo_Response : CAuthentication_GetAuthSessionInfo_Request)
+  : M extends 'GetAuthSessionRiskInfo' ? (T extends 'Response' ? CAuthentication_GetAuthSessionRiskInfo_Response : CAuthentication_GetAuthSessionRiskInfo_Request)
+  : M extends 'GetAuthSessionsForAccount' ? (T extends 'Response' ? CAuthentication_GetAuthSessionsForAccount_Response : CAuthentication_GetAuthSessionsForAccount_Request)
+  : M extends 'GetPasswordRSAPublicKey' ? (T extends 'Response' ? CAuthentication_GetPasswordRSAPublicKey_Response : CAuthentication_GetPasswordRSAPublicKey_Request)
+  : M extends 'MigrateMobileSession' ? (T extends 'Response' ? CAuthentication_MigrateMobileSession_Response : CAuthentication_MigrateMobileSession_Request)
+  : M extends 'PollAuthSessionStatus' ? (T extends 'Response' ? CAuthentication_PollAuthSessionStatus_Response : CAuthentication_PollAuthSessionStatus_Request)
+  : M extends 'RevokeRefreshToken' ? (T extends 'Response' ? CAuthentication_RefreshToken_Revoke_Response : CAuthentication_RefreshToken_Revoke_Request)
+  : M extends 'RevokeToken' ? (T extends 'Response' ? CAuthentication_Token_Revoke_Response : CAuthentication_Token_Revoke_Request)
+  : M extends 'UpdateAuthSessionWithMobileConfirmation' ? (T extends 'Response' ? CAuthentication_UpdateAuthSessionWithMobileConfirmation_Response : CAuthentication_UpdateAuthSessionWithMobileConfirmation_Request)
+  : M extends 'UpdateAuthSessionWithSteamGuardCode' ? (T extends 'Response' ? CAuthentication_UpdateAuthSessionWithSteamGuardCode_Response : CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespAchievementsType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'Achievements' = 'Achievements',
+> = T extends never ? never
+  : M extends 'GetInfo' ? (T extends 'Response' ? CAchievements_GetInfo_Response : CAchievements_GetInfo_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespAccountPrivateAppsType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'AccountPrivateApps' = 'AccountPrivateApps',
+> = T extends never ? never
+  : M extends 'GetPrivateAppList' ? (T extends 'Response' ? CAccountPrivateApps_GetPrivateAppList_Response : CAccountPrivateApps_GetPrivateAppList_Request)
+  : M extends 'ToggleAppPrivacy' ? (T extends 'Response' ? CAccountPrivateApps_ToggleAppPrivacy_Response : CAccountPrivateApps_ToggleAppPrivacy_Request)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespAccountPrivateAppsClientType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'AccountPrivateAppsClient' = 'AccountPrivateAppsClient',
+> = T extends never ? never
+  : M extends 'NotifyPrivateAppListChanged' ? (T extends 'Response' ? NoResponse : CAccountPrivateApsClient_NotifyPrivateAppListChanged_Notification)
+: never
+    
+
+
+
+type InferSteamStdReqOrRespAccountPrivacyType<
+    M extends ServiceMethodDict<S>,
+    T extends 'Request'|'Response',
+    S extends 'AccountPrivacy' = 'AccountPrivacy',
+> = T extends never ? never
+  : M extends 'GetCookiePreferences' ? (T extends 'Response' ? CAccountPrivacy_GetCookiePreferences_Response : CAccountPrivacy_GetCookiePreferences_Request)
+: never
+    
+
+
+export type InferSteamStdReqOrRespType<
+  S extends ServiceDict,
+  M extends ServiceMethodDict<S>,
+  T extends 'Response' | 'Request'
+> =  S extends never ? never
+  : M extends ServiceMethodDict<'Wishlist'> ? InferSteamStdReqOrRespWishlistType<M,T>
+  : M extends ServiceMethodDict<'UserNews'> ? InferSteamStdReqOrRespUserNewsType<M,T>
+  : M extends ServiceMethodDict<'UserGameNotes'> ? InferSteamStdReqOrRespUserGameNotesType<M,T>
+  : M extends ServiceMethodDict<'UserGameActivity'> ? InferSteamStdReqOrRespUserGameActivityType<M,T>
+  : M extends ServiceMethodDict<'UserAccount'> ? InferSteamStdReqOrRespUserAccountType<M,T>
+  : M extends ServiceMethodDict<'StoreSales'> ? InferSteamStdReqOrRespStoreSalesType<M,T>
+  : M extends ServiceMethodDict<'StoreQuery'> ? InferSteamStdReqOrRespStoreQueryType<M,T>
+  : M extends ServiceMethodDict<'StoreMarketing'> ? InferSteamStdReqOrRespStoreMarketingType<M,T>
+  : M extends ServiceMethodDict<'StoreCatalog'> ? InferSteamStdReqOrRespStoreCatalogType<M,T>
+  : M extends ServiceMethodDict<'StoreBrowse'> ? InferSteamStdReqOrRespStoreBrowseType<M,T>
+  : M extends ServiceMethodDict<'StoreAppSimilarity'> ? InferSteamStdReqOrRespStoreAppSimilarityType<M,T>
+  : M extends ServiceMethodDict<'Store'> ? InferSteamStdReqOrRespStoreType<M,T>
+  : M extends ServiceMethodDict<'StoreClient'> ? InferSteamStdReqOrRespStoreClientType<M,T>
+  : M extends ServiceMethodDict<'SteamNotification'> ? InferSteamStdReqOrRespSteamNotificationType<M,T>
+  : M extends ServiceMethodDict<'SteamNotificationClient'> ? InferSteamStdReqOrRespSteamNotificationClientType<M,T>
+  : M extends ServiceMethodDict<'SteamCharts'> ? InferSteamStdReqOrRespSteamChartsType<M,T>
+  : M extends ServiceMethodDict<'SteamAwards'> ? InferSteamStdReqOrRespSteamAwardsType<M,T>
+  : M extends ServiceMethodDict<'Publishing'> ? InferSteamStdReqOrRespPublishingType<M,T>
+  : M extends ServiceMethodDict<'PublishedFile'> ? InferSteamStdReqOrRespPublishedFileType<M,T>
+  : M extends ServiceMethodDict<'PublishedFileClient'> ? InferSteamStdReqOrRespPublishedFileClientType<M,T>
+  : M extends ServiceMethodDict<'Playtest'> ? InferSteamStdReqOrRespPlaytestType<M,T>
+  : M extends ServiceMethodDict<'Player'> ? InferSteamStdReqOrRespPlayerType<M,T>
+  : M extends ServiceMethodDict<'PlayerClient'> ? InferSteamStdReqOrRespPlayerClientType<M,T>
+  : M extends ServiceMethodDict<'News'> ? InferSteamStdReqOrRespNewsType<M,T>
+  : M extends ServiceMethodDict<'LoyaltyRewards'> ? InferSteamStdReqOrRespLoyaltyRewardsType<M,T>
+  : M extends ServiceMethodDict<'FriendsList'> ? InferSteamStdReqOrRespFriendsListType<M,T>
+  : M extends ServiceMethodDict<'FriendsListClient'> ? InferSteamStdReqOrRespFriendsListClientType<M,T>
+  : M extends ServiceMethodDict<'FriendMessages'> ? InferSteamStdReqOrRespFriendMessagesType<M,T>
+  : M extends ServiceMethodDict<'FriendMessagesClient'> ? InferSteamStdReqOrRespFriendMessagesClientType<M,T>
+  : M extends ServiceMethodDict<'FamilyGroups'> ? InferSteamStdReqOrRespFamilyGroupsType<M,T>
+  : M extends ServiceMethodDict<'FamilyGroupsClient'> ? InferSteamStdReqOrRespFamilyGroupsClientType<M,T>
+  : M extends ServiceMethodDict<'ExperimentService'> ? InferSteamStdReqOrRespExperimentServiceType<M,T>
+  : M extends ServiceMethodDict<'Econ'> ? InferSteamStdReqOrRespEconType<M,T>
+  : M extends ServiceMethodDict<'Community'> ? InferSteamStdReqOrRespCommunityType<M,T>
+  : M extends ServiceMethodDict<'CloudConfigStore'> ? InferSteamStdReqOrRespCloudConfigStoreType<M,T>
+  : M extends ServiceMethodDict<'CloudConfigStoreClient'> ? InferSteamStdReqOrRespCloudConfigStoreClientType<M,T>
+  : M extends ServiceMethodDict<'Cloud'> ? InferSteamStdReqOrRespCloudType<M,T>
+  : M extends ServiceMethodDict<'CloudClient'> ? InferSteamStdReqOrRespCloudClientType<M,T>
+  : M extends ServiceMethodDict<'ClientComm'> ? InferSteamStdReqOrRespClientCommType<M,T>
+  : M extends ServiceMethodDict<'AuthenticationSupport'> ? InferSteamStdReqOrRespAuthenticationSupportType<M,T>
+  : M extends ServiceMethodDict<'Authentication'> ? InferSteamStdReqOrRespAuthenticationType<M,T>
+  : M extends ServiceMethodDict<'Achievements'> ? InferSteamStdReqOrRespAchievementsType<M,T>
+  : M extends ServiceMethodDict<'AccountPrivateApps'> ? InferSteamStdReqOrRespAccountPrivateAppsType<M,T>
+  : M extends ServiceMethodDict<'AccountPrivateAppsClient'> ? InferSteamStdReqOrRespAccountPrivateAppsClientType<M,T>
+  : M extends ServiceMethodDict<'AccountPrivacy'> ? InferSteamStdReqOrRespAccountPrivacyType<M,T>
+  : never
+    

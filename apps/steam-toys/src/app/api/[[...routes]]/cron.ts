@@ -26,9 +26,9 @@ export const refreshTokenTask = async () => {
     renew = true
   }
   const id = token.steamid
-  const res =  await steamWebStdAPI.auth.accessToken_GenerateForApp({
+  const res =  await steamWebStdAPI.authentication.generateAccessTokenForApp({
     refreshToken: refreshToken,
-    steamid: BigInt(id),
+    steamid: id,
     renewalType: renew ? 1 : 0
   })
   if(!res.success) {

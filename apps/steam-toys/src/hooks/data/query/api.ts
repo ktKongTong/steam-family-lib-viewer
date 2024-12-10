@@ -1,30 +1,34 @@
 import {f} from "@/lib/omfetch";
-import {CFamilyGroups_PlaytimeEntry, InferRespType} from "@repo/steam-proto";
+import {CFamilyGroups_PlaytimeEntryJson, InferRespJsonType } from "@repo/steam-proto";
 import {PlayerCommunityData} from "@/interface/playerStatsData";
 import _ from "lodash";
 import {PlayerSummariesResponse} from "@/hooks/data/query/interface";
 import {PlayerStats} from "@/app/receipt/interface";
-type OwnedGame = InferRespType<'Player', 'GetOwnedGames'>
-export type LibItem = OwnedGame['games'][number]
+type OwnedGame = InferRespJsonType<'Player', 'GetOwnedGames'>
+
+type NotUndefined<T> = T extends undefined ? never : T
+
+export type LibItem = NotUndefined<OwnedGame['games']>[number]
+
 export class APIService {
   static getOwnedGames({ apikey, steamid }:{ apikey:string, steamid:string }) {
     return f.get<OwnedGame>(`/api/steam/player/ownedGames?key=${apikey}&steamid=${steamid}`)
   }
   static getPlayerLinkDetails({ accessToken, steamids }:{ accessToken:string, steamids:string[] }) {
-    return f.get<InferRespType<'Player', 'GetPlayerLinkDetails'>>(`/api/steam/player/${steamids.join(',')}?access_token=${accessToken}`)
+    return f.get<InferRespJsonType<'Player', 'GetPlayerLinkDetails'>>(`/api/steam/player/${steamids.join(',')}?access_token=${accessToken}`)
   }
 
   static async getPlaytimeSummary({ accessToken, familyId }:{ accessToken:string, familyId:string }) {
-    const data = await f.get<InferRespType<'FamilyGroups', 'GetPlaytimeSummary'>>(`/api/steam/family/playtime/${familyId}?access_token=${accessToken}`)
+    const data = await f.get<InferRespJsonType<'FamilyGroups', 'GetPlaytimeSummary'>>(`/api/steam/family/playtime/${familyId}?access_token=${accessToken}`)
     return (data && calculateSharedPlaytime(data)) ?? []
   }
 
 
   static getFamilyGroupForUser(accessToken: string) {
-    return f.get<InferRespType<'FamilyGroups', 'GetFamilyGroupForUser'>>(`/api/steam/family?access_token=${accessToken}`)
+    return f.get<InferRespJsonType<'FamilyGroups', 'GetFamilyGroupForUser'>>(`/api/steam/family?access_token=${accessToken}`)
   }
   static getSharedLibraryApps({ accessToken, familyId }:{ accessToken:string, familyId:string }){
-    return  f.get<InferRespType<'FamilyGroups', 'GetSharedLibraryApps'>>(`/api/steam/family/shared/${familyId}?access_token=${accessToken}`)
+    return  f.get<InferRespJsonType<'FamilyGroups', 'GetSharedLibraryApps'>>(`/api/steam/family/shared/${familyId}?access_token=${accessToken}`)
   }
 
   static getCommunityStats(id: string) {
@@ -57,7 +61,7 @@ export class APIService {
   }
 
   static getStoreItems (ids: string[]) {
-    return f.get<InferRespType<'StoreBrowse', 'GetItems'>>(`/api/steam/items/${ids.join(',')}`)
+    return f.get<InferRespJsonType<'StoreBrowse', 'GetItems'>>(`/api/steam/items/${ids.join(',')}`)
   }
 }
 
@@ -65,12 +69,12 @@ export class APIService {
 
 interface SharedPlayTimeItem {
   appid: number,
-  players: (CFamilyGroups_PlaytimeEntry & {isOwner:boolean})[]
+  players: (CFamilyGroups_PlaytimeEntryJson & {isOwner:boolean})[]
 }
 
-export const calculateSharedPlaytime = (data: InferRespType<'FamilyGroups', 'GetPlaytimeSummary'>) => {
-  const appids = data.entries.flatMap((it)=>it.appid!)
-  const appidsByOwner = data.entriesByOwner.flatMap((it) => it.appid!)
+export const calculateSharedPlaytime = (data: InferRespJsonType<'FamilyGroups', 'GetPlaytimeSummary'>) => {
+  const appids = data.entries!.flatMap((it)=>it.appid!)
+  const appidsByOwner = data.entriesByOwner!.flatMap((it) => it.appid!)
   const allIds = _.uniq(appids.concat(appidsByOwner))
   const appPlaytimeDict = _.groupBy(data.entries,'appid')
   const appPlaytimeByOwnerDict = _.groupBy(data.entriesByOwner, 'appid')

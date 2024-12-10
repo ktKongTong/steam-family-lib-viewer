@@ -1,9 +1,9 @@
-import {InferRespType} from "@repo/steam-proto";
+import {InferRespJsonType} from "@repo/steam-proto";
 
 export interface PlayerStats {
-  player: InferRespType<'Player', 'GetPlayerLinkDetails'>,
-  achievementProgress: InferRespType<'Player', 'GetAchievementsProgress'>['achievementProgress'],
-  games: InferRespType<'Player', 'GetOwnedGames'>,
+  player: InferRespJsonType<'Player', 'GetPlayerLinkDetails'>,
+  achievementProgress: InferRespJsonType<'Player', 'GetAchievementsProgress'>['achievementProgress'],
+  games: InferRespJsonType<'Player', 'GetOwnedGames'>,
   community: PlayerCommunityData
 }
 

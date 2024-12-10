@@ -2,6 +2,7 @@
 
   "extends": "../../tsconfig.options.json",
   "compilerOptions": {
+    "target": "esnext",
     "emitDeclarationOnly": true,
     "jsx": "preserve",
     "outDir": "./dist/types",

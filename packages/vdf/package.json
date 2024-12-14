@@ -1,0 +1,29 @@
+{
+  "name": "@repo/steam-vdf",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsup",
+    "types": "tsc"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.mjs"
+    }
+  },
+  "files": [
+    "src",
+    "package.json",
+    "dist"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@types/wicg-file-system-access": "^2023.10.5",
+    "@types/node": "^20",
+    "typescript": "^5",
+    "tsup": "^8.3.5"
+  }
+}

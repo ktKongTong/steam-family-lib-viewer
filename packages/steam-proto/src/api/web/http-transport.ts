@@ -103,7 +103,11 @@ export const callHttpSteamStdAPI = async <
   }else {
     const arrBuf = await resp.arrayBuffer()
     const resBin = new Uint8Array(arrBuf)
-    resData = fromBinary(respSchema, resBin)
+    try {
+      resData = fromBinary(respSchema, resBin)
+    }catch (e) {
+      resData = create(respSchema, {})
+    }
   }
   let errResultHeader = resp.headers.get('x-eresult');
   let errorMessageHeader = resp.headers.get('x-error_message');

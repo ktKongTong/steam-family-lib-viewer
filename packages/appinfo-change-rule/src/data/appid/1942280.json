@@ -1,0 +1,22 @@
+{
+  "id": "appid/1942280",
+  "type": "appinfo-preset",
+  "name": "Brotato Preset",
+  "description": "A preset to set brotato localized name",
+  "createdAt": "2024-12-12",
+  "updatedAt": "2024-12-12",
+  "tags": ["Game Preset", "独立游戏", "Rouge", "Brotato"],
+  "rules": {
+    "default": [
+      {
+        "appid": 1942280,
+        "name": "Brotato",
+        "sortas": "土豆兄弟",
+        "localized": {
+          "schinese": "土豆兄弟",
+          "tchinese": "土豆兄弟"
+        }
+      }
+    ]
+  }
+}

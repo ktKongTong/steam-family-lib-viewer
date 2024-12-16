@@ -1,0 +1,12 @@
+{
+  "id": "series/sid-meier_s-civilization",
+  "type": "appinfo-preset",
+  "name": "Sid Meier’s Civilization Preset",
+  "description": "A preset to set Sid Meier’s Civilization Series localized name",
+  "createAt": "2024-12-12",
+  "updateAt": "2024-12-12",
+  "tags": ["Publisher", "Sid Meier’s Civilization", "Civilization"],
+  "rules": [
+    "appinfo-preset://appid/289070"
+  ]
+}

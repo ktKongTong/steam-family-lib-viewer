@@ -1,49 +1,71 @@
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import {getTextCheckSum, readBVDF, vdfToTextFormat, writeAppInfoBinaryVDF} from "@repo/steam-vdf";
-import {FormEvent, useState} from "react";
-import {BVDFField} from "@repo/steam-vdf";
+import { readBVDF, writeAppInfoBinaryVDF} from "@repo/steam-vdf";
+import { useState } from "react";
+import { BVDFField } from "@repo/steam-vdf";
 
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "./components/ui/popover"
+import AppInfoRulePreset from "./preset.tsx";
+import {presets, AppinfoPreset, applyAppinfoPresets} from "@repo/steam-appinfo-change-rule";
 
 function App() {
   const [appinfos , setAppinfos] = useState<AppInfoItemProps[]>([])
+
+  const [handle, setHandle] = useState<FileSystemFileHandle | null>(null)
+
   const handleClick = async () => {
-    const [newHandle] = await window.showOpenFilePicker();
-    const f = await newHandle.getFile()
+    const opt = {
+      types: [{
+        description: 'Steam App Info',
+        accept: {
+          'text/steam-vdf': '.vdf' as const,
+        },
+      }],
+    }
+    const [newHandle] = await window.showOpenFilePicker(opt);
+    const permission = await newHandle.requestPermission({
+      mode: 'readwrite',
+    })
+    if(permission !== 'granted') {
+      return
+    }
+    setHandle(newHandle)
+    await loadData(newHandle)
+  }
+
+  const loadData = async (handle: FileSystemFileHandle) => {
+    const f = await handle!.getFile()
     const buf = await f.arrayBuffer()
     const res = await readBVDF(buf)
     setAppinfos(res as any)
     console.log(res)
   }
 
-  const showdata = async () => {
-    console.log(appinfos)
-  }
-
   const saveData = async () => {
-
-    const options = {
-      types: [{
-        description: 'Steam App Info',
-        accept: {
-          'text/steam-vdf': ['.vdf'],
-        },
-      }],
-    };
-    // @ts-ignore
-    const handle = await window.showSaveFilePicker(options);
-    console.log("writing")
+    if(!handle) {
+      return
+    }
     const buf = await writeAppInfoBinaryVDF(appinfos, '0x29')
     const writable = await handle.createWritable();
     await writable.write(buf);
     await writable.close();
+  }
 
+  const [selectedPreset, setSelectedPreset] = useState<string[]>([])
+  const applyChangeset = () => {
+    const _presets = selectedPreset.map(id=>presets.find(it=>it.id === id))
+      .filter(it=>it) as unknown as AppinfoPreset[]
+    applyAppinfoPresets(appinfos, _presets)
+  }
+  const handleChangeSelectedPreset = (id: string) => {
+    if (selectedPreset.includes(id)) {
+      setSelectedPreset(selectedPreset.filter(it=>it !== id))
+    }else {
+      setSelectedPreset([...selectedPreset, id])
+    }
   }
 
   return (
@@ -51,25 +73,40 @@ function App() {
       <button onClick={handleClick}>
         select file
       </button>
-      <button onClick={showdata}>
-        show data
+      <button onClick={applyChangeset}>
+        apply changeset
       </button>
       <button onClick={saveData}>
         save data
       </button>
-      <div className="card">
-
-        <div className={'grid grid-cols-4 '}>
+      <div className="card max-h-[800px] overflow-y-auto">
+        <div className={'grid grid-cols-4'}>
+          {
+            presets.map((it, idx) => {
+              return <div className={'relative border rounded-lg p-4 m-2 bg-primary-foreground'} key={it.id}>
+                        <AppInfoRulePreset {...it} className={''} />
+                        <div className={'absolute bottom-2 right-4'}>
+                          <input
+                            type={'checkbox'}
+                            className={'w-4 h-4 checked:bg-primary checked:text-primary-foreground'}
+                            onChange={(e)=>{handleChangeSelectedPreset(it.id)}}
+                            value={selectedPreset.includes(it.id)?.toString()}
+                          />
+                        </div>
+                     </div>
+            })
+          }
+        </div>
+      </div>
+      <div className="card max-h-[800px] overflow-y-auto">
+        <div className={'grid grid-cols-4'}>
           {
             appinfos.map((it, idx) => {
               return <AppItem {...it} key={it.appid}/>
             })
           }
-
         </div>
       </div>
-      <p className="read-the-docs">
-      </p>
     </main>
   )
 }
@@ -114,6 +151,16 @@ interface App {
     }
   }
 }
+
+// name
+
+// name_localized
+
+// sort_as
+
+// developer
+
+
 const AppItem = (app: AppInfoItemProps) => {
   const { appinfo } = app.data
 
@@ -131,18 +178,17 @@ const AppItem = (app: AppInfoItemProps) => {
   //   }
   // )
 
-
-  if (!appinfo?.data.common) {
+  const type = appinfo.data.common?.data.type?.data
+  if (!appinfo?.data.common || (type!='game' && type!='Game')) {
     return <></>
   }
   const icoData = appinfo.data.common?.data.icon?.data
   const iconurl = icoData ? `https://cdn.fastly.steamstatic.com/steamcommunity/public/images/apps/${app.appid}/${icoData}.jpg` : ''
-
+  const name = appinfo.data.common?.data.name?.data
   return <div className={'p-2 rounded bg-zinc-100 m-2 relative flex flex-col '}>
     <div className={'flex gap-2'}>
       <img src={iconurl} alt="" className={'w-4 h-4 rounded'}/>
-      <span className={'text-xs font-medium'}>{appinfo.data.common?.data.name?.data}</span>
-
+      <span className={'text-xs font-medium'}>{name}</span>
     {/* 编辑 名称编辑、排序规则... */}
 
     </div>
@@ -184,6 +230,7 @@ const VDF = ({field}: {
       d = Boolean(d)
     } else if(inputType === 'text' && type == 'uint64') {
       d = BigInt(d)
+    } else if(inputType === 'text' && type == 'str') {
     }else {
       return
     }

@@ -1,0 +1,12 @@
+{
+  "id": "publisher/electronic-arts",
+  "type": "appinfo-preset",
+  "name": "EA Preset",
+  "description": "A preset to set EA publisher localized name",
+  "createAt": "2024-12-12",
+  "updateAt": "2024-12-12",
+  "tags": ["Publisher", "Electronic Art", "EA"],
+  "rules": [
+    "appinfo-preset://appid/1942280?variant=default"
+  ]
+}

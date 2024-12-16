@@ -1,0 +1,24 @@
+{
+  "id": "appid/289070",
+  "type": "appinfo-preset",
+  "name": "Sid Meier’s Civilization VI Preset",
+  "description": "A preset to set Sid Meier’s Civilization VI localized name",
+  "createdAt": "2024-12-12",
+  "updatedAt": "2024-12-12",
+  "tags": ["Game Preset", "Civilization"],
+  "rules": {
+    "default": [
+      {
+        "appid": 289070,
+        "name": "Sid Meier’s Civilization VI",
+        "modifiedName": "Sid Meier’s Civilization VI",
+        "sortas": "Sid Meier’s Civilization VI",
+        "localized": {
+          "english": "Sid Meier’s Civilization VI",
+          "schinese": "文明六",
+          "tchinese": "文明六"
+        }
+      }
+    ]
+  }
+}

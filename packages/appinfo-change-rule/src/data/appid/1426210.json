@@ -1,0 +1,23 @@
+{
+  "id": "appid/1426210",
+  "type": "appinfo-preset",
+  "name": "It takes two Preset",
+  "description": "A preset to set It takes two localized name",
+  "createdAt": "2024-12-12",
+  "updatedAt": "2024-12-12",
+  "tags": ["Game Preset", "EA", "It takes two"],
+  "rules": {
+    "default": [
+      {
+        "appid": 1426210,
+        "name": "It takes two",
+        "modifiedName": "It takes two",
+        "sortas": "双人成行",
+        "localized": {
+          "schinese": "双人成行",
+          "tchinese": "双人成行"
+        }
+      }
+    ]
+  }
+}

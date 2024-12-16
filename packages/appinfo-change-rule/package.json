@@ -1,5 +1,5 @@
 {
-  "name": "@repo/steam-vdf",
+  "name": "@repo/steam-appinfo-change-rule",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -19,6 +19,7 @@
     "dist"
   ],
   "dependencies": {
+    "@repo/steam-vdf": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20",

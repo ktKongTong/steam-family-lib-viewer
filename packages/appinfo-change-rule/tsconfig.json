@@ -1,0 +1,21 @@
+{
+
+  "extends": "../../tsconfig.options.json",
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["DOM","ESNext"],
+    "emitDeclarationOnly": true,
+    "jsx": "preserve",
+    "outDir": "./dist/types",
+    "rootDir": "src",
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "proto"],
+  "references": [
+    {
+      "path": "../shared"
+    }
+  ]
+}

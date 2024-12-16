@@ -1,0 +1,23 @@
+{
+  "id": "appid/1222700",
+  "type": "appinfo-preset",
+  "name": "A way out Preset",
+  "description": "A preset to set A way out localized name",
+  "createdAt": "2024-12-12",
+  "updatedAt": "2024-12-12",
+  "tags": ["Game Preset", "EA", "A way out"],
+  "rules": {
+    "default": [
+      {
+        "appid": 1222700,
+        "name": "A way out",
+        "modifiedName": "A way out",
+        "sortas": "A way out",
+        "localized": {
+          "schinese": "逃出升天",
+          "tchinese": "逃出升天"
+        }
+      }
+    ]
+  }
+}

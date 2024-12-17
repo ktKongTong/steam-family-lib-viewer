@@ -15,10 +15,10 @@
   "devDependencies": {
     "@types/lodash": "^4.17.0",
     "@types/node": "^20",
-    "protobufjs-cli": "^1.1.2",
     "tsup": "^8.3.5",
     "turbo": "^2.3.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "esbuild-plugin-file-path-extensions": "^2.1.4"
   },
   "resolutions": {
     "@types/react": "^18",

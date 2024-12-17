@@ -12,6 +12,7 @@
     "@ktfun/sts-i18n-react": "0.2.2",
     "@repo/shared": "workspace:*",
     "@repo/steam-proto": "workspace:*",
+    "framer-motion": "^11.13.5",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -46,18 +47,12 @@
     "echarts-wordcloud": "^2.1.0",
     "hono": "^4.6.12",
     "html-to-image": "^1.11.11",
-    "html2canvas": "^1.4.1",
-    "jsbarcode": "^3.11.6",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
-    "long": "^5.2.3",
-    "lucide-react": "^0.363.0",
+    "lucide-react": "^0.468.0",
     "next": "14.2.18",
     "ofetch": "^1.4.1",
-    "query-string": "^9.1.0",
     "react": "^18",
-    "react-dnd": "^16.0.1",
-    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18",
     "react-qr-code": "^2.0.15",
     "react-use": "^17.5.0",
@@ -69,9 +64,7 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
-    "@types/lodash": "^4.17.0",
     "@types/react-virtualized": "^9.21.30",
-    "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
@@ -79,7 +72,6 @@
     "eslint": "^8",
     "eslint-config-next": "14.1.4",
     "postcss": "^8",
-    "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "tailwindcss": "^3.3.0"
   }
 }

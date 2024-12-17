@@ -19,10 +19,5 @@
     "dist"
   ],
   "dependencies": {
-  },
-  "devDependencies": {
-    "@types/node": "^20",
-    "typescript": "^5",
-    "tsup": "^8.3.5"
   }
 }

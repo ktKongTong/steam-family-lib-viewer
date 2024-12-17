@@ -42,7 +42,8 @@ export const callHttpSteamStdAPI = async <
     method,
 }: SteamStdRequestJsonType<T, M> & {
   method?: 'GET' | 'POST',
-  codec?: 'json' | 'proto'
+  codec?: 'json' | 'proto',
+  apiCaller: (url: string, options: RequestInit) => Promise<Response>
 }
 ): Promise<
   SteamStdResponseJsonType<T, M>
@@ -95,10 +96,12 @@ export const callHttpSteamStdAPI = async <
     options.body = form
   }
   let resData
-  const resp = await fetch(url, options)
+  const apiCall = async (url: string, options: RequestInit) => {
+    return fetch(url, options)
+  }
+  const resp =  await apiCall(url, options)
   if(codec && codec === 'json') {
     let data = await resp.json().then((it: any) => it.response)
-
     resData = fromJson(respSchema, data)
   }else {
     const arrBuf = await resp.arrayBuffer()
@@ -149,23 +152,27 @@ export type RequestOpts = {
   codec?: 'json' | 'proto'
 }
 
-export const createSteamStdAPI = <T extends ServiceDict>(serviceName: T, token?: string) => {
-  let ak = token
-  return new Proxy<SteamHTTPAPI<T>>({} as any, {
-    get: <M extends ServiceMethodDict<T>>(target: any, serviceMethod: M) => {
-      // make serviceMethod First Letter to UpperCase
-      let s = serviceMethod.charAt(0).toUpperCase() + serviceMethod.slice(1) as M
-      return (param:InferReqJsonType<T, M>, requestOpts?: RequestOpts) => callHttpSteamStdAPI({
-        apiVersion: requestOpts?.apiVersion,
-        headers: requestOpts?.headers,
-        serviceName,
-        serviceMethod: s,
-        accessToken: requestOpts?.accessToken ?? ak,
-        apiKey: requestOpts?.apiKey,
-        requestData: param,
-        method: requestOpts?.method,
-        codec: requestOpts?.codec,
-      })
-    }
-  })
-}
+export const createSteamStdAPI = <T extends ServiceDict>(serviceName: T, opts?:{
+    accessToken?: string,
+    apiCaller?: (url: string, options: RequestInit) => Promise<Response>
+  }) => {
+    let ak = opts?.accessToken
+    return new Proxy<SteamHTTPAPI<T>>({} as any, {
+      get: <M extends ServiceMethodDict<T>>(target: any, serviceMethod: M) => {
+        // make serviceMethod First Letter to UpperCase
+        let s = serviceMethod.charAt(0).toUpperCase() + serviceMethod.slice(1) as M
+        return (param:InferReqJsonType<T, M>, requestOpts?: RequestOpts) => callHttpSteamStdAPI({
+          apiVersion: requestOpts?.apiVersion,
+          headers: requestOpts?.headers,
+          serviceName,
+          serviceMethod: s,
+          accessToken: requestOpts?.accessToken ?? ak,
+          apiKey: requestOpts?.apiKey,
+          requestData: param,
+          method: requestOpts?.method,
+          codec: requestOpts?.codec,
+          apiCaller: opts?.apiCaller ?? ((url, options) => fetch(url, options))
+        })
+      }
+    })
+  }

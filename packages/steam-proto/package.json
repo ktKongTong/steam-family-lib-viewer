@@ -21,19 +21,11 @@
     "dist"
   ],
   "dependencies": {
-    "@bufbuild/protobuf": "^2.2.3",
-    "jwt-decode": "^4.0.0",
-    "lodash": "^4.17.21",
-    "long": "^5.2.3",
-    "steamid": "^2.1.0"
+    "@bufbuild/protobuf": "^2.2.3"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.47.2",
     "glob": "^11.0.0",
-    "@bufbuild/protoc-gen-es": "^2.2.3",
-    "@types/node": "^20",
-    "esbuild-plugin-file-path-extensions": "^2.1.4",
-    "typescript": "^5",
-    "tsup": "^8.3.5"
+    "@bufbuild/protoc-gen-es": "^2.2.3"
   }
 }

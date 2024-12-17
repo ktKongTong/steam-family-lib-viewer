@@ -1,4 +1,3 @@
-import _ from "lodash";
 import {ua} from "../utils/ua";
 
 export class SteamCommonApi {
@@ -21,11 +20,13 @@ export class SteamCommonApi {
         appId:appId
       })).filter(app=>app.appId !== "success")
     }))
+
     const wishes = wishesByPlayer.flatMap(wish=>wish)
-    const groupedWishes = _.groupBy(wishes,'appId')
+    const groupedWishes = Object.groupBy(wishes, (it) => it.appId)
+    // const groupedWishes = _.groupBy(wishes,'appId')
     const appIds = Object.keys(groupedWishes)
     const finalWishes = appIds.map(appId => {
-      const items = groupedWishes[appId]
+      const items = groupedWishes[appId]!
       return {
         wishers: items.map(item=>item.wisher),
         appId: appId,

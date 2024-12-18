@@ -23,6 +23,7 @@ app.route('/', info)
 app.route('/', cron)
 
 app.onError((err, c) => {
+  console.error(err)
   if (err instanceof BizError) {
     return c.json({
       success: false,

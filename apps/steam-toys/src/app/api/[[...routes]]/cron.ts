@@ -2,6 +2,8 @@ import {Hono} from "hono";
 import { createClient } from '@vercel/kv';
 import {steamWebStdAPI} from "@repo/steam-proto";
 import {handlerAccessToken} from "@repo/shared";
+import {f} from "@/lib/omfetch";
+import {randomBytes} from "crypto";
 
 const cron = new Hono()
 
@@ -12,7 +14,7 @@ cron.get('/api/cron/token-refresh', async ( c )=> {
     status: 'ok'
   })
 })
-
+const proxyHost = process.env.STEAM_TOKEN_PROXY_HOST as string;
 export const refreshTokenTask = async () => {
   const kv = createClient({
     url: process.env.VERCEL_KV_REST_API_URL,
@@ -31,11 +33,20 @@ export const refreshTokenTask = async () => {
     steamid: id,
     renewalType: renew ? 1 : 0
   })
+  let newAK: string
   if(!res.success) {
-    throw new Error(`refresh token task failed: ${res.errorMessage} ${res.result}`)
+    try {
+      const sessionid = randomBytes(12).toString('hex')
+      const res = await f.get(`${proxyHost}/api/steam/auth/getToken`, { query: { nonce: refreshToken, sessionid } })
+      newAK = res.data.accessToken
+    }catch (e) {
+      throw new Error(`refresh token task failed: ${res.errorMessage} ${res.result}`)
+    }
+  }else {
+    newAK = res?.data?.accessToken ?? accessToken
   }
   const newRefreshToken = res?.data?.refreshToken ?? refreshToken
-  const newAccessToken = res?.data?.accessToken?? accessToken
+  const newAccessToken = newAK
   await kv.mset({
     'sflv:cron:refresh-token': newRefreshToken,
     'sflv:cron:access-token': newAccessToken
